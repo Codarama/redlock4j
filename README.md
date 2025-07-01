@@ -127,6 +127,77 @@ if (lock.tryLock(5, TimeUnit.SECONDS)) {
 }
 ```
 
+## Testing with Testcontainers
+
+The project includes comprehensive integration tests that use [Testcontainers](https://www.testcontainers.org/) to automatically spin up Redis containers. This means you can run the full test suite without manually setting up Redis instances.
+
+### Running Integration Tests
+
+```bash
+# Run all tests (including integration tests with Testcontainers)
+mvn test
+
+# Run only integration tests
+mvn test -Dtest=RedlockIntegrationTest
+```
+
+### Adding Testcontainers to Your Project
+
+If you want to use Testcontainers for testing your own Redlock-based applications:
+
+```xml
+<!-- Add to your test dependencies -->
+<dependency>
+    <groupId>org.testcontainers</groupId>
+    <artifactId>junit-jupiter</artifactId>
+    <version>1.19.3</version>
+    <scope>test</scope>
+</dependency>
+
+<dependency>
+    <groupId>org.testcontainers</groupId>
+    <artifactId>testcontainers</artifactId>
+    <version>1.19.3</version>
+    <scope>test</scope>
+</dependency>
+```
+
+### Example Test with Testcontainers
+
+```java
+@Testcontainers
+public class MyRedlockTest {
+
+    @Container
+    static GenericContainer<?> redis1 = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
+            .withExposedPorts(6379);
+
+    @Container
+    static GenericContainer<?> redis2 = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
+            .withExposedPorts(6379);
+
+    @Container
+    static GenericContainer<?> redis3 = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
+            .withExposedPorts(6379);
+
+    @Test
+    public void testDistributedLocking() {
+        RedlockConfiguration config = RedlockConfiguration.builder()
+            .addRedisNode("localhost", redis1.getMappedPort(6379))
+            .addRedisNode("localhost", redis2.getMappedPort(6379))
+            .addRedisNode("localhost", redis3.getMappedPort(6379))
+            .build();
+
+        try (RedlockManager manager = RedlockManager.withJedis(config)) {
+            Lock lock = manager.createLock("test-resource");
+            assertTrue(lock.tryLock());
+            // Your test logic here
+            lock.unlock();
+        }
+    }
+}
+```
+
 ## Configuration Options
 
 ### RedlockConfiguration

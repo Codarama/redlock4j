@@ -25,6 +25,11 @@ package org.codarama.redlock4j;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeAll;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -34,17 +39,38 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
 /**
- * Performance tests for Redlock functionality.
- * These tests require running Redis instances and are disabled by default.
+ * Performance tests for Redlock functionality using Testcontainers.
+ * These tests are disabled by default as they are for performance analysis.
  */
-@Disabled("Requires running Redis instances and is for performance testing")
+@Disabled("Performance tests - enable manually when needed")
+@Testcontainers
 public class RedlockPerformanceTest {
-    
-    private RedlockConfiguration createTestConfiguration() {
-        return RedlockConfiguration.builder()
-            .addRedisNode("localhost", 6379)
-            .addRedisNode("localhost", 6380)
-            .addRedisNode("localhost", 6381)
+
+    // Create 3 Redis containers for performance testing
+    @Container
+    static GenericContainer<?> redis1 = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
+            .withExposedPorts(6379)
+            .withCommand("redis-server", "--appendonly", "yes");
+
+    @Container
+    static GenericContainer<?> redis2 = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
+            .withExposedPorts(6379)
+            .withCommand("redis-server", "--appendonly", "yes");
+
+    @Container
+    static GenericContainer<?> redis3 = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
+            .withExposedPorts(6379)
+            .withCommand("redis-server", "--appendonly", "yes");
+
+    private static RedlockConfiguration testConfiguration;
+
+    @BeforeAll
+    static void setUp() {
+        // Create configuration with dynamic ports from containers
+        testConfiguration = RedlockConfiguration.builder()
+            .addRedisNode("localhost", redis1.getMappedPort(6379))
+            .addRedisNode("localhost", redis2.getMappedPort(6379))
+            .addRedisNode("localhost", redis3.getMappedPort(6379))
             .defaultLockTimeout(5, TimeUnit.SECONDS)
             .retryDelay(50, TimeUnit.MILLISECONDS)
             .maxRetryAttempts(2)
@@ -54,9 +80,7 @@ public class RedlockPerformanceTest {
     
     @Test
     public void testLockAcquisitionPerformance() throws InterruptedException {
-        RedlockConfiguration config = createTestConfiguration();
-        
-        try (RedlockManager manager = RedlockManager.withJedis(config)) {
+        try (RedlockManager manager = RedlockManager.withJedis(testConfiguration)) {
             int iterations = 1000;
             long startTime = System.currentTimeMillis();
             
@@ -86,9 +110,7 @@ public class RedlockPerformanceTest {
     
     @Test
     public void testConcurrentLockContention() throws InterruptedException {
-        RedlockConfiguration config = createTestConfiguration();
-        
-        try (RedlockManager manager = RedlockManager.withJedis(config)) {
+        try (RedlockManager manager = RedlockManager.withJedis(testConfiguration)) {
             int threadCount = 10;
             int iterationsPerThread = 100;
             String lockKey = "contention-test-lock";
@@ -153,16 +175,15 @@ public class RedlockPerformanceTest {
     
     @Test
     public void testJedisVsLettucePerformance() throws InterruptedException {
-        RedlockConfiguration config = createTestConfiguration();
         int iterations = 500;
-        
+
         // Test Jedis performance
-        long jedisTime = testDriverPerformance("Jedis", 
-            RedlockManager.withJedis(config), iterations);
-        
+        long jedisTime = testDriverPerformance("Jedis",
+            RedlockManager.withJedis(testConfiguration), iterations);
+
         // Test Lettuce performance
-        long lettuceTime = testDriverPerformance("Lettuce", 
-            RedlockManager.withLettuce(config), iterations);
+        long lettuceTime = testDriverPerformance("Lettuce",
+            RedlockManager.withLettuce(testConfiguration), iterations);
         
         System.out.println("\nDriver Performance Comparison:");
         System.out.println("Jedis total time: " + jedisTime + "ms");
@@ -204,14 +225,14 @@ public class RedlockPerformanceTest {
     @Test
     public void testLockValidityTimeAccuracy() throws InterruptedException {
         RedlockConfiguration config = RedlockConfiguration.builder()
-            .addRedisNode("localhost", 6379)
-            .addRedisNode("localhost", 6380)
-            .addRedisNode("localhost", 6381)
+            .addRedisNode("localhost", redis1.getMappedPort(6379))
+            .addRedisNode("localhost", redis2.getMappedPort(6379))
+            .addRedisNode("localhost", redis3.getMappedPort(6379))
             .defaultLockTimeout(2, TimeUnit.SECONDS) // Short timeout for testing
             .retryDelay(50, TimeUnit.MILLISECONDS)
             .maxRetryAttempts(1)
             .build();
-        
+
         try (RedlockManager manager = RedlockManager.withJedis(config)) {
             Lock lock = manager.createLock("validity-test-lock");
             
