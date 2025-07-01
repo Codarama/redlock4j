@@ -1,5 +1,10 @@
 # Redlock4j
 
+[![CI](https://github.com/Codarama/redlock4j/actions/workflows/ci.yml/badge.svg)](https://github.com/Codarama/redlock4j/actions/workflows/ci.yml)
+[![Nightly Tests](https://github.com/Codarama/redlock4j/actions/workflows/nightly.yml/badge.svg)](https://github.com/Codarama/redlock4j/actions/workflows/nightly.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Java](https://img.shields.io/badge/Java-8%2B-blue.svg)](https://openjdk.java.net/)
+
 A Java implementation of the [Redlock distributed locking algorithm](https://redis.io/docs/latest/develop/use/patterns/distributed-locks/) that implements the standard Java `java.util.concurrent.locks.Lock` interface.
 
 ## Features
@@ -295,6 +300,46 @@ This implementation follows the Redlock algorithm as specified by Redis:
 4. **Monitor Redis node health** and connection status
 5. **Consider lock validity time** for long-running operations
 6. **Use unique lock keys** to avoid conflicts between different resources
+
+## CI/CD and Testing
+
+This project uses GitHub Actions for continuous integration and comprehensive testing:
+
+### Automated Testing
+- **Pull Request Validation**: Every PR is automatically tested with compilation, unit tests, and integration tests
+- **Nightly Comprehensive Tests**: Full test suite including performance tests runs every night
+- **Multi-Platform Testing**: Tests run on Ubuntu, Windows, and macOS
+- **Multi-Java Version**: Tested against Java 8, 11, 17, and 21
+- **Multi-Redis Version**: Tested against Redis 6, 7, and latest versions
+
+### Security and Quality
+- **Dependency Security Scanning**: OWASP dependency check for known vulnerabilities
+- **Code Coverage**: JaCoCo integration for test coverage reporting
+- **License Compliance**: Automated verification of license headers
+- **Code Style**: Basic formatting and style checks
+
+### Workflows
+- **CI Workflow** (`.github/workflows/ci.yml`): Runs on every push and PR
+- **Nightly Workflow** (`.github/workflows/nightly.yml`): Comprehensive testing every night
+- **PR Validation** (`.github/workflows/pr-validation.yml`): Detailed PR validation with comments
+
+### Running Tests Locally
+```bash
+# Run all tests
+mvn test
+
+# Run only unit tests
+mvn test -Dtest=RedlockConfigurationTest
+
+# Run only integration tests
+mvn test -Dtest=RedlockIntegrationTest
+
+# Run with coverage
+mvn test jacoco:report
+
+# Security scan
+mvn org.owasp:dependency-check-maven:check
+```
 
 ## License
 
