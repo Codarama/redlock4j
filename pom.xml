@@ -6,7 +6,30 @@
   <version>1.0-SNAPSHOT</version>
   <name>redlock4j</name>
   <description>Java implementation of the Redlock distributed locking algorithm</description>
-  <url>http://maven.apache.org</url>
+  <url>https://github.com/Codarama/redlock4j</url>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>codarama</id>
+      <name>Codarama</name>
+      <organization>Codarama</organization>
+      <organizationUrl>https://github.com/Codarama</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com/Codarama/redlock4j.git</connection>
+    <developerConnection>scm:git:ssh://github.com:Codarama/redlock4j.git</developerConnection>
+    <url>https://github.com/Codarama/redlock4j/tree/main</url>
+  </scm>
 
   <properties>
     <maven.compiler.source>8</maven.compiler.source>
