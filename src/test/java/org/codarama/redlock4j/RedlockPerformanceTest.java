@@ -1,0 +1,212 @@
+package org.codarama.redlock4j;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+
+/**
+ * Performance tests for Redlock functionality.
+ * These tests require running Redis instances and are disabled by default.
+ */
+@Disabled("Requires running Redis instances and is for performance testing")
+public class RedlockPerformanceTest {
+    
+    private RedlockConfiguration createTestConfiguration() {
+        return RedlockConfiguration.builder()
+            .addRedisNode("localhost", 6379)
+            .addRedisNode("localhost", 6380)
+            .addRedisNode("localhost", 6381)
+            .defaultLockTimeout(5, TimeUnit.SECONDS)
+            .retryDelay(50, TimeUnit.MILLISECONDS)
+            .maxRetryAttempts(2)
+            .lockAcquisitionTimeout(2, TimeUnit.SECONDS)
+            .build();
+    }
+    
+    @Test
+    public void testLockAcquisitionPerformance() throws InterruptedException {
+        RedlockConfiguration config = createTestConfiguration();
+        
+        try (RedlockManager manager = RedlockManager.withJedis(config)) {
+            int iterations = 1000;
+            long startTime = System.currentTimeMillis();
+            
+            for (int i = 0; i < iterations; i++) {
+                Lock lock = manager.createLock("perf-test-" + i);
+                if (lock.tryLock()) {
+                    try {
+                        // Simulate some work
+                        Thread.sleep(1);
+                    } finally {
+                        lock.unlock();
+                    }
+                }
+            }
+            
+            long endTime = System.currentTimeMillis();
+            long totalTime = endTime - startTime;
+            double avgTime = (double) totalTime / iterations;
+            
+            System.out.println("Lock acquisition performance test:");
+            System.out.println("Total iterations: " + iterations);
+            System.out.println("Total time: " + totalTime + "ms");
+            System.out.println("Average time per lock: " + String.format("%.2f", avgTime) + "ms");
+            System.out.println("Locks per second: " + String.format("%.2f", 1000.0 / avgTime));
+        }
+    }
+    
+    @Test
+    public void testConcurrentLockContention() throws InterruptedException {
+        RedlockConfiguration config = createTestConfiguration();
+        
+        try (RedlockManager manager = RedlockManager.withJedis(config)) {
+            int threadCount = 10;
+            int iterationsPerThread = 100;
+            String lockKey = "contention-test-lock";
+            
+            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+            CountDownLatch startLatch = new CountDownLatch(1);
+            CountDownLatch endLatch = new CountDownLatch(threadCount);
+            AtomicInteger successfulLocks = new AtomicInteger(0);
+            AtomicInteger failedLocks = new AtomicInteger(0);
+            
+            long startTime = System.currentTimeMillis();
+            
+            for (int i = 0; i < threadCount; i++) {
+                final int threadId = i;
+                executor.submit(() -> {
+                    try {
+                        startLatch.await(); // Wait for all threads to be ready
+                        
+                        for (int j = 0; j < iterationsPerThread; j++) {
+                            Lock lock = manager.createLock(lockKey);
+                            if (lock.tryLock(100, TimeUnit.MILLISECONDS)) {
+                                try {
+                                    successfulLocks.incrementAndGet();
+                                    // Simulate some work
+                                    Thread.sleep(1);
+                                } finally {
+                                    lock.unlock();
+                                }
+                            } else {
+                                failedLocks.incrementAndGet();
+                            }
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    } finally {
+                        endLatch.countDown();
+                    }
+                });
+            }
+            
+            startLatch.countDown(); // Start all threads
+            endLatch.await(); // Wait for all threads to complete
+            
+            long endTime = System.currentTimeMillis();
+            long totalTime = endTime - startTime;
+            
+            executor.shutdown();
+            
+            System.out.println("\nConcurrent lock contention test:");
+            System.out.println("Threads: " + threadCount);
+            System.out.println("Iterations per thread: " + iterationsPerThread);
+            System.out.println("Total attempts: " + (threadCount * iterationsPerThread));
+            System.out.println("Successful locks: " + successfulLocks.get());
+            System.out.println("Failed locks: " + failedLocks.get());
+            System.out.println("Success rate: " + String.format("%.2f", 
+                (double) successfulLocks.get() / (threadCount * iterationsPerThread) * 100) + "%");
+            System.out.println("Total time: " + totalTime + "ms");
+            System.out.println("Average time per attempt: " + 
+                String.format("%.2f", (double) totalTime / (threadCount * iterationsPerThread)) + "ms");
+        }
+    }
+    
+    @Test
+    public void testJedisVsLettucePerformance() throws InterruptedException {
+        RedlockConfiguration config = createTestConfiguration();
+        int iterations = 500;
+        
+        // Test Jedis performance
+        long jedisTime = testDriverPerformance("Jedis", 
+            RedlockManager.withJedis(config), iterations);
+        
+        // Test Lettuce performance
+        long lettuceTime = testDriverPerformance("Lettuce", 
+            RedlockManager.withLettuce(config), iterations);
+        
+        System.out.println("\nDriver Performance Comparison:");
+        System.out.println("Jedis total time: " + jedisTime + "ms");
+        System.out.println("Lettuce total time: " + lettuceTime + "ms");
+        System.out.println("Jedis avg per lock: " + String.format("%.2f", (double) jedisTime / iterations) + "ms");
+        System.out.println("Lettuce avg per lock: " + String.format("%.2f", (double) lettuceTime / iterations) + "ms");
+        
+        if (jedisTime < lettuceTime) {
+            System.out.println("Jedis is " + String.format("%.2f", (double) lettuceTime / jedisTime) + "x faster");
+        } else {
+            System.out.println("Lettuce is " + String.format("%.2f", (double) jedisTime / lettuceTime) + "x faster");
+        }
+    }
+    
+    private long testDriverPerformance(String driverName, RedlockManager manager, int iterations)
+            throws InterruptedException {
+        try {
+            long startTime = System.currentTimeMillis();
+
+            for (int i = 0; i < iterations; i++) {
+                Lock lock = manager.createLock("perf-test-" + driverName.toLowerCase() + "-" + i);
+                if (lock.tryLock()) {
+                    try {
+                        // Simulate minimal work
+                        Thread.sleep(1);
+                    } finally {
+                        lock.unlock();
+                    }
+                }
+            }
+
+            long endTime = System.currentTimeMillis();
+            return endTime - startTime;
+        } finally {
+            manager.close();
+        }
+    }
+    
+    @Test
+    public void testLockValidityTimeAccuracy() throws InterruptedException {
+        RedlockConfiguration config = RedlockConfiguration.builder()
+            .addRedisNode("localhost", 6379)
+            .addRedisNode("localhost", 6380)
+            .addRedisNode("localhost", 6381)
+            .defaultLockTimeout(2, TimeUnit.SECONDS) // Short timeout for testing
+            .retryDelay(50, TimeUnit.MILLISECONDS)
+            .maxRetryAttempts(1)
+            .build();
+        
+        try (RedlockManager manager = RedlockManager.withJedis(config)) {
+            Lock lock = manager.createLock("validity-test-lock");
+            
+            if (lock.tryLock() && lock instanceof RedlockLock) {
+                RedlockLock redlockLock = (RedlockLock) lock;
+                
+                long initialValidity = redlockLock.getRemainingValidityTime();
+                System.out.println("\nLock validity time test:");
+                System.out.println("Initial validity time: " + initialValidity + "ms");
+                
+                Thread.sleep(500);
+                
+                long afterDelay = redlockLock.getRemainingValidityTime();
+                System.out.println("Validity after 500ms: " + afterDelay + "ms");
+                System.out.println("Actual time passed: " + (initialValidity - afterDelay) + "ms");
+                
+                redlockLock.unlock();
+            }
+        }
+    }
+}
