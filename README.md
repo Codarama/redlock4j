@@ -56,11 +56,11 @@ Add the following dependencies to your `pom.xml`:
 Add this library and your preferred Redis client to your `pom.xml`:
 
 ```xml
-<!-- This library (when published) -->
+<!-- Redlock4j from Maven Central -->
 <dependency>
     <groupId>org.codarama</groupId>
     <artifactId>redlock4j</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 </dependency>
 
 <!-- Choose either Jedis OR Lettuce -->
@@ -322,6 +322,7 @@ This project uses GitHub Actions for continuous integration and comprehensive te
 - **CI Workflow** (`.github/workflows/ci.yml`): Runs on every push and PR
 - **Nightly Workflow** (`.github/workflows/nightly.yml`): Comprehensive testing every night
 - **PR Validation** (`.github/workflows/pr-validation.yml`): Detailed PR validation with comments
+- **Release Workflow** (`.github/workflows/release.yml`): Automated Maven Central publishing
 
 ### Running Tests Locally
 ```bash
@@ -340,6 +341,42 @@ mvn test jacoco:report
 # Security scan
 mvn org.owasp:dependency-check-maven:check
 ```
+
+## Releases and Maven Central
+
+Redlock4j is automatically published to Maven Central when new GitHub releases are created.
+
+### Latest Release
+
+The latest stable version is available on Maven Central:
+
+**Maven:**
+```xml
+<dependency>
+    <groupId>org.codarama</groupId>
+    <artifactId>redlock4j</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+**Gradle:**
+```gradle
+implementation 'org.codarama:redlock4j:1.0.0'
+```
+
+### Release Process
+
+1. **Automated Publishing**: New GitHub releases automatically trigger Maven Central publication
+2. **Quality Gates**: All tests must pass before publishing
+3. **Artifact Signing**: All artifacts are GPG signed for security
+4. **Documentation**: Javadoc and sources are included with each release
+
+For detailed release information, see [RELEASE.md](RELEASE.md).
+
+### Version History
+
+- **1.0.0** - Initial release with full Redlock implementation
+- **Future releases** - Check [GitHub Releases](https://github.com/Codarama/redlock4j/releases) for the latest
 
 ## License
 
