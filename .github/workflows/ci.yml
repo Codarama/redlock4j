@@ -18,18 +18,7 @@ jobs:
     
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         java: [8, 11, 17, 21]
-        exclude:
-          # Reduce matrix size for faster builds - test all Java versions only on Ubuntu
-          - os: windows-latest
-            java: 8
-          - os: windows-latest
-            java: 11
-          - os: macos-latest
-            java: 8
-          - os: macos-latest
-            java: 11
       fail-fast: false
     
     steps:
