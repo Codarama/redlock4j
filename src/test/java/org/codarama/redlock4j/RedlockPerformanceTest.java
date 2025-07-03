@@ -124,7 +124,6 @@ public class RedlockPerformanceTest {
             long startTime = System.currentTimeMillis();
             
             for (int i = 0; i < threadCount; i++) {
-                final int threadId = i;
                 executor.submit(() -> {
                     try {
                         startLatch.await(); // Wait for all threads to be ready
@@ -236,20 +235,20 @@ public class RedlockPerformanceTest {
         try (RedlockManager manager = RedlockManager.withJedis(config)) {
             Lock lock = manager.createLock("validity-test-lock");
             
-            if (lock.tryLock() && lock instanceof RedlockLock) {
-                RedlockLock redlockLock = (RedlockLock) lock;
+            if (lock.tryLock() && lock instanceof Redlock) {
+                Redlock redlock = (Redlock) lock;
                 
-                long initialValidity = redlockLock.getRemainingValidityTime();
+                long initialValidity = redlock.getRemainingValidityTime();
                 System.out.println("\nLock validity time test:");
                 System.out.println("Initial validity time: " + initialValidity + "ms");
                 
                 Thread.sleep(500);
                 
-                long afterDelay = redlockLock.getRemainingValidityTime();
+                long afterDelay = redlock.getRemainingValidityTime();
                 System.out.println("Validity after 500ms: " + afterDelay + "ms");
                 System.out.println("Actual time passed: " + (initialValidity - afterDelay) + "ms");
                 
-                redlockLock.unlock();
+                redlock.unlock();
             }
         }
     }

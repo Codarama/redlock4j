@@ -10,6 +10,8 @@ A Java implementation of the [Redlock distributed locking algorithm](https://red
 ## Features
 
 - **Standard Java Lock Interface**: Implements `java.util.concurrent.locks.Lock` for seamless integration
+- **Asynchronous API**: CompletionStage-based async lock operations for non-blocking applications
+- **RxJava Reactive API**: Full RxJava 3 reactive types (Single, Completable, Observable)
 - **Multiple Redis Drivers**: Supports both Jedis and Lettuce Redis clients
 - **Builder Pattern Configuration**: Easy-to-use configuration with sensible defaults
 - **Thread-Safe**: Proper thread-local lock state management
@@ -132,75 +134,76 @@ if (lock.tryLock(5, TimeUnit.SECONDS)) {
 }
 ```
 
-## Testing with Testcontainers
+## Asynchronous and Reactive APIs
 
-The project includes comprehensive integration tests that use [Testcontainers](https://www.testcontainers.org/) to automatically spin up Redis containers. This means you can run the full test suite without manually setting up Redis instances.
+Redlock4j provides modern asynchronous and reactive APIs for non-blocking applications.
 
-### Running Integration Tests
-
-```bash
-# Run all tests (including integration tests with Testcontainers)
-mvn test
-
-# Run only integration tests
-mvn test -Dtest=RedlockIntegrationTest
-```
-
-### Adding Testcontainers to Your Project
-
-If you want to use Testcontainers for testing your own Redlock-based applications:
-
-```xml
-<!-- Add to your test dependencies -->
-<dependency>
-    <groupId>org.testcontainers</groupId>
-    <artifactId>junit-jupiter</artifactId>
-    <version>1.19.3</version>
-    <scope>test</scope>
-</dependency>
-
-<dependency>
-    <groupId>org.testcontainers</groupId>
-    <artifactId>testcontainers</artifactId>
-    <version>1.19.3</version>
-    <scope>test</scope>
-</dependency>
-```
-
-### Example Test with Testcontainers
+### Asynchronous API (CompletionStage)
 
 ```java
-@Testcontainers
-public class MyRedlockTest {
+// Create async lock
+AsyncRedlock asyncLock = redlockManager.createAsyncLock("async-resource");
 
-    @Container
-    static GenericContainer<?> redis1 = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
-            .withExposedPorts(6379);
-
-    @Container
-    static GenericContainer<?> redis2 = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
-            .withExposedPorts(6379);
-
-    @Container
-    static GenericContainer<?> redis3 = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
-            .withExposedPorts(6379);
-
-    @Test
-    public void testDistributedLocking() {
-        RedlockConfiguration config = RedlockConfiguration.builder()
-            .addRedisNode("localhost", redis1.getMappedPort(6379))
-            .addRedisNode("localhost", redis2.getMappedPort(6379))
-            .addRedisNode("localhost", redis3.getMappedPort(6379))
-            .build();
-
-        try (RedlockManager manager = RedlockManager.withJedis(config)) {
-            Lock lock = manager.createLock("test-resource");
-            assertTrue(lock.tryLock());
-            // Your test logic here
-            lock.unlock();
+// Async lock acquisition
+CompletionStage<Boolean> lockFuture = asyncLock.tryLockAsync();
+lockFuture
+    .thenAccept(acquired -> {
+        if (acquired) {
+            System.out.println("Lock acquired asynchronously!");
+            // Perform async work
         }
-    }
-}
+    })
+    .thenCompose(v -> asyncLock.unlockAsync())
+    .thenRun(() -> System.out.println("Lock released!"));
+
+// Async lock with timeout
+asyncLock.tryLockAsync(5, TimeUnit.SECONDS)
+    .thenAccept(acquired -> {
+        // Handle result
+    });
+```
+
+### RxJava Reactive API
+
+```java
+// Create RxJava reactive lock
+RxRedlock rxLock = redlockManager.createRxLock("rxjava-resource");
+
+// RxJava Single for lock acquisition
+Single<Boolean> lockSingle = rxLock.tryLockRx();
+lockSingle.subscribe(
+    acquired -> System.out.println("Lock acquired: " + acquired),
+    throwable -> System.err.println("Error: " + throwable.getMessage())
+);
+
+// RxJava Observable for validity monitoring
+Observable<Long> validityObservable = rxLock.validityObservable(1, TimeUnit.SECONDS);
+validityObservable
+    .take(5)
+    .subscribe(validityTime -> System.out.println("Lock valid for " + validityTime + "ms"));
+
+// RxJava lock state monitoring
+Observable<RxRedlock.LockState> stateObservable = rxLock.lockStateObservable();
+stateObservable.subscribe(state -> System.out.println("Lock state: " + state));
+```
+
+### Combined Async/Reactive Lock
+
+```java
+// Lock implementing both AsyncRedlock and RxRedlock interfaces
+AsyncRxRedlock combinedLock = redlockManager.createAsyncRxLock("combined-resource");
+
+// Use CompletionStage interface for acquisition
+combinedLock.tryLockAsync()
+    .thenAccept(acquired -> {
+        if (acquired) {
+            // Use RxJava interface for monitoring
+            Observable<Long> validityObservable = combinedLock.validityObservable(500, TimeUnit.MILLISECONDS);
+            validityObservable.take(3).subscribe(validity -> {
+                System.out.println("Validity: " + validity + "ms");
+            });
+        }
+    });
 ```
 
 ## Configuration Options
@@ -250,10 +253,10 @@ RedlockConfiguration config = RedlockConfiguration.builder()
 ### Checking Lock State
 
 ```java
-RedlockLock redlockLock = (RedlockLock) lock;
+Redlock redlock = (Redlock) lock;
 
-if (redlockLock.isHeldByCurrentThread()) {
-    long remainingTime = redlockLock.getRemainingValidityTime();
+if (redlock.isHeldByCurrentThread()) {
+    long remainingTime = redlock.getRemainingValidityTime();
     System.out.println("Lock valid for " + remainingTime + "ms more");
 }
 ```
@@ -282,7 +285,7 @@ This implementation follows the Redlock algorithm as specified by Redis:
 ## Thread Safety
 
 - Each thread maintains its own lock state using `ThreadLocal`
-- Multiple threads can safely use the same `RedlockLock` instance
+- Multiple threads can safely use the same `Redlock` instance
 - Lock state is automatically cleaned up when locks are released
 
 ## Error Handling

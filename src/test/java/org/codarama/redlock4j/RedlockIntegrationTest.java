@@ -34,8 +34,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Integration tests for Redlock functionality using Testcontainers.
@@ -98,17 +96,17 @@ public class RedlockIntegrationTest {
             // Test basic lock/unlock
             assertTrue(lock.tryLock(), "Should be able to acquire lock");
 
-            if (lock instanceof RedlockLock) {
-                RedlockLock redlockLock = (RedlockLock) lock;
-                assertTrue(redlockLock.isHeldByCurrentThread(), "Lock should be held by current thread");
-                assertTrue(redlockLock.getRemainingValidityTime() > 0, "Lock should have remaining validity time");
+            if (lock instanceof Redlock) {
+                Redlock redlock = (Redlock) lock;
+                assertTrue(redlock.isHeldByCurrentThread(), "Lock should be held by current thread");
+                assertTrue(redlock.getRemainingValidityTime() > 0, "Lock should have remaining validity time");
             }
 
             lock.unlock();
 
-            if (lock instanceof RedlockLock) {
-                RedlockLock redlockLock = (RedlockLock) lock;
-                assertFalse(redlockLock.isHeldByCurrentThread(), "Lock should not be held after unlock");
+            if (lock instanceof Redlock) {
+                Redlock redlock = (Redlock) lock;
+                assertFalse(redlock.isHeldByCurrentThread(), "Lock should not be held after unlock");
             }
         }
     }
@@ -143,7 +141,7 @@ public class RedlockIntegrationTest {
     }
     
     @Test
-    public void testConcurrentLockAccess() throws InterruptedException {
+    public void testConcurrentLockAccess() {
         try (RedlockManager manager = RedlockManager.withJedis(testConfiguration)) {
             Lock lock1 = manager.createLock("concurrent-test-lock");
             Lock lock2 = manager.createLock("concurrent-test-lock"); // Same key
@@ -212,28 +210,20 @@ public class RedlockIntegrationTest {
         assertFalse(manager.isHealthy(), "Manager should not be healthy after close");
 
         // Should throw exception when trying to create locks after close
-        assertThrows(RedlockException.class, () -> {
-            manager.createLock("should-fail");
-        });
+        assertThrows(RedlockException.class, () -> manager.createLock("should-fail"));
     }
     
     @Test
     public void testInvalidLockKey() {
         try (RedlockManager manager = RedlockManager.withJedis(testConfiguration)) {
             // Test null key
-            assertThrows(IllegalArgumentException.class, () -> {
-                manager.createLock(null);
-            });
+            assertThrows(IllegalArgumentException.class, () -> manager.createLock(null));
 
             // Test empty key
-            assertThrows(IllegalArgumentException.class, () -> {
-                manager.createLock("");
-            });
+            assertThrows(IllegalArgumentException.class, () ->manager.createLock(""));
 
             // Test whitespace-only key
-            assertThrows(IllegalArgumentException.class, () -> {
-                manager.createLock("   ");
-            });
+            assertThrows(IllegalArgumentException.class, () -> manager.createLock("   "));
         }
     }
 

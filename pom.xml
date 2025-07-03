@@ -47,7 +47,7 @@
     <maven.compiler.target>8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jedis.version>5.1.0</jedis.version>
-    <lettuce.version>6.3.0.RELEASE</lettuce.version>
+    <lettuce.version>6.7.1.RELEASE</lettuce.version>
     <slf4j.version>2.0.9</slf4j.version>
     <junit.version>5.10.1</junit.version>
   </properties>
@@ -73,6 +73,14 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${slf4j.version}</version>
+    </dependency>
+
+    <!-- RxJava for reactive programming (optional) -->
+    <dependency>
+      <groupId>io.reactivex.rxjava3</groupId>
+      <artifactId>rxjava</artifactId>
+      <version>3.1.8</version>
+      <optional>true</optional>
     </dependency>
 
     <!-- Test dependencies -->
@@ -101,7 +109,7 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
-      <version>1.19.3</version>
+      <version>1.21.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

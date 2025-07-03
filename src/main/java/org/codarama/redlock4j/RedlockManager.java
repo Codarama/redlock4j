@@ -31,6 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -46,6 +49,8 @@ public class RedlockManager implements AutoCloseable {
     private final RedlockConfiguration config;
     private final List<RedisDriver> redisDrivers;
     private final DriverType driverType;
+    private final ExecutorService executorService;
+    private final ScheduledExecutorService scheduledExecutorService;
     private volatile boolean closed = false;
     
     /**
@@ -72,8 +77,18 @@ public class RedlockManager implements AutoCloseable {
         this.config = config;
         this.driverType = driverType;
         this.redisDrivers = createDrivers();
-        
-        logger.info("Created RedlockManager with {} driver and {} Redis nodes", 
+        this.executorService = Executors.newCachedThreadPool(r -> {
+            Thread t = new Thread(r, "redlock-async-" + System.currentTimeMillis());
+            t.setDaemon(true);
+            return t;
+        });
+        this.scheduledExecutorService = Executors.newScheduledThreadPool(2, r -> {
+            Thread t = new Thread(r, "redlock-scheduled-" + System.currentTimeMillis());
+            t.setDaemon(true);
+            return t;
+        });
+
+        logger.info("Created RedlockManager with {} driver and {} Redis nodes",
                    driverType, redisDrivers.size());
     }
     
@@ -124,7 +139,7 @@ public class RedlockManager implements AutoCloseable {
     
     /**
      * Creates a new distributed lock for the given key.
-     * 
+     *
      * @param lockKey the key to lock
      * @return a new Lock instance
      * @throws RedlockException if the manager is closed
@@ -133,12 +148,70 @@ public class RedlockManager implements AutoCloseable {
         if (closed) {
             throw new RedlockException("RedlockManager is closed");
         }
-        
+
         if (lockKey == null || lockKey.trim().isEmpty()) {
             throw new IllegalArgumentException("Lock key cannot be null or empty");
         }
-        
-        return new RedlockLock(lockKey, redisDrivers, config);
+
+        return new Redlock(lockKey, redisDrivers, config);
+    }
+
+    /**
+     * Creates a new asynchronous distributed lock for the given key.
+     *
+     * @param lockKey the key to lock
+     * @return a new AsyncRedlock instance
+     * @throws RedlockException if the manager is closed
+     */
+    public AsyncRedlock createAsyncLock(String lockKey) {
+        if (closed) {
+            throw new RedlockException("RedlockManager is closed");
+        }
+
+        if (lockKey == null || lockKey.trim().isEmpty()) {
+            throw new IllegalArgumentException("Lock key cannot be null or empty");
+        }
+
+        return new AsyncRxRedlock(lockKey, redisDrivers, config, executorService, scheduledExecutorService);
+    }
+
+    /**
+     * Creates a new RxJava reactive distributed lock for the given key.
+     *
+     * @param lockKey the key to lock
+     * @return a new RxRedlock instance
+     * @throws RedlockException if the manager is closed
+     */
+    public RxRedlock createRxLock(String lockKey) {
+        if (closed) {
+            throw new RedlockException("RedlockManager is closed");
+        }
+
+        if (lockKey == null || lockKey.trim().isEmpty()) {
+            throw new IllegalArgumentException("Lock key cannot be null or empty");
+        }
+
+        return new AsyncRxRedlock(lockKey, redisDrivers, config, executorService, scheduledExecutorService);
+    }
+
+    /**
+     * Creates a comprehensive lock that implements both async and reactive interfaces.
+     * This lock supports both CompletionStage and RxJava reactive types.
+     *
+     * @param lockKey the key to lock
+     * @return a new lock instance implementing both AsyncRedlock and RxRedlock
+     * @throws RedlockException if the manager is closed
+     */
+    public AsyncRxRedlock createAsyncRxLock(String lockKey) {
+        if (closed) {
+            throw new RedlockException("RedlockManager is closed");
+        }
+
+        if (lockKey == null || lockKey.trim().isEmpty()) {
+            throw new IllegalArgumentException("Lock key cannot be null or empty");
+        }
+
+        return new AsyncRxRedlock(lockKey, redisDrivers, config, executorService, scheduledExecutorService);
     }
     
     /**
@@ -192,9 +265,31 @@ public class RedlockManager implements AutoCloseable {
         if (closed) {
             return;
         }
-        
+
         closed = true;
-        
+
+        // Shutdown executor services
+        try {
+            executorService.shutdown();
+            if (!executorService.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+
+        try {
+            scheduledExecutorService.shutdown();
+            if (!scheduledExecutorService.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
+                scheduledExecutorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduledExecutorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+
+        // Close Redis drivers
         for (RedisDriver driver : redisDrivers) {
             try {
                 driver.close();
@@ -202,7 +297,7 @@ public class RedlockManager implements AutoCloseable {
                 logger.warn("Error closing Redis driver {}: {}", driver.getIdentifier(), e.getMessage());
             }
         }
-        
+
         logger.info("Closed RedlockManager");
     }
 }

@@ -109,25 +109,25 @@ public class RedlockUsageExample {
                 System.out.println("Lock is currently held by another process.");
             }
             
-            // Example 4: Using RedlockLock specific methods
-            if (lock instanceof RedlockLock) {
-                RedlockLock redlockLock = (RedlockLock) lock;
+            // Example 4: Using Redlock specific methods
+            if (lock instanceof Redlock) {
+                Redlock redlock = (Redlock) lock;
                 
-                if (redlockLock.tryLock()) {
+                if (redlock.tryLock()) {
                     try {
                         System.out.println("\nLock acquired. Checking lock state...");
-                        System.out.println("Is held by current thread: " + redlockLock.isHeldByCurrentThread());
-                        System.out.println("Remaining validity time: " + redlockLock.getRemainingValidityTime() + "ms");
+                        System.out.println("Is held by current thread: " + redlock.isHeldByCurrentThread());
+                        System.out.println("Remaining validity time: " + redlock.getRemainingValidityTime() + "ms");
                         
                         Thread.sleep(1000);
                         
                         System.out.println("After 1 second...");
-                        System.out.println("Remaining validity time: " + redlockLock.getRemainingValidityTime() + "ms");
+                        System.out.println("Remaining validity time: " + redlock.getRemainingValidityTime() + "ms");
                         
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     } finally {
-                        redlockLock.unlock();
+                        redlock.unlock();
                         System.out.println("Lock released.");
                     }
                 }
@@ -135,7 +135,6 @@ public class RedlockUsageExample {
             
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
         }
         
         System.out.println("\nExample completed.");

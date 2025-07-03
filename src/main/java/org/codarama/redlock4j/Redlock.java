@@ -38,8 +38,8 @@ import java.util.concurrent.locks.Lock;
 /**
  * Implementation of the Redlock distributed locking algorithm that implements Java's Lock interface.
  */
-public class RedlockLock implements Lock {
-    private static final Logger logger = LoggerFactory.getLogger(RedlockLock.class);
+public class Redlock implements Lock {
+    private static final Logger logger = LoggerFactory.getLogger(Redlock.class);
     
     private final String lockKey;
     private final List<RedisDriver> redisDrivers;
@@ -65,7 +65,7 @@ public class RedlockLock implements Lock {
         }
     }
     
-    public RedlockLock(String lockKey, List<RedisDriver> redisDrivers, RedlockConfiguration config) {
+    public Redlock(String lockKey, List<RedisDriver> redisDrivers, RedlockConfiguration config) {
         this.lockKey = lockKey;
         this.redisDrivers = redisDrivers;
         this.config = config;
