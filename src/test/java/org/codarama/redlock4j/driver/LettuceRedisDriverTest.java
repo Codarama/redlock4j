@@ -98,9 +98,8 @@ public class LettuceRedisDriverTest {
     
     @Test
     public void testDriverCreationWithNullConfig() {
-        assertThrows(NullPointerException.class, () -> {
-            new LettuceRedisDriver(null);
-        });
+        assertThrows(NullPointerException.class, () ->
+            new LettuceRedisDriver(null));
     }
     
     @Test

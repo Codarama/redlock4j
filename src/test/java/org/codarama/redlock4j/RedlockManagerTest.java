@@ -64,24 +64,22 @@ public class RedlockManagerTest {
     
     @Test
     public void testInvalidConfigurationWithTooFewNodes() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () ->
             RedlockConfiguration.builder()
                 .addRedisNode("localhost", 6379)
                 .addRedisNode("localhost", 6380)
-                .build();
-        });
+                .build());
     }
     
     @Test
     public void testInvalidConfigurationWithNegativeTimeout() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () ->
             RedlockConfiguration.builder()
                 .addRedisNode("localhost", 6379)
                 .addRedisNode("localhost", 6380)
                 .addRedisNode("localhost", 6381)
                 .defaultLockTimeout(Duration.ofSeconds(-1))
-                .build();
-        });
+                .build());
     }
     
     @Test

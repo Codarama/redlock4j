@@ -99,54 +99,47 @@ public class RedlockConfigurationTest {
         });
         
         // Test no nodes
-        assertThrows(IllegalArgumentException.class, () -> {
-            RedlockConfiguration.builder().build();
-        });
-        
+        assertThrows(IllegalArgumentException.class, () -> RedlockConfiguration.builder().build());
+
         // Test invalid timeout
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () ->
             RedlockConfiguration.builder()
                 .addRedisNode("localhost", 6379)
                 .addRedisNode("localhost", 6380)
                 .addRedisNode("localhost", 6381)
                 .defaultLockTimeout(Duration.ofSeconds(-1))
-                .build();
-        });
+                .build());
         
         // Test invalid clock drift factor
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () ->
             RedlockConfiguration.builder()
                 .addRedisNode("localhost", 6379)
                 .addRedisNode("localhost", 6380)
                 .addRedisNode("localhost", 6381)
                 .clockDriftFactor(1.5) // > 1.0
-                .build();
-        });
+                .build());
     }
     
     @Test
     public void testNodeConfigurationValidation() {
         // Test invalid host
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () ->
             RedisNodeConfiguration.builder()
                 .host("")
-                .build();
-        });
+                .build());
         
         // Test invalid port
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () ->
             RedisNodeConfiguration.builder()
                 .host("localhost")
                 .port(0)
-                .build();
-        });
+                .build());
         
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () ->
             RedisNodeConfiguration.builder()
                 .host("localhost")
                 .port(70000) // > 65535
-                .build();
-        });
+                .build());
     }
     
     @Test

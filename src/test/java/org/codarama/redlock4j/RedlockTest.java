@@ -163,7 +163,7 @@ public class RedlockTest {
         
         Redlock lock = new Redlock("test-key", drivers, testConfig);
         
-        assertDoesNotThrow(() -> lock.lock());
+        assertDoesNotThrow(lock::lock);
         assertTrue(lock.isHeldByCurrentThread());
     }
     
@@ -175,16 +175,13 @@ public class RedlockTest {
         when(mockDriver3.setIfNotExists(anyString(), anyString(), anyLong())).thenReturn(false);
         
         Redlock lock = new Redlock("test-key", drivers, testConfig);
-        
-        RedlockException exception = assertThrows(RedlockException.class, () -> {
-            lock.lock();
-        });
+        RedlockException exception = assertThrows(RedlockException.class, () -> lock.lock());
         
         assertTrue(exception.getMessage().contains("Failed to acquire lock within timeout"));
     }
     
     @Test
-    public void testLockInterruptibly() throws RedisDriverException, InterruptedException {
+    public void testLockInterruptibly() throws RedisDriverException {
         // Mock successful lock acquisition
         when(mockDriver1.setIfNotExists(anyString(), anyString(), anyLong())).thenReturn(true);
         when(mockDriver2.setIfNotExists(anyString(), anyString(), anyLong())).thenReturn(true);
@@ -192,7 +189,7 @@ public class RedlockTest {
         
         Redlock lock = new Redlock("test-key", drivers, testConfig);
         
-        assertDoesNotThrow(() -> lock.lockInterruptibly());
+        assertDoesNotThrow(lock::lockInterruptibly);
         assertTrue(lock.isHeldByCurrentThread());
     }
     
@@ -208,9 +205,7 @@ public class RedlockTest {
         // Interrupt the current thread
         Thread.currentThread().interrupt();
 
-        assertThrows(InterruptedException.class, () -> {
-            lock.tryLock(1, TimeUnit.SECONDS);
-        });
+        assertThrows(InterruptedException.class, () -> lock.tryLock(1, TimeUnit.SECONDS));
 
         // Clear interrupt flag
         Thread.interrupted();
@@ -243,7 +238,7 @@ public class RedlockTest {
         Redlock lock = new Redlock("test-key", drivers, testConfig);
         
         // Should not throw exception when unlocking without holding lock
-        assertDoesNotThrow(() -> lock.unlock());
+        assertDoesNotThrow(lock::unlock);
         
         assertFalse(lock.isHeldByCurrentThread());
     }
@@ -279,7 +274,7 @@ public class RedlockTest {
             .deleteIfValueMatches(anyString(), anyString());
         
         // Should not throw exception
-        assertDoesNotThrow(() -> lock.unlock());
+        assertDoesNotThrow(lock::unlock);
         
         assertFalse(lock.isHeldByCurrentThread());
     }
@@ -288,9 +283,7 @@ public class RedlockTest {
     public void testNewConditionThrowsUnsupportedOperation() {
         Redlock lock = new Redlock("test-key", drivers, testConfig);
         
-        assertThrows(UnsupportedOperationException.class, () -> {
-            lock.newCondition();
-        });
+        assertThrows(UnsupportedOperationException.class, lock::newCondition);
     }
     
     @Test
@@ -345,7 +338,7 @@ public class RedlockTest {
         Thread.sleep(100);
 
         // Unlock should handle expired lock gracefully
-        assertDoesNotThrow(() -> lock.unlock());
+        assertDoesNotThrow(lock::unlock);
     }
 
     @Test
