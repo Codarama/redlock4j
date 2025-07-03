@@ -21,8 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.codarama.redlock4j;
+package org.codarama.redlock4j.examples;
 
+import org.codarama.redlock4j.Redlock;
+import org.codarama.redlock4j.RedlockManager;
+import org.codarama.redlock4j.configuration.RedlockConfiguration;
+
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -37,10 +42,10 @@ public class RedlockUsageExample {
             .addRedisNode("localhost", 6379)
             .addRedisNode("localhost", 6380)
             .addRedisNode("localhost", 6381)
-            .defaultLockTimeout(30, TimeUnit.SECONDS)
-            .retryDelay(200, TimeUnit.MILLISECONDS)
+            .defaultLockTimeout(Duration.ofSeconds(30))
+            .retryDelay(Duration.ofMillis(200))
             .maxRetryAttempts(3)
-            .lockAcquisitionTimeout(10, TimeUnit.SECONDS)
+            .lockAcquisitionTimeout(Duration.ofSeconds(10))
             .build();
         
         // Create RedlockManager with Jedis (or use withLettuce for Lettuce)

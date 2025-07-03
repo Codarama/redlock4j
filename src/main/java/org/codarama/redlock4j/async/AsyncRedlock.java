@@ -21,10 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.codarama.redlock4j;
+package org.codarama.redlock4j.async;
 
+import org.codarama.redlock4j.RedlockException;
+
+import java.time.Duration;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Asynchronous distributed lock interface using CompletionStage for non-blocking operations.
@@ -41,12 +43,11 @@ public interface AsyncRedlock {
     
     /**
      * Attempts to acquire the lock asynchronously with a timeout.
-     * 
-     * @param time the maximum time to wait for the lock
-     * @param unit the time unit of the time argument
+     *
+     * @param timeout the maximum time to wait for the lock
      * @return a CompletionStage that completes with true if the lock was acquired within the timeout, false otherwise
      */
-    CompletionStage<Boolean> tryLockAsync(long time, TimeUnit unit);
+    CompletionStage<Boolean> tryLockAsync(Duration timeout);
     
     /**
      * Acquires the lock asynchronously, waiting if necessary until the lock becomes available

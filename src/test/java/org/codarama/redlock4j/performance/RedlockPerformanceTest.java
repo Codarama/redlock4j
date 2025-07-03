@@ -21,8 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.codarama.redlock4j;
+package org.codarama.redlock4j.performance;
 
+import org.codarama.redlock4j.Redlock;
+import org.codarama.redlock4j.RedlockManager;
+import org.codarama.redlock4j.configuration.RedlockConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,6 +34,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,10 +75,10 @@ public class RedlockPerformanceTest {
             .addRedisNode("localhost", redis1.getMappedPort(6379))
             .addRedisNode("localhost", redis2.getMappedPort(6379))
             .addRedisNode("localhost", redis3.getMappedPort(6379))
-            .defaultLockTimeout(5, TimeUnit.SECONDS)
-            .retryDelay(50, TimeUnit.MILLISECONDS)
+            .defaultLockTimeout(Duration.ofSeconds(5))
+            .retryDelay(Duration.ofMillis(50))
             .maxRetryAttempts(2)
-            .lockAcquisitionTimeout(2, TimeUnit.SECONDS)
+            .lockAcquisitionTimeout(Duration.ofSeconds(2))
             .build();
     }
     
@@ -227,8 +231,8 @@ public class RedlockPerformanceTest {
             .addRedisNode("localhost", redis1.getMappedPort(6379))
             .addRedisNode("localhost", redis2.getMappedPort(6379))
             .addRedisNode("localhost", redis3.getMappedPort(6379))
-            .defaultLockTimeout(2, TimeUnit.SECONDS) // Short timeout for testing
-            .retryDelay(50, TimeUnit.MILLISECONDS)
+            .defaultLockTimeout(Duration.ofSeconds(2)) // Short timeout for testing
+            .retryDelay(Duration.ofMillis(50))
             .maxRetryAttempts(1)
             .build();
 

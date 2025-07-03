@@ -21,12 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.codarama.redlock4j;
+package org.codarama.redlock4j.async;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 /**
  * RxJava reactive distributed lock interface providing reactive streams for lock operations.
@@ -43,12 +43,11 @@ public interface RxRedlock {
     
     /**
      * Attempts to acquire the lock reactively with a timeout.
-     * 
-     * @param time the maximum time to wait for the lock
-     * @param unit the time unit of the time argument
+     *
+     * @param timeout the maximum time to wait for the lock
      * @return a Single that emits true if the lock was acquired within the timeout, false otherwise
      */
-    Single<Boolean> tryLockRx(long time, TimeUnit unit);
+    Single<Boolean> tryLockRx(Duration timeout);
     
     /**
      * Acquires the lock reactively, waiting if necessary until the lock becomes available
@@ -68,23 +67,21 @@ public interface RxRedlock {
     /**
      * Creates a reactive stream that periodically emits the lock validity time.
      * Useful for monitoring lock health in reactive applications.
-     * 
+     *
      * @param checkInterval the interval between validity checks
-     * @param unit the time unit of the check interval
      * @return an Observable that emits the remaining validity time at each check
      */
-    Observable<Long> validityObservable(long checkInterval, TimeUnit unit);
+    Observable<Long> validityObservable(Duration checkInterval);
     
     /**
      * Creates a reactive stream that emits lock acquisition attempts with retry logic.
      * This provides fine-grained control over retry behavior in reactive applications.
-     * 
+     *
      * @param maxRetries maximum number of retry attempts
      * @param retryDelay delay between retry attempts
-     * @param unit time unit for retry delay
      * @return a Single that emits true when lock is acquired, or error if all retries fail
      */
-    Single<Boolean> tryLockWithRetryRx(int maxRetries, long retryDelay, TimeUnit unit);
+    Single<Boolean> tryLockWithRetryRx(int maxRetries, Duration retryDelay);
     
     /**
      * Creates an observable that emits lock state changes.

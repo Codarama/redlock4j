@@ -21,11 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.codarama.redlock4j;
+package org.codarama.redlock4j.configuration;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 /**
  * Unit tests for RedlockConfiguration.
@@ -42,7 +42,7 @@ public class RedlockConfigurationTest {
         
         assertEquals(3, config.getRedisNodes().size());
         assertEquals(2, config.getQuorum()); // (3/2) + 1 = 2
-        assertEquals(TimeUnit.SECONDS.toMillis(30), config.getDefaultLockTimeoutMs());
+        assertEquals(Duration.ofSeconds(30).toMillis(), config.getDefaultLockTimeoutMs());
         assertEquals(200, config.getRetryDelayMs());
         assertEquals(3, config.getMaxRetryAttempts());
         assertEquals(0.01, config.getClockDriftFactor(), 0.001);
@@ -54,19 +54,19 @@ public class RedlockConfigurationTest {
             .addRedisNode("redis1", 6379, "password")
             .addRedisNode("redis2", 6379, "password")
             .addRedisNode("redis3", 6379, "password")
-            .defaultLockTimeout(60, TimeUnit.SECONDS)
-            .retryDelay(500, TimeUnit.MILLISECONDS)
+            .defaultLockTimeout(Duration.ofSeconds(60))
+            .retryDelay(Duration.ofMillis(500))
             .maxRetryAttempts(5)
             .clockDriftFactor(0.02)
-            .lockAcquisitionTimeout(20, TimeUnit.SECONDS)
+            .lockAcquisitionTimeout(Duration.ofSeconds(20))
             .build();
-        
+
         assertEquals(3, config.getRedisNodes().size());
-        assertEquals(TimeUnit.SECONDS.toMillis(60), config.getDefaultLockTimeoutMs());
+        assertEquals(Duration.ofSeconds(60).toMillis(), config.getDefaultLockTimeoutMs());
         assertEquals(500, config.getRetryDelayMs());
         assertEquals(5, config.getMaxRetryAttempts());
         assertEquals(0.02, config.getClockDriftFactor(), 0.001);
-        assertEquals(TimeUnit.SECONDS.toMillis(20), config.getLockAcquisitionTimeoutMs());
+        assertEquals(Duration.ofSeconds(20).toMillis(), config.getLockAcquisitionTimeoutMs());
     }
     
     @Test
@@ -109,7 +109,7 @@ public class RedlockConfigurationTest {
                 .addRedisNode("localhost", 6379)
                 .addRedisNode("localhost", 6380)
                 .addRedisNode("localhost", 6381)
-                .defaultLockTimeout(-1, TimeUnit.SECONDS)
+                .defaultLockTimeout(Duration.ofSeconds(-1))
                 .build();
         });
         

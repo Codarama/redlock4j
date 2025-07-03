@@ -21,13 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.codarama.redlock4j;
+package org.codarama.redlock4j.examples;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
+import org.codarama.redlock4j.RedlockManager;
+import org.codarama.redlock4j.async.AsyncRedlock;
+import org.codarama.redlock4j.async.RxRedlock;
+import org.codarama.redlock4j.async.AsyncRedlockImpl;
+import org.codarama.redlock4j.configuration.RedlockConfiguration;
 
+import java.time.Duration;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -46,10 +52,10 @@ public class AsyncRxUsageExample {
             .addRedisNode("localhost", 6379)
             .addRedisNode("localhost", 6380)
             .addRedisNode("localhost", 6381)
-            .defaultLockTimeout(30, TimeUnit.SECONDS)
-            .retryDelay(200, TimeUnit.MILLISECONDS)
+            .defaultLockTimeout(Duration.ofSeconds(30))
+            .retryDelay(Duration.ofMillis(200))
             .maxRetryAttempts(3)
-            .lockAcquisitionTimeout(10, TimeUnit.SECONDS)
+            .lockAcquisitionTimeout(Duration.ofSeconds(10))
             .build();
         
         try (RedlockManager redlockManager = RedlockManager.withJedis(config)) {
@@ -146,7 +152,7 @@ public class AsyncRxUsageExample {
             .join(); // Wait for completion in this example
         
         // Async lock with timeout
-        asyncLock.tryLockAsync(3, TimeUnit.SECONDS)
+        asyncLock.tryLockAsync(Duration.ofSeconds(3))
             .thenAccept(acquired -> {
                 System.out.println("Async lock with timeout: " + (acquired ? "✅ Success" : "❌ Failed"));
                 if (acquired) {
@@ -215,7 +221,7 @@ public class AsyncRxUsageExample {
     private static void startRxValidityMonitoring(RxRedlock rxLock) {
         System.out.println("📊 Starting RxJava validity monitoring...");
         
-        Observable<Long> validityObservable = rxLock.validityObservable(1, TimeUnit.SECONDS);
+        Observable<Long> validityObservable = rxLock.validityObservable(Duration.ofSeconds(1));
         
         Disposable validityDisposable = validityObservable
             .take(3) // Take only 3 emissions
@@ -243,7 +249,7 @@ public class AsyncRxUsageExample {
     private static void demonstrateCombinedLock(RedlockManager manager) {
         System.out.println("\n=== Combined Async/Reactive Lock ===");
         
-        AsyncRxRedlock combinedLock = manager.createAsyncRxLock("combined-resource");
+        AsyncRedlockImpl combinedLock = manager.createAsyncRxLock("combined-resource");
         
         // Use CompletionStage interface for acquisition
         System.out.println("🔄 Acquiring lock via CompletionStage interface...");
@@ -254,7 +260,7 @@ public class AsyncRxUsageExample {
                     
                     // Use RxJava interface for monitoring
                     System.out.println("📊 Monitoring via RxJava interface...");
-                    Observable<Long> validityObservable = combinedLock.validityObservable(500, TimeUnit.MILLISECONDS);
+                    Observable<Long> validityObservable = combinedLock.validityObservable(Duration.ofMillis(500));
                     
                     Disposable monitoringDisposable = validityObservable
                         .take(2)

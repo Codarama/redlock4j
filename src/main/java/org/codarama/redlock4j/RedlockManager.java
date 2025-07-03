@@ -23,9 +23,14 @@
  */
 package org.codarama.redlock4j;
 
+import org.codarama.redlock4j.async.AsyncRedlock;
+import org.codarama.redlock4j.async.RxRedlock;
+import org.codarama.redlock4j.configuration.RedisNodeConfiguration;
+import org.codarama.redlock4j.configuration.RedlockConfiguration;
 import org.codarama.redlock4j.driver.JedisRedisDriver;
 import org.codarama.redlock4j.driver.LettuceRedisDriver;
 import org.codarama.redlock4j.driver.RedisDriver;
+import org.codarama.redlock4j.async.AsyncRedlockImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,14 +177,14 @@ public class RedlockManager implements AutoCloseable {
             throw new IllegalArgumentException("Lock key cannot be null or empty");
         }
 
-        return new AsyncRxRedlock(lockKey, redisDrivers, config, executorService, scheduledExecutorService);
+        return new AsyncRedlockImpl(lockKey, redisDrivers, config, executorService, scheduledExecutorService);
     }
 
     /**
      * Creates a new RxJava reactive distributed lock for the given key.
      *
      * @param lockKey the key to lock
-     * @return a new RxRedlock instance
+     * @return a new AsyncRedlockImpl instance
      * @throws RedlockException if the manager is closed
      */
     public RxRedlock createRxLock(String lockKey) {
@@ -191,7 +196,7 @@ public class RedlockManager implements AutoCloseable {
             throw new IllegalArgumentException("Lock key cannot be null or empty");
         }
 
-        return new AsyncRxRedlock(lockKey, redisDrivers, config, executorService, scheduledExecutorService);
+        return new AsyncRedlockImpl(lockKey, redisDrivers, config, executorService, scheduledExecutorService);
     }
 
     /**
@@ -199,10 +204,10 @@ public class RedlockManager implements AutoCloseable {
      * This lock supports both CompletionStage and RxJava reactive types.
      *
      * @param lockKey the key to lock
-     * @return a new lock instance implementing both AsyncRedlock and RxRedlock
+     * @return a new lock instance implementing both AsyncRedlock and AsyncRedlockImpl
      * @throws RedlockException if the manager is closed
      */
-    public AsyncRxRedlock createAsyncRxLock(String lockKey) {
+    public AsyncRedlockImpl createAsyncRxLock(String lockKey) {
         if (closed) {
             throw new RedlockException("RedlockManager is closed");
         }
@@ -211,7 +216,7 @@ public class RedlockManager implements AutoCloseable {
             throw new IllegalArgumentException("Lock key cannot be null or empty");
         }
 
-        return new AsyncRxRedlock(lockKey, redisDrivers, config, executorService, scheduledExecutorService);
+        return new AsyncRedlockImpl(lockKey, redisDrivers, config, executorService, scheduledExecutorService);
     }
     
     /**

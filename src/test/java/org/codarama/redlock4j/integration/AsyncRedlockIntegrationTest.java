@@ -21,9 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.codarama.redlock4j;
+package org.codarama.redlock4j.integration;
 
 import io.reactivex.rxjava3.observers.TestObserver;
+import org.codarama.redlock4j.RedlockManager;
+import org.codarama.redlock4j.async.AsyncRedlock;
+import org.codarama.redlock4j.async.AsyncRedlockImpl;
+import org.codarama.redlock4j.async.RxRedlock;
+import org.codarama.redlock4j.configuration.RedlockConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.GenericContainer;
@@ -32,6 +37,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.Duration;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  * Simple tests to verify async and reactive APIs work correctly.
  */
 @Testcontainers
-public class SimpleAsyncRxTest {
+public class AsyncRedlockIntegrationTest {
     
     @Container
     static GenericContainer<?> redis1 = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
@@ -64,10 +70,10 @@ public class SimpleAsyncRxTest {
             .addRedisNode("localhost", redis1.getMappedPort(6379))
             .addRedisNode("localhost", redis2.getMappedPort(6379))
             .addRedisNode("localhost", redis3.getMappedPort(6379))
-            .defaultLockTimeout(10, TimeUnit.SECONDS)
-            .retryDelay(100, TimeUnit.MILLISECONDS)
+            .defaultLockTimeout(Duration.ofSeconds(10))
+            .retryDelay(Duration.ofMillis(100))
             .maxRetryAttempts(3)
-            .lockAcquisitionTimeout(5, TimeUnit.SECONDS)
+            .lockAcquisitionTimeout(Duration.ofSeconds(5))
             .build();
     }
     
@@ -119,7 +125,7 @@ public class SimpleAsyncRxTest {
     @Test
     public void testCombinedAsyncRxLock() throws Exception {
         try (RedlockManager manager = RedlockManager.withJedis(testConfiguration)) {
-            AsyncRxRedlock combinedLock = manager.createAsyncRxLock("test-combined-basic");
+            AsyncRedlockImpl combinedLock = manager.createAsyncRxLock("test-combined-basic");
             
             // Test CompletionStage interface
             Boolean asyncResult = combinedLock.tryLockAsync().toCompletableFuture().get(5, TimeUnit.SECONDS);
@@ -141,7 +147,7 @@ public class SimpleAsyncRxTest {
             AsyncRedlock asyncLock = manager.createAsyncLock("test-async-timeout");
             
             // Test async tryLock with timeout
-            CompletionStage<Boolean> lockResult = asyncLock.tryLockAsync(2, TimeUnit.SECONDS);
+            CompletionStage<Boolean> lockResult = asyncLock.tryLockAsync(Duration.ofSeconds(2));
             Boolean acquired = lockResult.toCompletableFuture().get(5, TimeUnit.SECONDS);
             assertTrue(acquired, "Should acquire lock with timeout");
             
@@ -163,7 +169,7 @@ public class SimpleAsyncRxTest {
             lockObserver.assertValue(true);
 
             // Test validity observable - start immediately and take fewer emissions
-            TestObserver<Long> validityObserver = rxLock.validityObservable(300, TimeUnit.MILLISECONDS)
+            TestObserver<Long> validityObserver = rxLock.validityObservable(Duration.ofMillis(300))
                 .take(1) // Take only 1 emission to be safe
                 .test();
 
@@ -196,7 +202,7 @@ public class SimpleAsyncRxTest {
             assertNotNull(rxLock);
             assertEquals("factory-rx", rxLock.getLockKey());
             
-            AsyncRxRedlock combinedLock = manager.createAsyncRxLock("factory-combined");
+            AsyncRedlockImpl combinedLock = manager.createAsyncRxLock("factory-combined");
             assertNotNull(combinedLock);
             assertEquals("factory-combined", combinedLock.getLockKey());
             

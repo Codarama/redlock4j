@@ -28,7 +28,7 @@ import io.lettuce.core.RedisURI;
 import io.lettuce.core.SetArgs;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
-import org.codarama.redlock4j.RedisNodeConfiguration;
+import org.codarama.redlock4j.configuration.RedisNodeConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -23,6 +23,7 @@
  */
 package org.codarama.redlock4j;
 
+import org.codarama.redlock4j.configuration.RedlockConfiguration;
 import org.codarama.redlock4j.driver.RedisDriver;
 import org.codarama.redlock4j.driver.RedisDriverException;
 import org.slf4j.Logger;

@@ -21,9 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.codarama.redlock4j;
+package org.codarama.redlock4j.async;
 
 import io.reactivex.rxjava3.observers.TestObserver;
+import org.codarama.redlock4j.RedlockManager;
+import org.codarama.redlock4j.configuration.RedlockConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.GenericContainer;
@@ -32,6 +34,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.Duration;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  * Tests for asynchronous CompletionStage and RxJava reactive APIs.
  */
 @Testcontainers
-public class AsyncRxRedlockTest {
+public class AsyncRedlockImplTest {
     
     // Create 3 Redis containers for testing
     @Container
@@ -66,10 +69,10 @@ public class AsyncRxRedlockTest {
             .addRedisNode("localhost", redis1.getMappedPort(6379))
             .addRedisNode("localhost", redis2.getMappedPort(6379))
             .addRedisNode("localhost", redis3.getMappedPort(6379))
-            .defaultLockTimeout(10, TimeUnit.SECONDS)
-            .retryDelay(100, TimeUnit.MILLISECONDS)
+            .defaultLockTimeout(Duration.ofSeconds(10))
+            .retryDelay(Duration.ofMillis(100))
             .maxRetryAttempts(3)
-            .lockAcquisitionTimeout(5, TimeUnit.SECONDS)
+            .lockAcquisitionTimeout(Duration.ofSeconds(5))
             .build();
     }
     
@@ -102,7 +105,7 @@ public class AsyncRxRedlockTest {
             AsyncRedlock asyncLock = manager.createAsyncLock("test-async-timeout");
             
             // Test async tryLock with timeout
-            CompletionStage<Boolean> lockResult = asyncLock.tryLockAsync(2, TimeUnit.SECONDS);
+            CompletionStage<Boolean> lockResult = asyncLock.tryLockAsync(Duration.ofSeconds(2));
             Boolean acquired = lockResult.toCompletableFuture().get(5, TimeUnit.SECONDS);
             assertTrue(acquired, "Should acquire lock with timeout");
             
@@ -154,7 +157,7 @@ public class AsyncRxRedlockTest {
             lockObserver.assertValue(true);
 
             // Test validity observable - start it immediately after lock acquisition
-            TestObserver<Long> validityObserver = rxLock.validityObservable(200, TimeUnit.MILLISECONDS)
+            TestObserver<Long> validityObserver = rxLock.validityObservable(Duration.ofMillis(200))
                 .take(2) // Take only 2 emissions to be safe
                 .test();
 
@@ -196,7 +199,8 @@ public class AsyncRxRedlockTest {
             assertTrue(stateObserver.values().size() >= 2, "Should have at least 2 state changes");
 
             // First state should be RELEASED (initial state)
-            assertEquals(RxRedlock.LockState.RELEASED, stateObserver.values().get(0));
+            assertEquals(
+                RxRedlock.LockState.RELEASED, stateObserver.values().get(0));
 
             // Last state should be ACQUIRED (if lock was successful)
             RxRedlock.LockState lastState = stateObserver.values().get(stateObserver.values().size() - 1);
@@ -214,7 +218,7 @@ public class AsyncRxRedlockTest {
             RxRedlock rxLock = manager.createRxLock("test-retry-logic");
             
             // Test retry with immediate success (should succeed on first try)
-            TestObserver<Boolean> retryObserver = rxLock.tryLockWithRetryRx(3, 100, TimeUnit.MILLISECONDS).test();
+            TestObserver<Boolean> retryObserver = rxLock.tryLockWithRetryRx(3, Duration.ofMillis(100)).test();
             retryObserver.await(5, TimeUnit.SECONDS);
             retryObserver.assertComplete();
             retryObserver.assertValue(true);
@@ -229,7 +233,7 @@ public class AsyncRxRedlockTest {
     @Test
     public void testCombinedAsyncRxLock() throws Exception {
         try (RedlockManager manager = RedlockManager.withJedis(testConfiguration)) {
-            AsyncRxRedlock combinedLock = manager.createAsyncRxLock("test-combined-lock");
+            AsyncRedlockImpl combinedLock = manager.createAsyncRxLock("test-combined-lock");
             
             // Test CompletionStage interface
             Boolean asyncResult = combinedLock.tryLockAsync().toCompletableFuture().get(5, TimeUnit.SECONDS);
@@ -239,7 +243,7 @@ public class AsyncRxRedlockTest {
             assertTrue(combinedLock.isHeldByCurrentThread(), "Lock should be held");
             
             // Test validity observable
-            TestObserver<Long> validityObserver = combinedLock.validityObservable(200, TimeUnit.MILLISECONDS)
+            TestObserver<Long> validityObserver = combinedLock.validityObservable(Duration.ofMillis(200))
                 .take(2)
                 .test();
             

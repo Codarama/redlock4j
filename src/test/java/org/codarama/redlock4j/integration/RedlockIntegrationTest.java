@@ -21,8 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.codarama.redlock4j;
+package org.codarama.redlock4j.integration;
 
+import org.codarama.redlock4j.Redlock;
+import org.codarama.redlock4j.RedlockException;
+import org.codarama.redlock4j.RedlockManager;
+import org.codarama.redlock4j.configuration.RedisNodeConfiguration;
+import org.codarama.redlock4j.configuration.RedlockConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
@@ -32,6 +37,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -72,10 +78,10 @@ public class RedlockIntegrationTest {
             .addRedisNode("localhost", redis1.getMappedPort(6379))
             .addRedisNode("localhost", redis2.getMappedPort(6379))
             .addRedisNode("localhost", redis3.getMappedPort(6379))
-            .defaultLockTimeout(10, TimeUnit.SECONDS)
-            .retryDelay(100, TimeUnit.MILLISECONDS)
+            .defaultLockTimeout(Duration.ofSeconds(10))
+            .retryDelay(Duration.ofMillis(100))
             .maxRetryAttempts(3)
-            .lockAcquisitionTimeout(5, TimeUnit.SECONDS)
+            .lockAcquisitionTimeout(Duration.ofSeconds(5))
             .build();
     }
 
@@ -182,8 +188,8 @@ public class RedlockIntegrationTest {
                 .connectionTimeoutMs(1000)
                 .socketTimeoutMs(1000)
                 .build())
-            .defaultLockTimeout(5, TimeUnit.SECONDS)
-            .retryDelay(50, TimeUnit.MILLISECONDS)
+            .defaultLockTimeout(Duration.ofSeconds(5))
+            .retryDelay(Duration.ofMillis(50))
             .maxRetryAttempts(2)
             .clockDriftFactor(0.02)
             .build();

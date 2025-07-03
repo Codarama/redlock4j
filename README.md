@@ -13,7 +13,6 @@ A Java implementation of the [Redlock distributed locking algorithm](https://red
 - **Asynchronous API**: CompletionStage-based async lock operations for non-blocking applications
 - **RxJava Reactive API**: Full RxJava 3 reactive types (Single, Completable, Observable)
 - **Multiple Redis Drivers**: Supports both Jedis and Lettuce Redis clients
-- **Builder Pattern Configuration**: Easy-to-use configuration with sensible defaults
 - **Thread-Safe**: Proper thread-local lock state management
 - **Fault Tolerant**: Works with Redis node failures as long as quorum is maintained
 - **Configurable**: Customizable timeouts, retry logic, and clock drift compensation
@@ -40,7 +39,7 @@ Add the following dependencies to your `pom.xml`:
 <dependency>
     <groupId>io.lettuce</groupId>
     <artifactId>lettuce-core</artifactId>
-    <version>6.3.0.RELEASE</version>
+    <version>6.7.1.RELEASE</version>
 </dependency>
 
 <!-- Logging -->
@@ -75,7 +74,7 @@ Add this library and your preferred Redis client to your `pom.xml`:
 <dependency>
     <groupId>io.lettuce</groupId>
     <artifactId>lettuce-core</artifactId>
-    <version>6.3.0.RELEASE</version>
+    <version>6.7.1.RELEASE</version>
 </dependency>
 ```
 
@@ -86,8 +85,8 @@ RedlockConfiguration config = RedlockConfiguration.builder()
     .addRedisNode("redis1.example.com", 6379)
     .addRedisNode("redis2.example.com", 6379)
     .addRedisNode("redis3.example.com", 6379)
-    .defaultLockTimeout(30, TimeUnit.SECONDS)
-    .retryDelay(200, TimeUnit.MILLISECONDS)
+    .defaultLockTimeout(Duration.ofSeconds(30))
+    .retryDelay(Duration.ofMillis(200))
     .maxRetryAttempts(3)
     .build();
 ```
@@ -157,7 +156,7 @@ lockFuture
     .thenRun(() -> System.out.println("Lock released!"));
 
 // Async lock with timeout
-asyncLock.tryLockAsync(5, TimeUnit.SECONDS)
+asyncLock.tryLockAsync(Duration.ofSeconds(5))
     .thenAccept(acquired -> {
         // Handle result
     });
@@ -177,7 +176,7 @@ lockSingle.subscribe(
 );
 
 // RxJava Observable for validity monitoring
-Observable<Long> validityObservable = rxLock.validityObservable(1, TimeUnit.SECONDS);
+Observable<Long> validityObservable = rxLock.validityObservable(Duration.ofSeconds(1));
 validityObservable
     .take(5)
     .subscribe(validityTime -> System.out.println("Lock valid for " + validityTime + "ms"));
@@ -190,7 +189,7 @@ stateObservable.subscribe(state -> System.out.println("Lock state: " + state));
 ### Combined Async/Reactive Lock
 
 ```java
-// Lock implementing both AsyncRedlock and RxRedlock interfaces
+// Lock implementing both AsyncRedlock and AsyncRedlockImpl interfaces
 AsyncRxRedlock combinedLock = redlockManager.createAsyncRxLock("combined-resource");
 
 // Use CompletionStage interface for acquisition
@@ -198,7 +197,7 @@ combinedLock.tryLockAsync()
     .thenAccept(acquired -> {
         if (acquired) {
             // Use RxJava interface for monitoring
-            Observable<Long> validityObservable = combinedLock.validityObservable(500, TimeUnit.MILLISECONDS);
+            Observable<Long> validityObservable = combinedLock.validityObservable(Duration.ofMillis(500));
             validityObservable.take(3).subscribe(validity -> {
                 System.out.println("Validity: " + validity + "ms");
             });

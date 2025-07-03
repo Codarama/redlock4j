@@ -21,28 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.codarama.redlock4j;
+package org.codarama.redlock4j.async;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
+import org.codarama.redlock4j.LockResult;
+import org.codarama.redlock4j.configuration.RedlockConfiguration;
+import org.codarama.redlock4j.RedlockException;
 import org.codarama.redlock4j.driver.RedisDriver;
 import org.codarama.redlock4j.driver.RedisDriverException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * Implementation supporting both AsyncRedlock and RxRedlock interfaces.
+ * Implementation supporting both AsyncRedlock and AsyncRedlockImpl interfaces.
  * Provides asynchronous CompletionStage and RxJava reactive capabilities.
  */
-public class AsyncRxRedlock implements AsyncRedlock, RxRedlock {
-    private static final Logger logger = LoggerFactory.getLogger(AsyncRxRedlock.class);
+public class AsyncRedlockImpl implements AsyncRedlock, RxRedlock {
+    private static final Logger logger = LoggerFactory.getLogger(AsyncRedlockImpl.class);
     
     private final String lockKey;
     private final List<RedisDriver> redisDrivers;
@@ -73,7 +77,7 @@ public class AsyncRxRedlock implements AsyncRedlock, RxRedlock {
         }
     }
     
-    public AsyncRxRedlock(String lockKey, List<RedisDriver> redisDrivers,
+    public AsyncRedlockImpl(String lockKey, List<RedisDriver> redisDrivers,
                              RedlockConfiguration config, ExecutorService executorService,
                              ScheduledExecutorService scheduledExecutorService) {
         this.lockKey = lockKey;
@@ -110,10 +114,10 @@ public class AsyncRxRedlock implements AsyncRedlock, RxRedlock {
     }
     
     @Override
-    public CompletionStage<Boolean> tryLockAsync(long time, TimeUnit unit) {
-        long timeoutMs = unit.toMillis(time);
+    public CompletionStage<Boolean> tryLockAsync(Duration timeout) {
+        long timeoutMs = timeout.toMillis();
         long startTime = System.currentTimeMillis();
-        
+
         return tryLockWithRetryAsync(timeoutMs, startTime, 0);
     }
     
@@ -154,7 +158,7 @@ public class AsyncRxRedlock implements AsyncRedlock, RxRedlock {
     
     @Override
     public CompletionStage<Void> lockAsync() {
-        return tryLockAsync(config.getLockAcquisitionTimeoutMs(), TimeUnit.MILLISECONDS)
+        return tryLockAsync(Duration.ofMillis(config.getLockAcquisitionTimeoutMs()))
             .thenCompose(acquired -> {
                 if (acquired) {
                     return CompletableFuture.completedFuture(null);
@@ -190,7 +194,7 @@ public class AsyncRxRedlock implements AsyncRedlock, RxRedlock {
         }, executorService);
     }
     
-    // RxRedlock implementation (RxJava)
+    // AsyncRedlockImpl implementation (RxJava)
     
     @Override
     public Single<Boolean> tryLockRx() {
@@ -199,8 +203,8 @@ public class AsyncRxRedlock implements AsyncRedlock, RxRedlock {
     }
     
     @Override
-    public Single<Boolean> tryLockRx(long time, TimeUnit unit) {
-        return Single.fromCompletionStage(tryLockAsync(time, unit))
+    public Single<Boolean> tryLockRx(Duration timeout) {
+        return Single.fromCompletionStage(tryLockAsync(timeout))
             .subscribeOn(Schedulers.io());
     }
     
@@ -217,17 +221,17 @@ public class AsyncRxRedlock implements AsyncRedlock, RxRedlock {
     }
     
     @Override
-    public Observable<Long> validityObservable(long checkInterval, TimeUnit unit) {
-        return Observable.interval(checkInterval, unit, Schedulers.io())
+    public Observable<Long> validityObservable(Duration checkInterval) {
+        return Observable.interval(checkInterval.toMillis(), TimeUnit.MILLISECONDS, Schedulers.io())
             .map(tick -> getRemainingValidityTime())
             .takeWhile(validity -> validity > 0);
     }
-    
+
     @Override
-    public Single<Boolean> tryLockWithRetryRx(int maxRetries, long retryDelay, TimeUnit unit) {
+    public Single<Boolean> tryLockWithRetryRx(int maxRetries, Duration retryDelay) {
         return tryLockRx()
             .retry(maxRetries)
-            .delay(retryDelay, unit);
+            .delay(retryDelay.toMillis(), TimeUnit.MILLISECONDS);
     }
     
     @Override

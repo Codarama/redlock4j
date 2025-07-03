@@ -21,11 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.codarama.redlock4j;
+package org.codarama.redlock4j.configuration;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Central configuration class for Redlock using builder pattern.
@@ -81,11 +81,11 @@ public class RedlockConfiguration {
 
     public static class Builder {
         private final List<RedisNodeConfiguration> redisNodes = new ArrayList<>();
-        private long defaultLockTimeoutMs = TimeUnit.SECONDS.toMillis(30);
+        private long defaultLockTimeoutMs = Duration.ofSeconds(30).toMillis();
         private long retryDelayMs = 200;
         private int maxRetryAttempts = 3;
         private double clockDriftFactor = 0.01;
-        private long lockAcquisitionTimeoutMs = TimeUnit.SECONDS.toMillis(10);
+        private long lockAcquisitionTimeoutMs = Duration.ofSeconds(10).toMillis();
 
         public Builder addRedisNode(RedisNodeConfiguration nodeConfig) {
             this.redisNodes.add(nodeConfig);
@@ -107,13 +107,13 @@ public class RedlockConfiguration {
                     .build());
         }
 
-        public Builder defaultLockTimeout(long timeout, TimeUnit unit) {
-            this.defaultLockTimeoutMs = unit.toMillis(timeout);
+        public Builder defaultLockTimeout(Duration timeout) {
+            this.defaultLockTimeoutMs = timeout.toMillis();
             return this;
         }
 
-        public Builder retryDelay(long delay, TimeUnit unit) {
-            this.retryDelayMs = unit.toMillis(delay);
+        public Builder retryDelay(Duration delay) {
+            this.retryDelayMs = delay.toMillis();
             return this;
         }
 
@@ -127,8 +127,8 @@ public class RedlockConfiguration {
             return this;
         }
 
-        public Builder lockAcquisitionTimeout(long timeout, TimeUnit unit) {
-            this.lockAcquisitionTimeoutMs = unit.toMillis(timeout);
+        public Builder lockAcquisitionTimeout(Duration timeout) {
+            this.lockAcquisitionTimeoutMs = timeout.toMillis();
             return this;
         }
 
