@@ -54,15 +54,25 @@ public class Redlock implements Lock {
         final String lockValue;
         final long acquisitionTime;
         final long validityTime;
-        
+        int holdCount; // For reentrancy
+
         LockState(String lockValue, long acquisitionTime, long validityTime) {
             this.lockValue = lockValue;
             this.acquisitionTime = acquisitionTime;
             this.validityTime = validityTime;
+            this.holdCount = 1; // Initial acquisition
         }
-        
+
         boolean isValid() {
             return System.currentTimeMillis() < acquisitionTime + validityTime;
+        }
+
+        void incrementHoldCount() {
+            holdCount++;
+        }
+
+        int decrementHoldCount() {
+            return --holdCount;
         }
     }
     
@@ -104,34 +114,42 @@ public class Redlock implements Lock {
     
     @Override
     public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
+        // Check if current thread already holds the lock (reentrancy)
+        LockState currentState = lockState.get();
+        if (currentState != null && currentState.isValid()) {
+            currentState.incrementHoldCount();
+            logger.debug("Reentrant lock acquisition for {} (hold count: {})", lockKey, currentState.holdCount);
+            return true;
+        }
+
         long timeoutMs = unit.toMillis(time);
         long startTime = System.currentTimeMillis();
-        
+
         for (int attempt = 0; attempt <= config.getMaxRetryAttempts(); attempt++) {
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
             }
-            
+
             LockResult result = attemptLock();
             if (result.isAcquired()) {
                 lockState.set(new LockState(result.getLockValue(), System.currentTimeMillis(), result.getValidityTimeMs()));
                 logger.debug("Successfully acquired lock {} on attempt {}", lockKey, attempt + 1);
                 return true;
             }
-            
+
             // Check if we've exceeded the timeout
             if (timeoutMs > 0 && (System.currentTimeMillis() - startTime) >= timeoutMs) {
                 logger.debug("Lock acquisition timeout exceeded for {}", lockKey);
                 break;
             }
-            
+
             // Wait before retrying (except on the last attempt)
             if (attempt < config.getMaxRetryAttempts()) {
                 long delay = config.getRetryDelayMs() + ThreadLocalRandom.current().nextLong(config.getRetryDelayMs());
                 Thread.sleep(delay);
             }
         }
-        
+
         logger.debug("Failed to acquire lock {} after {} attempts", lockKey, config.getMaxRetryAttempts() + 1);
         return false;
     }
@@ -173,13 +191,21 @@ public class Redlock implements Lock {
             logger.warn("Attempting to unlock {} but no lock state found for current thread", lockKey);
             return;
         }
-        
+
         if (!state.isValid()) {
             logger.warn("Lock {} has expired, cannot safely unlock", lockKey);
             lockState.remove();
             return;
         }
-        
+
+        // Handle reentrancy - only release when hold count reaches 0
+        int remainingHolds = state.decrementHoldCount();
+        if (remainingHolds > 0) {
+            logger.debug("Reentrant unlock for {} (remaining holds: {})", lockKey, remainingHolds);
+            return;
+        }
+
+        // Final unlock - release the distributed lock
         releaseLock(state.lockValue);
         lockState.remove();
         logger.debug("Successfully released lock {}", lockKey);
@@ -222,7 +248,7 @@ public class Redlock implements Lock {
     
     /**
      * Gets the remaining validity time of the lock for the current thread.
-     * 
+     *
      * @return remaining validity time in milliseconds, or 0 if not held or expired
      */
     public long getRemainingValidityTime() {
@@ -232,5 +258,16 @@ public class Redlock implements Lock {
         }
         long remaining = state.acquisitionTime + state.validityTime - System.currentTimeMillis();
         return Math.max(0, remaining);
+    }
+
+    /**
+     * Gets the hold count for the current thread.
+     * This indicates how many times the current thread has acquired this lock.
+     *
+     * @return hold count, or 0 if not held by current thread
+     */
+    public int getHoldCount() {
+        LockState state = lockState.get();
+        return state != null && state.isValid() ? state.holdCount : 0;
     }
 }

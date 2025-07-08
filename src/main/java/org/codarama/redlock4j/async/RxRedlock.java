@@ -109,11 +109,20 @@ public interface RxRedlock {
     
     /**
      * Gets the lock key.
-     * 
+     *
      * @return the lock key
      */
     String getLockKey();
-    
+
+    /**
+     * Gets the hold count for the reactive lock.
+     * This indicates how many times the lock has been acquired.
+     * This is a synchronous operation as it only checks local state.
+     *
+     * @return hold count, or 0 if not held
+     */
+    int getHoldCount();
+
     /**
      * Represents the state of a lock for reactive monitoring.
      */

@@ -366,19 +366,10 @@ The latest stable version is available on Maven Central:
 implementation 'org.codarama:redlock4j:1.0.0'
 ```
 
-### Release Process
-
-1. **Automated Publishing**: New GitHub releases automatically trigger Maven Central publication
-2. **Quality Gates**: All tests must pass before publishing
-3. **Artifact Signing**: All artifacts are GPG signed for security
-4. **Documentation**: Javadoc and sources are included with each release
-
-For detailed release information, see [RELEASE.md](RELEASE.md).
-
-### Version History
-
-- **1.0.0** - Initial release with full Redlock implementation
-- **Future releases** - Check [GitHub Releases](https://github.com/Codarama/redlock4j/releases) for the latest
+### Related Documentation
+- [How to do distributed locking](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html) by Martin Kleppmann
+- [Is Redlock safe?](https://antirez.com/news/101) bt Salvatore Sanfilippo
+- [Locks, leases, fencing tokens, FizzBee!](https://surfingcomplexity.blog/2025/03/03/locks-leases-fencing-tokens-fizzbee/) by Lorin Hochstein
 
 ## License
 

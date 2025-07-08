@@ -65,15 +65,25 @@ public class AsyncRedlockImpl implements AsyncRedlock, RxRedlock {
         final String lockValue;
         final long acquisitionTime;
         final long validityTime;
-        
+        volatile int holdCount; // For reentrancy - volatile for thread safety
+
         LockStateInfo(String lockValue, long acquisitionTime, long validityTime) {
             this.lockValue = lockValue;
             this.acquisitionTime = acquisitionTime;
             this.validityTime = validityTime;
+            this.holdCount = 1; // Initial acquisition
         }
-        
+
         boolean isValid() {
             return System.currentTimeMillis() < acquisitionTime + validityTime;
+        }
+
+        synchronized void incrementHoldCount() {
+            holdCount++;
+        }
+
+        synchronized int decrementHoldCount() {
+            return --holdCount;
         }
     }
     
@@ -94,6 +104,14 @@ public class AsyncRedlockImpl implements AsyncRedlock, RxRedlock {
     public CompletionStage<Boolean> tryLockAsync() {
         return CompletableFuture.supplyAsync(() -> {
             try {
+                // Check if already held (reentrancy)
+                LockStateInfo currentState = lockState;
+                if (currentState != null && currentState.isValid()) {
+                    currentState.incrementHoldCount();
+                    logger.debug("Reentrant async lock acquisition for {} (hold count: {})", lockKey, currentState.holdCount);
+                    return true;
+                }
+
                 lockStateSubject.onNext(LockState.ACQUIRING);
                 LockResult result = attemptLock();
                 if (result.isAcquired()) {
@@ -187,6 +205,14 @@ public class AsyncRedlockImpl implements AsyncRedlock, RxRedlock {
                 return;
             }
 
+            // Handle reentrancy - only release when hold count reaches 0
+            int remainingHolds = state.decrementHoldCount();
+            if (remainingHolds > 0) {
+                logger.debug("Reentrant async unlock for {} (remaining holds: {})", lockKey, remainingHolds);
+                return;
+            }
+
+            // Final unlock - release the distributed lock
             releaseLock(state.lockValue);
             lockState = null;
             lockStateSubject.onNext(LockState.RELEASED);
@@ -260,6 +286,17 @@ public class AsyncRedlockImpl implements AsyncRedlock, RxRedlock {
     @Override
     public String getLockKey() {
         return lockKey;
+    }
+
+    /**
+     * Gets the hold count for the async lock.
+     * This indicates how many times the lock has been acquired.
+     *
+     * @return hold count, or 0 if not held
+     */
+    public int getHoldCount() {
+        LockStateInfo state = lockState;
+        return state != null && state.isValid() ? state.holdCount : 0;
     }
     
     // Private helper methods

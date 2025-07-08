@@ -51,30 +51,47 @@ public class LettuceRedisDriver implements RedisDriver {
     private final StatefulRedisConnection<String, String> connection;
     private final RedisCommands<String, String> commands;
     private final String identifier;
-    
+
     public LettuceRedisDriver(RedisNodeConfiguration config) {
+        this(config, null, null, null);
+    }
+
+    // Package-private constructor for testing with dependency injection
+    LettuceRedisDriver(RedisNodeConfiguration config,
+                       RedisClient redisClient,
+                       StatefulRedisConnection<String, String> connection,
+                       RedisCommands<String, String> commands) {
         this.identifier = "redis://" + config.getHost() + ":" + config.getPort();
-        
-        RedisURI.Builder uriBuilder = RedisURI.builder()
-            .withHost(config.getHost())
-            .withPort(config.getPort())
-            .withDatabase(config.getDatabase())
-            .withTimeout(Duration.ofMillis(config.getConnectionTimeoutMs()));
-        
-        if (config.getPassword() != null && !config.getPassword().trim().isEmpty()) {
-            uriBuilder.withPassword(config.getPassword().toCharArray());
+
+        if (redisClient != null && connection != null && commands != null) {
+            // Use injected dependencies (for testing)
+            this.redisClient = redisClient;
+            this.connection = connection;
+            this.commands = commands;
+            logger.debug("Created Lettuce driver for {} with injected dependencies", identifier);
+        } else {
+            // Create real connections (production)
+            RedisURI.Builder uriBuilder = RedisURI.builder()
+                .withHost(config.getHost())
+                .withPort(config.getPort())
+                .withDatabase(config.getDatabase())
+                .withTimeout(Duration.ofMillis(config.getConnectionTimeoutMs()));
+
+            if (config.getPassword() != null && !config.getPassword().trim().isEmpty()) {
+                uriBuilder.withPassword(config.getPassword().toCharArray());
+            }
+
+            RedisURI redisURI = uriBuilder.build();
+
+            this.redisClient = RedisClient.create(redisURI);
+            this.connection = this.redisClient.connect();
+            this.commands = this.connection.sync();
+
+            // Set socket timeout
+            this.connection.setTimeout(Duration.ofMillis(config.getSocketTimeoutMs()));
+
+            logger.debug("Created Lettuce driver for {}", identifier);
         }
-        
-        RedisURI redisURI = uriBuilder.build();
-        
-        this.redisClient = RedisClient.create(redisURI);
-        this.connection = redisClient.connect();
-        this.commands = connection.sync();
-        
-        // Set socket timeout
-        connection.setTimeout(Duration.ofMillis(config.getSocketTimeoutMs()));
-        
-        logger.debug("Created Lettuce driver for {}", identifier);
     }
     
     @Override
