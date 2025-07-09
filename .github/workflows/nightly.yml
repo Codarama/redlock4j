@@ -51,7 +51,7 @@ jobs:
       if: github.event.inputs.run_performance_tests == 'true' || github.event_name == 'schedule'
       run: |
         # Enable performance tests by removing @Disabled annotation temporarily
-        sed -i 's/@Disabled("Performance tests - enable manually when needed")/\/\/@Disabled("Performance tests - enable manually when needed")/g' src/test/java/org/codarama/redlock4j/RedlockPerformanceTest.java
+        sed -i 's/@Disabled("Performance tests - enable manually when needed")/\/\/@Disabled("Performance tests - enable manually when needed")/g' src/test/java/org/codarama/redlock4j/performance/RedlockPerformanceTest.java
         mvn test -Dtest=RedlockPerformanceTest
       env:
         TESTCONTAINERS_RYUK_DISABLED: false
@@ -145,8 +145,8 @@ jobs:
     - name: Update Redis version in tests
       run: |
         # Update the Redis image version in test files
-        sed -i 's/redis:7-alpine/redis:${{ matrix.redis-version }}/g' src/test/java/org/codarama/redlock4j/RedlockIntegrationTest.java
-        sed -i 's/redis:7-alpine/redis:${{ matrix.redis-version }}/g' src/test/java/org/codarama/redlock4j/RedlockPerformanceTest.java
+        sed -i 's/redis:7-alpine/redis:${{ matrix.redis-version }}/g' src/test/java/org/codarama/redlock4j/integration/RedlockIntegrationTest.java
+        sed -i 's/redis:7-alpine/redis:${{ matrix.redis-version }}/g' src/test/java/org/codarama/redlock4j/pderformance/RedlockPerformanceTest.java
         
     - name: Run integration tests with Redis ${{ matrix.redis-version }}
       run: mvn test -Dtest=RedlockIntegrationTest
