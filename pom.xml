@@ -157,6 +157,13 @@
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>0.8.11</version>
+        <configuration>
+          <excludes>
+            <!-- Exclude Lettuce JFR classes that cause instrumentation issues -->
+            <exclude>io/lettuce/core/event/**/*</exclude>
+            <exclude>io/lettuce/core/internal/**/*</exclude>
+          </excludes>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -188,6 +195,30 @@
   </build>
 
   <profiles>
+    <!-- Profile to skip integration tests when Docker is not available -->
+    <profile>
+      <id>skip-integration-tests</id>
+      <activation>
+        <property>
+          <name>skipIntegrationTests</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/*IntegrationTest.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <!-- Profile for releasing to Maven Central -->
     <profile>
       <id>sonatype-oss-release</id>
