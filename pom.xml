@@ -291,6 +291,7 @@
             <extensions>true</extensions>
             <configuration>
               <serverId>central</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
               <autoReleaseAfterClose>true</autoReleaseAfterClose>
             </configuration>
           </plugin>
