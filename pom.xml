@@ -253,8 +253,12 @@
               </execution>
             </executions>
             <configuration>
+              <level>public</level>
+              <author>true</author>
+              <header>RedLock4J</header>
               <doclint>none</doclint>
               <source>8</source>
+              <quiet>true</quiet>
               <additionalJOptions>
                 <additionalJOption>-Xdoclint:none</additionalJOption>
               </additionalJOptions>
@@ -283,16 +287,26 @@
             </executions>
           </plugin>
 
-          <!-- Nexus Staging plugin -->
           <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.13</version>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-release-plugin</artifactId>
+            <configuration>
+              <releaseProfiles>sonatype-oss-release</releaseProfiles>
+              <goals>deploy</goals>
+              <autoVersionSubmodules>true</autoVersionSubmodules>
+              <tagNameFormat>@{project.version}</tagNameFormat>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.8.0</version>
             <extensions>true</extensions>
             <configuration>
-              <serverId>central</serverId>
-              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+              <publishingServerId>central</publishingServerId>
+              <autoPublish>true</autoPublish>
+              <waitUntil>published</waitUntil>
             </configuration>
           </plugin>
         </plugins>
