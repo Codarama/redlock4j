@@ -1,8 +1,8 @@
 # Redlock4j
 
 [![CI](https://github.com/Codarama/redlock4j/actions/workflows/ci.yml/badge.svg)](https://github.com/Codarama/redlock4j/actions/workflows/ci.yml)
-[![Nightly Tests](https://github.com/Codarama/redlock4j/actions/workflows/nightly.yml/badge.svg)](https://github.com/Codarama/redlock4j/actions/workflows/nightly.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Maven Central](https://img.shields.io/maven-central/v/org.codarama/redlock4j?versionSuffix=RELEASE)](https://maven-badges.herokuapp.com/maven-central/org.codarama/redlock4j)
+[![Javadocs](https://www.javadoc.io/badge/org.codarama/redlock4j.svg)](https://javadoc.io/doc/org.codarama/redlock4j)
 [![Java](https://img.shields.io/badge/Java-8%2B-blue.svg)](https://openjdk.java.net/)
 
 > [!IMPORTANT]
@@ -276,7 +276,56 @@ if (redlockManager.isHealthy()) {
 
 ## How It Works
 
-This implementation follows the Redlock algorithm as specified by Redis:
+This implementation follows the Redlock algorithm as specified by Redis. The diagram below illustrates the complete flow:
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Redis1
+    participant Redis2
+    participant Redis3
+    participant Redis4
+    participant Redis5
+
+    Note over Client: 1. Lock Acquisition Phase
+    Client->>Redis1: SET key value NX PX ttl
+    Redis1-->>Client: OK
+    Client->>Redis2: SET key value NX PX ttl
+    Redis2-->>Client: OK
+    Client->>Redis3: SET key value NX PX ttl
+    Redis3-->>Client: OK
+    Client->>Redis4: SET key value NX PX ttl
+    Redis4-->>Client: (nil) - Failed
+    Client->>Redis5: SET key value NX PX ttl
+    Redis5-->>Client: (nil) - Failed
+
+    Note over Client: 2. Quorum Check (3/5 = majority)
+    Note over Client: ✓ Lock acquired on 3 nodes<br/>✓ Quorum achieved (3 > 5/2)
+
+    Note over Client: 3. Validity Calculation
+    Note over Client: validity = ttl - elapsed_time - drift_factor
+
+    rect rgb(200, 255, 200)
+        Note over Client: 4. Critical Section
+        Note over Client: Perform protected operations
+    end
+
+    Note over Client: 5. Lock Release Phase
+    Client->>Redis1: Lua script: if get(key)==value then del(key)
+    Redis1-->>Client: 1 (deleted)
+    Client->>Redis2: Lua script: if get(key)==value then del(key)
+    Redis2-->>Client: 1 (deleted)
+    Client->>Redis3: Lua script: if get(key)==value then del(key)
+    Redis3-->>Client: 1 (deleted)
+    Client->>Redis4: Lua script: if get(key)==value then del(key)
+    Redis4-->>Client: 0 (not found)
+    Client->>Redis5: Lua script: if get(key)==value then del(key)
+    Redis5-->>Client: 0 (not found)
+
+    Note over Client: ✓ Lock successfully released
+```
+
+### Algorithm Steps:
 
 1. **Lock Acquisition**: Attempts to acquire the lock on all Redis nodes sequentially
 2. **Quorum Check**: Requires majority of nodes (N/2+1) to successfully acquire the lock

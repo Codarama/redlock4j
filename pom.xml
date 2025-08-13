@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.codarama</groupId>
   <artifactId>redlock4j</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1.0-SNAPSHOT</version>
   <name>redlock4j</name>
   <description>Java implementation of the Redlock distributed locking algorithm</description>
   <url>https://github.com/Codarama/redlock4j</url>
