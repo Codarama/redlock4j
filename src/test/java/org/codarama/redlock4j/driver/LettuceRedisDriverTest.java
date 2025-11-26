@@ -27,7 +27,6 @@ import io.lettuce.core.RedisClient;
 import io.lettuce.core.SetArgs;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
-import io.lettuce.core.ScriptOutputType;
 import org.codarama.redlock4j.configuration.RedisNodeConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -181,9 +180,7 @@ public class LettuceRedisDriverTest {
         when(mockCommands.set(eq("test-key"), eq("test-value"), any(SetArgs.class)))
             .thenThrow(new RuntimeException("Connection failed"));
 
-        RedisDriverException exception = assertThrows(RedisDriverException.class, () -> {
-            driver.setIfNotExists("test-key", "test-value", 10000);
-        });
+        RedisDriverException exception = assertThrows(RedisDriverException.class, () -> driver.setIfNotExists("test-key", "test-value", 10000));
 
         assertTrue(exception.getMessage().contains("Failed to execute SET NX PX command"));
         assertTrue(exception.getMessage().contains("redis://localhost:6379"));
@@ -191,42 +188,45 @@ public class LettuceRedisDriverTest {
 
     @Test
     public void testDeleteIfValueMatchesSuccess() throws RedisDriverException {
-        driver = new LettuceRedisDriver(testConfig, mockRedisClient, mockConnection, mockCommands);
+        // Mock dispatch() for CAD detection (returns success, indicating native support)
+        when(mockCommands.dispatch(any(), any(), any())).thenReturn(1L);
 
-        when(mockCommands.eval(anyString(), eq(ScriptOutputType.INTEGER), any(String[].class), anyString()))
-            .thenReturn(1L);
+        driver = new LettuceRedisDriver(testConfig, mockRedisClient, mockConnection, mockCommands);
 
         boolean result = driver.deleteIfValueMatches("test-key", "test-value");
 
         assertTrue(result);
-        verify(mockCommands).eval(anyString(), eq(ScriptOutputType.INTEGER), any(String[].class), eq("test-value"));
+        // Verify dispatch was called (once for detection, once for actual delete)
+        verify(mockCommands, atLeast(2)).dispatch(any(), any(), any());
     }
 
     @Test
     public void testDeleteIfValueMatchesFailure() throws RedisDriverException {
-        driver = new LettuceRedisDriver(testConfig, mockRedisClient, mockConnection, mockCommands);
+        // Mock dispatch() for CAD detection (returns success, indicating native support)
+        // Then return 0 for the actual delete (key not deleted)
+        when(mockCommands.dispatch(any(), any(), any())).thenReturn(1L, 0L);
 
-        when(mockCommands.eval(anyString(), eq(ScriptOutputType.INTEGER), any(String[].class), anyString()))
-            .thenReturn(0L);
+        driver = new LettuceRedisDriver(testConfig, mockRedisClient, mockConnection, mockCommands);
 
         boolean result = driver.deleteIfValueMatches("test-key", "test-value");
 
         assertFalse(result);
-        verify(mockCommands).eval(anyString(), eq(ScriptOutputType.INTEGER), any(String[].class), eq("test-value"));
+        verify(mockCommands, atLeast(2)).dispatch(any(), any(), any());
     }
 
     @Test
     public void testDeleteIfValueMatchesException() {
+        // Mock dispatch() for CAD detection (returns success, indicating native support)
+        // Then throw exception for the actual delete
+        when(mockCommands.dispatch(any(), any(), any()))
+            .thenReturn(1L)
+            .thenThrow(new RuntimeException("DELEX execution failed"));
+
         driver = new LettuceRedisDriver(testConfig, mockRedisClient, mockConnection, mockCommands);
 
-        when(mockCommands.eval(anyString(), eq(ScriptOutputType.INTEGER), any(String[].class), anyString()))
-            .thenThrow(new RuntimeException("Script execution failed"));
+        RedisDriverException exception = assertThrows(RedisDriverException.class, () -> driver.deleteIfValueMatches("test-key", "test-value"));
 
-        RedisDriverException exception = assertThrows(RedisDriverException.class, () -> {
-            driver.deleteIfValueMatches("test-key", "test-value");
-        });
-
-        assertTrue(exception.getMessage().contains("Failed to execute delete script"));
+        assertTrue(exception.getMessage().contains("Failed to execute DELEX command"));
         assertTrue(exception.getMessage().contains("redis://localhost:6379"));
     }
 

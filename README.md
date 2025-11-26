@@ -15,6 +15,7 @@ A Java implementation of the [Redlock distributed locking algorithm](https://red
 - **Standard Java Lock Interface**: Implements `java.util.concurrent.locks.Lock` for seamless integration
 - **Asynchronous API**: CompletionStage-based async lock operations for non-blocking applications
 - **RxJava Reactive API**: Full RxJava 3 reactive types (Single, Completable, Observable)
+- **Lock Extension**: Extend lock validity time without releasing and re-acquiring
 - **Multiple Redis Drivers**: Supports both Jedis and Lettuce Redis clients
 - **Thread-Safe**: Proper thread-local lock state management
 - **Fault Tolerant**: Works with Redis node failures as long as quorum is maintained
@@ -267,12 +268,57 @@ if (redlock.isHeldByCurrentThread()) {
 
 ```java
 if (redlockManager.isHealthy()) {
-    System.out.println("Manager has " + redlockManager.getConnectedNodeCount() + 
+    System.out.println("Manager has " + redlockManager.getConnectedNodeCount() +
                       " connected nodes (quorum: " + redlockManager.getQuorum() + ")");
 } else {
     System.err.println("Not enough Redis nodes connected for reliable operation");
 }
 ```
+
+### Lock Extension
+
+Extend the validity time of an already-acquired lock without releasing it:
+
+```java
+// Synchronous
+Redlock lock = manager.createLock("my-resource");
+if (lock.tryLock()) {
+    try {
+        // Do some work...
+
+        // Need more time? Extend the lock by 10 seconds
+        boolean extended = lock.extend(10000);
+        if (extended) {
+            // Continue working with extended lock
+        } else {
+            // Extension failed - handle gracefully
+        }
+    } finally {
+        lock.unlock();
+    }
+}
+
+// Asynchronous
+AsyncRedlock asyncLock = manager.createAsyncLock("my-resource");
+asyncLock.tryLockAsync()
+    .thenCompose(acquired -> {
+        if (!acquired) return CompletableFuture.completedFuture(false);
+
+        // Do async work, then extend
+        return asyncLock.extendAsync(Duration.ofSeconds(10));
+    })
+    .whenComplete((extended, error) -> asyncLock.unlockAsync());
+
+// Reactive
+RxRedlock rxLock = manager.createRxLock("my-resource");
+rxLock.tryLockRx()
+    .filter(acquired -> acquired)
+    .flatMap(acquired -> rxLock.extendRx(Duration.ofSeconds(10)))
+    .doFinally(() -> rxLock.unlockRx().subscribe())
+    .subscribe();
+```
+
+**Important:** Lock extension is for efficiency, not correctness. It does not solve GC pause problems. For true correctness, use fencing tokens. See [Lock Extension Documentation](docs/LOCK-EXTENSION.md) for details.
 
 ## How It Works
 

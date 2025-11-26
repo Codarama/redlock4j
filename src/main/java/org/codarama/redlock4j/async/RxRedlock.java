@@ -124,6 +124,29 @@ public interface RxRedlock {
     int getHoldCount();
 
     /**
+     * Extends the validity time of the lock reactively.
+     * <p>
+     * This method attempts to extend the lock on a quorum of Redis nodes using the same
+     * lock value. The extension is only successful if:
+     * <ul>
+     *   <li>The lock is currently held and valid</li>
+     *   <li>The extension succeeds on at least a quorum (N/2+1) of nodes</li>
+     *   <li>The new validity time (after accounting for clock drift) is positive</li>
+     * </ul>
+     * <p>
+     * <b>Important limitations:</b>
+     * <ul>
+     *   <li>Lock extension is for efficiency, not correctness</li>
+     *   <li>Should not be used as a substitute for proper timeout configuration</li>
+     * </ul>
+     *
+     * @param additionalTime additional time to extend the lock
+     * @return a Single that emits true if the lock was successfully extended, false otherwise
+     * @throws IllegalArgumentException if additionalTime is negative or zero
+     */
+    Single<Boolean> extendRx(Duration additionalTime);
+
+    /**
      * Represents the state of a lock for reactive monitoring.
      */
     enum LockState {

@@ -35,22 +35,47 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 
 /**
- * Lettuce implementation of the RedisDriver interface.
+ * Lettuce implementation of the RedisDriver interface with automatic CAS/CAD detection.
+ *
+ * <p>This driver automatically detects and uses the best available method for each operation:
+ * <ul>
+ *   <li>Native Redis 8.4+ CAS/CAD commands (DELEX, SET IFEQ) when available</li>
+ *   <li>Lua script-based operations for older Redis versions</li>
+ * </ul>
+ * Detection happens once at driver initialization.</p>
  */
 public class LettuceRedisDriver implements RedisDriver {
     private static final Logger logger = LoggerFactory.getLogger(LettuceRedisDriver.class);
-    
-    private static final String DELETE_IF_VALUE_MATCHES_SCRIPT = 
+
+    private static final String DELETE_IF_VALUE_MATCHES_SCRIPT =
         "if redis.call('get', KEYS[1]) == ARGV[1] then " +
         "    return redis.call('del', KEYS[1]) " +
         "else " +
         "    return 0 " +
         "end";
-    
+
+    private static final String SET_IF_VALUE_MATCHES_SCRIPT =
+        "if redis.call('get', KEYS[1]) == ARGV[1] then " +
+        "    return redis.call('set', KEYS[1], ARGV[2], 'PX', ARGV[3]) " +
+        "else " +
+        "    return nil " +
+        "end";
+
+    /**
+     * Strategy for CAS/CAD operations.
+     */
+    private enum CADStrategy {
+        /** Use native Redis 8.4+ commands (DELEX, SET IFEQ) */
+        NATIVE,
+        /** Use Lua scripts for compatibility */
+        SCRIPT
+    }
+
     private final RedisClient redisClient;
     private final StatefulRedisConnection<String, String> connection;
     private final RedisCommands<String, String> commands;
     private final String identifier;
+    private final CADStrategy cadStrategy;
 
     public LettuceRedisDriver(RedisNodeConfiguration config) {
         this(config, null, null, null);
@@ -92,6 +117,35 @@ public class LettuceRedisDriver implements RedisDriver {
 
             logger.debug("Created Lettuce driver for {}", identifier);
         }
+
+        // Detect CAS/CAD support once at initialization
+        this.cadStrategy = detectCADStrategy();
+        logger.info("Using {} strategy for CAS/CAD operations on {}", cadStrategy, identifier);
+    }
+
+    /**
+     * Detects whether native CAS/CAD commands are available.
+     * This is called once during driver initialization.
+     */
+    private CADStrategy detectCADStrategy() {
+        try {
+            // Try to execute DELEX on a test key
+            String testKey = "__redlock4j_cad_test__" + System.currentTimeMillis();
+            commands.dispatch(
+                io.lettuce.core.protocol.CommandType.DELEX,
+                new io.lettuce.core.output.IntegerOutput<>(io.lettuce.core.codec.StringCodec.UTF8),
+                new io.lettuce.core.protocol.CommandArgs<>(io.lettuce.core.codec.StringCodec.UTF8)
+                    .addKey(testKey)
+                    .add("IFEQ")
+                    .add("test_value")
+            );
+            logger.debug("Native CAS/CAD commands detected for {}", identifier);
+            return CADStrategy.NATIVE;
+        } catch (Exception e) {
+            logger.debug("Native CAS/CAD commands not available for {}, using Lua scripts: {}",
+                identifier, e.getMessage());
+            return CADStrategy.SCRIPT;
+        }
     }
     
     @Override
@@ -107,6 +161,39 @@ public class LettuceRedisDriver implements RedisDriver {
     
     @Override
     public boolean deleteIfValueMatches(String key, String expectedValue) throws RedisDriverException {
+        switch (cadStrategy) {
+            case NATIVE:
+                return deleteIfValueMatchesNative(key, expectedValue);
+            case SCRIPT:
+                return deleteIfValueMatchesScript(key, expectedValue);
+            default:
+                throw new IllegalStateException("Unknown CAD strategy: " + cadStrategy);
+        }
+    }
+
+    /**
+     * Deletes a key using native DELEX command (Redis 8.4+).
+     */
+    private boolean deleteIfValueMatchesNative(String key, String expectedValue) throws RedisDriverException {
+        try {
+            Object result = commands.dispatch(
+                io.lettuce.core.protocol.CommandType.DELEX,
+                new io.lettuce.core.output.IntegerOutput<>(io.lettuce.core.codec.StringCodec.UTF8),
+                new io.lettuce.core.protocol.CommandArgs<>(io.lettuce.core.codec.StringCodec.UTF8)
+                    .addKey(key)
+                    .add("IFEQ")
+                    .add(expectedValue)
+            );
+            return Long.valueOf(1).equals(result);
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute DELEX command on " + identifier, e);
+        }
+    }
+
+    /**
+     * Deletes a key using Lua script (legacy compatibility).
+     */
+    private boolean deleteIfValueMatchesScript(String key, String expectedValue) throws RedisDriverException {
         try {
             Object result = commands.eval(
                 DELETE_IF_VALUE_MATCHES_SCRIPT,
@@ -147,6 +234,60 @@ public class LettuceRedisDriver implements RedisDriver {
             logger.debug("Closed Lettuce driver for {}", identifier);
         } catch (Exception e) {
             logger.warn("Error closing Lettuce driver for {}: {}", identifier, e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean setIfValueMatches(String key, String newValue, String expectedCurrentValue,
+                                    long expireTimeMs) throws RedisDriverException {
+        switch (cadStrategy) {
+            case NATIVE:
+                return setIfValueMatchesNative(key, newValue, expectedCurrentValue, expireTimeMs);
+            case SCRIPT:
+                return setIfValueMatchesScript(key, newValue, expectedCurrentValue, expireTimeMs);
+            default:
+                throw new IllegalStateException("Unknown CAD strategy: " + cadStrategy);
+        }
+    }
+
+    /**
+     * Sets a key using native SET IFEQ command (Redis 8.4+).
+     */
+    private boolean setIfValueMatchesNative(String key, String newValue, String expectedCurrentValue,
+                                           long expireTimeMs) throws RedisDriverException {
+        try {
+            String result = commands.dispatch(
+                io.lettuce.core.protocol.CommandType.SET,
+                new io.lettuce.core.output.StatusOutput<>(io.lettuce.core.codec.StringCodec.UTF8),
+                new io.lettuce.core.protocol.CommandArgs<>(io.lettuce.core.codec.StringCodec.UTF8)
+                    .addKey(key)
+                    .addValue(newValue)
+                    .add("IFEQ")
+                    .add(expectedCurrentValue)
+                    .add("PX")
+                    .add(expireTimeMs)
+            );
+            return "OK".equals(result);
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute SET IFEQ command on " + identifier, e);
+        }
+    }
+
+    /**
+     * Sets a key using Lua script (legacy compatibility).
+     */
+    private boolean setIfValueMatchesScript(String key, String newValue, String expectedCurrentValue,
+                                           long expireTimeMs) throws RedisDriverException {
+        try {
+            Object result = commands.eval(
+                SET_IF_VALUE_MATCHES_SCRIPT,
+                io.lettuce.core.ScriptOutputType.STATUS,
+                new String[]{key},
+                expectedCurrentValue, newValue, String.valueOf(expireTimeMs)
+            );
+            return "OK".equals(result);
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute SET script on " + identifier, e);
         }
     }
 }

@@ -96,4 +96,28 @@ public interface AsyncRedlock {
      * @return hold count, or 0 if not held
      */
     int getHoldCount();
+
+    /**
+     * Extends the validity time of the lock asynchronously.
+     * <p>
+     * This method attempts to extend the lock on a quorum of Redis nodes using the same
+     * lock value. The extension is only successful if:
+     * <ul>
+     *   <li>The lock is currently held and valid</li>
+     *   <li>The extension succeeds on at least a quorum (N/2+1) of nodes</li>
+     *   <li>The new validity time (after accounting for clock drift) is positive</li>
+     * </ul>
+     * <p>
+     * <b>Important limitations:</b>
+     * <ul>
+     *   <li>Lock extension is for efficiency, not correctness</li>
+     *   <li>Does not solve the GC pause problem - use fencing tokens for correctness</li>
+     *   <li>Should not be used as a substitute for proper timeout configuration</li>
+     * </ul>
+     *
+     * @param additionalTime additional time to extend the lock
+     * @return a CompletionStage that completes with true if the lock was successfully extended, false otherwise
+     * @throws IllegalArgumentException if additionalTime is negative or zero
+     */
+    CompletionStage<Boolean> extendAsync(Duration additionalTime);
 }
