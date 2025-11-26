@@ -264,7 +264,13 @@ public class AsyncRedlockImpl implements AsyncRedlock, RxRedlock {
     public Observable<LockState> lockStateObservable() {
         return lockStateSubject.distinctUntilChanged();
     }
-    
+
+    @Override
+    public Single<Boolean> extendRx(Duration additionalTime) {
+        return Single.fromCompletionStage(extendAsync(additionalTime))
+            .subscribeOn(Schedulers.io());
+    }
+
     // Common methods
     
     @Override
@@ -298,7 +304,61 @@ public class AsyncRedlockImpl implements AsyncRedlock, RxRedlock {
         LockStateInfo state = lockState;
         return state != null && state.isValid() ? state.holdCount : 0;
     }
-    
+
+    @Override
+    public CompletionStage<Boolean> extendAsync(Duration additionalTime) {
+        if (additionalTime.isNegative() || additionalTime.isZero()) {
+            CompletableFuture<Boolean> future = new CompletableFuture<>();
+            future.completeExceptionally(new IllegalArgumentException("Additional time must be positive"));
+            return future;
+        }
+
+        return CompletableFuture.supplyAsync(() -> {
+            LockStateInfo state = lockState;
+            if (state == null || !state.isValid()) {
+                logger.debug("Cannot extend lock {} - not held or expired", lockKey);
+                return false;
+            }
+
+            long startTime = System.currentTimeMillis();
+            int successfulNodes = 0;
+            long additionalTimeMs = additionalTime.toMillis();
+            long newExpireTimeMs = config.getDefaultLockTimeoutMs() + additionalTimeMs;
+
+            // Try to extend the lock on all nodes using CAS operation
+            for (RedisDriver driver : redisDrivers) {
+                try {
+                    // Use setIfValueMatches to atomically extend only if lock value matches
+                    if (driver.setIfValueMatches(lockKey, state.lockValue, state.lockValue, newExpireTimeMs)) {
+                        successfulNodes++;
+                    }
+                } catch (RedisDriverException e) {
+                    logger.warn("Failed to extend lock on {}: {}", driver.getIdentifier(), e.getMessage());
+                }
+            }
+
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            long driftTime = (long) (newExpireTimeMs * config.getClockDriftFactor()) + 2;
+            long newValidityTime = newExpireTimeMs - elapsedTime - driftTime;
+
+            boolean extended = successfulNodes >= config.getQuorum() && newValidityTime > 0;
+
+            if (extended) {
+                // Update lock state with new validity time
+                LockStateInfo newState = new LockStateInfo(state.lockValue, System.currentTimeMillis(), newValidityTime);
+                newState.holdCount = state.holdCount; // Preserve hold count
+                lockState = newState;
+                logger.debug("Successfully extended async lock {} on {}/{} nodes (new validity: {}ms)",
+                        lockKey, successfulNodes, redisDrivers.size(), newValidityTime);
+            } else {
+                logger.debug("Failed to extend async lock {} - only {}/{} nodes succeeded (quorum: {})",
+                        lockKey, successfulNodes, redisDrivers.size(), config.getQuorum());
+            }
+
+            return extended;
+        }, executorService);
+    }
+
     // Private helper methods
     
     private LockResult attemptLock() {

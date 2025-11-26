@@ -270,4 +270,74 @@ public class Redlock implements Lock {
         LockState state = lockState.get();
         return state != null && state.isValid() ? state.holdCount : 0;
     }
+
+    /**
+     * Extends the validity time of the lock held by the current thread.
+     * <p>
+     * This method attempts to extend the lock on a quorum of Redis nodes using the same
+     * lock value. The extension is only successful if:
+     * <ul>
+     *   <li>The current thread holds a valid lock</li>
+     *   <li>The extension succeeds on at least a quorum (N/2+1) of nodes</li>
+     *   <li>The new validity time (after accounting for clock drift) is positive</li>
+     * </ul>
+     * <p>
+     * <b>Important limitations:</b>
+     * <ul>
+     *   <li>Lock extension is for efficiency, not correctness</li>
+     *   <li>Should not be used as a substitute for proper timeout configuration</li>
+     * </ul>
+     *
+     * @param additionalTimeMs additional time in milliseconds to extend the lock
+     * @return true if the lock was successfully extended on a quorum of nodes, false otherwise
+     * @throws IllegalArgumentException if additionalTimeMs is negative or zero
+     */
+    public boolean extend(long additionalTimeMs) {
+        if (additionalTimeMs <= 0) {
+            throw new IllegalArgumentException("Additional time must be positive");
+        }
+
+        LockState state = lockState.get();
+        if (state == null || !state.isValid()) {
+            logger.debug("Cannot extend lock {} - not held or expired", lockKey);
+            return false;
+        }
+
+        long startTime = System.currentTimeMillis();
+        int successfulNodes = 0;
+        long newExpireTimeMs = config.getDefaultLockTimeoutMs() + additionalTimeMs;
+
+        // Try to extend the lock on all nodes using CAS operation
+        for (RedisDriver driver : redisDrivers) {
+            try {
+                // Use setIfValueMatches to atomically extend only if lock value matches
+                if (driver.setIfValueMatches(lockKey, state.lockValue, state.lockValue, newExpireTimeMs)) {
+                    successfulNodes++;
+                }
+            } catch (RedisDriverException e) {
+                logger.warn("Failed to extend lock on {}: {}", driver.getIdentifier(), e.getMessage());
+            }
+        }
+
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        long driftTime = (long) (newExpireTimeMs * config.getClockDriftFactor()) + 2;
+        long newValidityTime = newExpireTimeMs - elapsedTime - driftTime;
+
+        boolean extended = successfulNodes >= config.getQuorum() && newValidityTime > 0;
+
+        if (extended) {
+            // Update local lock state with new validity time
+            // Note: We create a new LockState to maintain immutability of timing fields
+            LockState newState = new LockState(state.lockValue, System.currentTimeMillis(), newValidityTime);
+            newState.holdCount = state.holdCount; // Preserve hold count
+            lockState.set(newState);
+            logger.debug("Successfully extended lock {} on {}/{} nodes (new validity: {}ms)",
+                    lockKey, successfulNodes, redisDrivers.size(), newValidityTime);
+        } else {
+            logger.debug("Failed to extend lock {} - only {}/{} nodes succeeded (quorum: {})",
+                    lockKey, successfulNodes, redisDrivers.size(), config.getQuorum());
+        }
+
+        return extended;
+    }
 }
