@@ -28,11 +28,16 @@ import io.lettuce.core.RedisURI;
 import io.lettuce.core.SetArgs;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
+import io.lettuce.core.pubsub.RedisPubSubAdapter;
+import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
+import io.lettuce.core.pubsub.api.sync.RedisPubSubCommands;
 import org.codarama.redlock4j.configuration.RedisNodeConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Lettuce implementation of the RedisDriver interface with automatic CAS/CAD detection.
@@ -288,6 +293,149 @@ public class LettuceRedisDriver implements RedisDriver {
             return "OK".equals(result);
         } catch (Exception e) {
             throw new RedisDriverException("Failed to execute SET script on " + identifier, e);
+        }
+    }
+
+    // ========== Sorted Set Operations ==========
+
+    @Override
+    public boolean zAdd(String key, double score, String member) throws RedisDriverException {
+        try {
+            Long result = commands.zadd(key, score, member);
+            return result != null && result > 0;
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute ZADD on " + identifier, e);
+        }
+    }
+
+    @Override
+    public boolean zRem(String key, String member) throws RedisDriverException {
+        try {
+            Long result = commands.zrem(key, member);
+            return result != null && result > 0;
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute ZREM on " + identifier, e);
+        }
+    }
+
+    @Override
+    public List<String> zRange(String key, long start, long stop) throws RedisDriverException {
+        try {
+            List<String> result = commands.zrange(key, start, stop);
+            return result != null ? result : java.util.Collections.emptyList();
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute ZRANGE on " + identifier, e);
+        }
+    }
+
+    @Override
+    public Double zScore(String key, String member) throws RedisDriverException {
+        try {
+            return commands.zscore(key, member);
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute ZSCORE on " + identifier, e);
+        }
+    }
+
+    @Override
+    public long zRemRangeByScore(String key, double minScore, double maxScore) throws RedisDriverException {
+        try {
+            Long result = commands.zremrangebyscore(key, minScore, maxScore);
+            return result != null ? result : 0;
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute ZREMRANGEBYSCORE on " + identifier, e);
+        }
+    }
+
+    // ========== String/Counter Operations ==========
+
+    @Override
+    public long incr(String key) throws RedisDriverException {
+        try {
+            Long result = commands.incr(key);
+            return result != null ? result : 0;
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute INCR on " + identifier, e);
+        }
+    }
+
+    @Override
+    public long decr(String key) throws RedisDriverException {
+        try {
+            Long result = commands.decr(key);
+            return result != null ? result : 0;
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute DECR on " + identifier, e);
+        }
+    }
+
+    @Override
+    public String get(String key) throws RedisDriverException {
+        try {
+            return commands.get(key);
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute GET on " + identifier, e);
+        }
+    }
+
+    @Override
+    public void setex(String key, String value, long expireTimeMs) throws RedisDriverException {
+        try {
+            commands.psetex(key, expireTimeMs, value);
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute SETEX on " + identifier, e);
+        }
+    }
+
+    @Override
+    public long del(String... keys) throws RedisDriverException {
+        try {
+            Long result = commands.del(keys);
+            return result != null ? result : 0;
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute DEL on " + identifier, e);
+        }
+    }
+
+    // ========== Pub/Sub Operations ==========
+
+    @Override
+    public long publish(String channel, String message) throws RedisDriverException {
+        try {
+            Long result = commands.publish(channel, message);
+            return result != null ? result : 0;
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute PUBLISH on " + identifier, e);
+        }
+    }
+
+    @Override
+    public void subscribe(MessageHandler handler, String... channels) throws RedisDriverException {
+        try {
+            StatefulRedisPubSubConnection<String, String> pubSubConnection = redisClient.connectPubSub();
+            RedisPubSubCommands<String, String> pubSubCommands = pubSubConnection.sync();
+
+            pubSubConnection.addListener(new RedisPubSubAdapter<String, String>() {
+                @Override
+                public void message(String channel, String message) {
+                    handler.onMessage(channel, message);
+                }
+
+                @Override
+                public void subscribed(String channel, long count) {
+                    logger.debug("Subscribed to channel {} on {}", channel, identifier);
+                }
+
+                @Override
+                public void unsubscribed(String channel, long count) {
+                    logger.debug("Unsubscribed from channel {} on {}", channel, identifier);
+                }
+            });
+
+            pubSubCommands.subscribe(channels);
+        } catch (Exception e) {
+            handler.onError(e);
+            throw new RedisDriverException("Failed to execute SUBSCRIBE on " + identifier, e);
         }
     }
 }

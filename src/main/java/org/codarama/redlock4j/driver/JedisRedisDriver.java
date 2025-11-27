@@ -29,10 +29,13 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.exceptions.JedisException;
 import redis.clients.jedis.params.SetParams;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Jedis implementation of the RedisDriver interface with automatic CAS/CAD detection.
@@ -256,6 +259,145 @@ public class JedisRedisDriver implements RedisDriver {
             return "OK".equals(result);
         } catch (JedisException e) {
             throw new RedisDriverException("Failed to execute SET script on " + identifier, e);
+        }
+    }
+
+    // ========== Sorted Set Operations ==========
+
+    @Override
+    public boolean zAdd(String key, double score, String member) throws RedisDriverException {
+        try (Jedis jedis = jedisPool.getResource()) {
+            Long result = jedis.zadd(key, score, member);
+            return result != null && result > 0;
+        } catch (JedisException e) {
+            throw new RedisDriverException("Failed to execute ZADD on " + identifier, e);
+        }
+    }
+
+    @Override
+    public boolean zRem(String key, String member) throws RedisDriverException {
+        try (Jedis jedis = jedisPool.getResource()) {
+            Long result = jedis.zrem(key, member);
+            return result != null && result > 0;
+        } catch (JedisException e) {
+            throw new RedisDriverException("Failed to execute ZREM on " + identifier, e);
+        }
+    }
+
+    @Override
+    public List<String> zRange(String key, long start, long stop) throws RedisDriverException {
+        try (Jedis jedis = jedisPool.getResource()) {
+            List<String> result = jedis.zrange(key, start, stop);
+            return result != null ? result : Collections.emptyList();
+        } catch (JedisException e) {
+            throw new RedisDriverException("Failed to execute ZRANGE on " + identifier, e);
+        }
+    }
+
+    @Override
+    public Double zScore(String key, String member) throws RedisDriverException {
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.zscore(key, member);
+        } catch (JedisException e) {
+            throw new RedisDriverException("Failed to execute ZSCORE on " + identifier, e);
+        }
+    }
+
+    @Override
+    public long zRemRangeByScore(String key, double minScore, double maxScore) throws RedisDriverException {
+        try (Jedis jedis = jedisPool.getResource()) {
+            Long result = jedis.zremrangeByScore(key, minScore, maxScore);
+            return result != null ? result : 0;
+        } catch (JedisException e) {
+            throw new RedisDriverException("Failed to execute ZREMRANGEBYSCORE on " + identifier, e);
+        }
+    }
+
+    // ========== String/Counter Operations ==========
+
+    @Override
+    public long incr(String key) throws RedisDriverException {
+        try (Jedis jedis = jedisPool.getResource()) {
+            Long result = jedis.incr(key);
+            return result != null ? result : 0;
+        } catch (JedisException e) {
+            throw new RedisDriverException("Failed to execute INCR on " + identifier, e);
+        }
+    }
+
+    @Override
+    public long decr(String key) throws RedisDriverException {
+        try (Jedis jedis = jedisPool.getResource()) {
+            Long result = jedis.decr(key);
+            return result != null ? result : 0;
+        } catch (JedisException e) {
+            throw new RedisDriverException("Failed to execute DECR on " + identifier, e);
+        }
+    }
+
+    @Override
+    public String get(String key) throws RedisDriverException {
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.get(key);
+        } catch (JedisException e) {
+            throw new RedisDriverException("Failed to execute GET on " + identifier, e);
+        }
+    }
+
+    @Override
+    public void setex(String key, String value, long expireTimeMs) throws RedisDriverException {
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.psetex(key, expireTimeMs, value);
+        } catch (JedisException e) {
+            throw new RedisDriverException("Failed to execute SETEX on " + identifier, e);
+        }
+    }
+
+    @Override
+    public long del(String... keys) throws RedisDriverException {
+        try (Jedis jedis = jedisPool.getResource()) {
+            Long result = jedis.del(keys);
+            return result != null ? result : 0;
+        } catch (JedisException e) {
+            throw new RedisDriverException("Failed to execute DEL on " + identifier, e);
+        }
+    }
+
+    // ========== Pub/Sub Operations ==========
+
+    @Override
+    public long publish(String channel, String message) throws RedisDriverException {
+        try (Jedis jedis = jedisPool.getResource()) {
+            Long result = jedis.publish(channel, message);
+            return result != null ? result : 0;
+        } catch (JedisException e) {
+            throw new RedisDriverException("Failed to execute PUBLISH on " + identifier, e);
+        }
+    }
+
+    @Override
+    public void subscribe(MessageHandler handler, String... channels) throws RedisDriverException {
+        try (Jedis jedis = jedisPool.getResource()) {
+            JedisPubSub jedisPubSub = new JedisPubSub() {
+                @Override
+                public void onMessage(String channel, String message) {
+                    handler.onMessage(channel, message);
+                }
+
+                @Override
+                public void onSubscribe(String channel, int subscribedChannels) {
+                    logger.debug("Subscribed to channel {} on {}", channel, identifier);
+                }
+
+                @Override
+                public void onUnsubscribe(String channel, int subscribedChannels) {
+                    logger.debug("Unsubscribed from channel {} on {}", channel, identifier);
+                }
+            };
+            jedis.subscribe(jedisPubSub, channels);
+        } catch (JedisException e) {
+            handler.onError(e);
+            throw new RedisDriverException("Failed to execute SUBSCRIBE on " + identifier, e);
         }
     }
 }
