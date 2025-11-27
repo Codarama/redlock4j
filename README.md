@@ -13,6 +13,7 @@ A Java implementation of the [Redlock distributed locking algorithm](https://red
 ## Features
 
 - **Standard Java Lock Interface**: Implements `java.util.concurrent.locks.Lock` for seamless integration
+- **Advanced Locking Primitives**: Fair locks, multi-locks, read-write locks, semaphores, and countdown latches
 - **Asynchronous API**: CompletionStage-based async lock operations for non-blocking applications
 - **RxJava Reactive API**: Full RxJava 3 reactive types (Single, Completable, Observable)
 - **Lock Extension**: Extend lock validity time without releasing and re-acquiring
@@ -135,6 +136,116 @@ if (lock.tryLock(5, TimeUnit.SECONDS)) {
     // Failed to acquire lock
     handleLockFailure();
 }
+```
+
+## Advanced Locking Primitives
+
+Redlock4j provides several advanced distributed synchronization primitives beyond basic locks.
+
+### Fair Lock (FIFO Ordering)
+
+Fair locks ensure that threads acquire locks in the order they requested them (FIFO).
+
+```java
+Lock fairLock = redlockManager.createFairLock("fair-resource");
+
+fairLock.lock();
+try {
+    // Critical section - guaranteed FIFO ordering
+    performWork();
+} finally {
+    fairLock.unlock();
+}
+```
+
+### Multi-Lock (Atomic Multi-Resource Locking)
+
+Multi-locks allow atomic acquisition of multiple resources, preventing deadlocks through consistent ordering.
+
+```java
+// Lock multiple resources atomically
+Lock multiLock = redlockManager.createMultiLock(
+    Arrays.asList("account:1", "account:2", "account:3")
+);
+
+multiLock.lock();
+try {
+    // All resources are now locked atomically
+    transferBetweenAccounts();
+} finally {
+    multiLock.unlock();
+}
+```
+
+### Read-Write Lock
+
+Read-write locks allow multiple concurrent readers or a single exclusive writer.
+
+```java
+RedlockReadWriteLock rwLock = redlockManager.createReadWriteLock("shared-data");
+
+// Multiple readers can access simultaneously
+rwLock.readLock().lock();
+try {
+    readData();
+} finally {
+    rwLock.readLock().unlock();
+}
+
+// Writers get exclusive access
+rwLock.writeLock().lock();
+try {
+    writeData();
+} finally {
+    rwLock.writeLock().unlock();
+}
+```
+
+### Semaphore (Distributed Permits)
+
+Semaphores control concurrent access with a configurable number of permits.
+
+```java
+// Create a semaphore with 5 permits
+RedlockSemaphore semaphore = redlockManager.createSemaphore("api-limiter", 5);
+
+if (semaphore.tryAcquire(5, TimeUnit.SECONDS)) {
+    try {
+        // One of 5 concurrent slots
+        callRateLimitedAPI();
+    } finally {
+        semaphore.release();
+    }
+}
+```
+
+### CountDownLatch (Distributed Coordination)
+
+Countdown latches allow threads to wait until a set of operations completes.
+
+```java
+// Create a latch that waits for 3 operations
+RedlockCountDownLatch latch = redlockManager.createCountDownLatch("startup", 3);
+
+// Worker threads count down
+new Thread(() -> {
+    initializeService1();
+    latch.countDown();
+}).start();
+
+new Thread(() -> {
+    initializeService2();
+    latch.countDown();
+}).start();
+
+new Thread(() -> {
+    initializeService3();
+    latch.countDown();
+}).start();
+
+// Main thread waits for all
+latch.await(); // Blocks until count reaches 0
+System.out.println("All services initialized!");
 ```
 
 ## Asynchronous and Reactive APIs

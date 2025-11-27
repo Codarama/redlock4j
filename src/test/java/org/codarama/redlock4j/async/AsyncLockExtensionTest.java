@@ -26,7 +26,6 @@ package org.codarama.redlock4j.async;
 import io.reactivex.rxjava3.observers.TestObserver;
 import org.codarama.redlock4j.configuration.RedlockConfiguration;
 import org.codarama.redlock4j.driver.RedisDriver;
-import org.codarama.redlock4j.driver.RedisDriverException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
@@ -221,8 +220,8 @@ public class AsyncLockExtensionTest {
         
         ExecutionException exception = assertThrows(ExecutionException.class, () -> 
             future.toCompletableFuture().get(5, TimeUnit.SECONDS));
-        
-        assertTrue(exception.getCause() instanceof IllegalArgumentException);
+
+      assertInstanceOf(IllegalArgumentException.class, exception.getCause());
     }
     
     @Test

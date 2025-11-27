@@ -218,7 +218,117 @@ public class RedlockManager implements AutoCloseable {
 
         return new AsyncRedlockImpl(lockKey, redisDrivers, config, executorService, scheduledExecutorService);
     }
-    
+
+    /**
+     * Creates a new distributed fair lock for the given key.
+     * Fair locks ensure FIFO ordering for lock acquisition.
+     *
+     * @param lockKey the key to lock
+     * @return a new FairLock instance
+     * @throws RedlockException if the manager is closed
+     */
+    public Lock createFairLock(String lockKey) {
+        if (closed) {
+            throw new RedlockException("RedlockManager is closed");
+        }
+
+        if (lockKey == null || lockKey.trim().isEmpty()) {
+            throw new IllegalArgumentException("Lock key cannot be null or empty");
+        }
+
+        return new FairLock(lockKey, redisDrivers, config);
+    }
+
+    /**
+     * Creates a new distributed multi-lock for the given keys.
+     * Multi-locks allow atomic acquisition of multiple resources.
+     *
+     * @param lockKeys the keys to lock atomically
+     * @return a new MultiLock instance
+     * @throws RedlockException if the manager is closed
+     */
+    public Lock createMultiLock(List<String> lockKeys) {
+        if (closed) {
+            throw new RedlockException("RedlockManager is closed");
+        }
+
+        if (lockKeys == null || lockKeys.isEmpty()) {
+            throw new IllegalArgumentException("Lock keys cannot be null or empty");
+        }
+
+        return new MultiLock(lockKeys, redisDrivers, config);
+    }
+
+    /**
+     * Creates a new distributed read-write lock for the given key.
+     * Read-write locks allow multiple concurrent readers or a single exclusive writer.
+     *
+     * @param resourceKey the resource key
+     * @return a new RedlockReadWriteLock instance
+     * @throws RedlockException if the manager is closed
+     */
+    public RedlockReadWriteLock createReadWriteLock(String resourceKey) {
+        if (closed) {
+            throw new RedlockException("RedlockManager is closed");
+        }
+
+        if (resourceKey == null || resourceKey.trim().isEmpty()) {
+            throw new IllegalArgumentException("Resource key cannot be null or empty");
+        }
+
+        return new RedlockReadWriteLock(resourceKey, redisDrivers, config);
+    }
+
+    /**
+     * Creates a new distributed semaphore with the specified number of permits.
+     * Semaphores control concurrent access to a resource with multiple permits.
+     *
+     * @param semaphoreKey the semaphore key
+     * @param permits the number of permits available
+     * @return a new RedlockSemaphore instance
+     * @throws RedlockException if the manager is closed
+     */
+    public RedlockSemaphore createSemaphore(String semaphoreKey, int permits) {
+        if (closed) {
+            throw new RedlockException("RedlockManager is closed");
+        }
+
+        if (semaphoreKey == null || semaphoreKey.trim().isEmpty()) {
+            throw new IllegalArgumentException("Semaphore key cannot be null or empty");
+        }
+
+        if (permits <= 0) {
+            throw new IllegalArgumentException("Permits must be positive");
+        }
+
+        return new RedlockSemaphore(semaphoreKey, permits, redisDrivers, config);
+    }
+
+    /**
+     * Creates a new distributed countdown latch with the specified count.
+     * Countdown latches allow threads to wait until a set of operations completes.
+     *
+     * @param latchKey the latch key
+     * @param count the initial count
+     * @return a new RedlockCountDownLatch instance
+     * @throws RedlockException if the manager is closed
+     */
+    public RedlockCountDownLatch createCountDownLatch(String latchKey, int count) {
+        if (closed) {
+            throw new RedlockException("RedlockManager is closed");
+        }
+
+        if (latchKey == null || latchKey.trim().isEmpty()) {
+            throw new IllegalArgumentException("Latch key cannot be null or empty");
+        }
+
+        if (count < 0) {
+            throw new IllegalArgumentException("Count cannot be negative");
+        }
+
+        return new RedlockCountDownLatch(latchKey, count, redisDrivers, config);
+    }
+
     /**
      * Gets the number of connected Redis nodes.
      * 
