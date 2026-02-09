@@ -135,7 +135,6 @@ Redlock redlock = new Redlock(client1, client2, client3);
 
 ## Next Steps
 
-- [Configuration](configuration.md) - Learn about advanced configuration options
 - [Basic Usage](../guide/basic-usage.md) - Explore more usage patterns
 - [Advanced Locking](../guide/advanced-locking.md) - Learn about advanced features
 

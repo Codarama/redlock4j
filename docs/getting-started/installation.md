@@ -80,5 +80,3 @@ public class RedlockTest {
 ## Next Steps
 
 - [Quick Start Guide](quick-start.md) - Learn the basics
-- [Configuration](configuration.md) - Configure Redlock4j for your needs
-

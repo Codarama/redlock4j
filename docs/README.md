@@ -76,8 +76,7 @@ docs/
 ├── index.md                    # Home page
 ├── getting-started/
 │   ├── installation.md         # Installation guide
-│   ├── quick-start.md          # Quick start guide
-│   └── configuration.md        # Configuration guide
+│   └── quick-start.md          # Quick start guide
 ├── guide/
 │   ├── basic-usage.md          # Basic usage patterns
 │   ├── advanced-locking.md     # Advanced locking features
