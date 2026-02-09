@@ -1,0 +1,109 @@
+/* Redis-inspired font and color configuration */
+
+/* Import Geist font from CDN if available, otherwise fallback to system fonts */
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  /* Main text font - Geist with fallbacks */
+  --md-text-font-family: Geist, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  /* Menu/monospace font - Space Mono with fallbacks */
+  --md-code-font-family: "Space Mono", "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Light mode colors */
+[data-md-color-scheme="default"] {
+  --md-default-bg-color: rgb(229, 231, 235);
+  --md-default-fg-color: rgb(9, 26, 35);
+  --md-typeset-color: rgb(9, 26, 35);
+  --md-typeset-a-color: rgb(9, 26, 35);
+}
+
+/* Dark mode colors */
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: rgb(9, 26, 35);
+  --md-default-fg-color: rgb(232, 235, 236);
+  --md-typeset-color: rgb(232, 235, 236);
+  --md-typeset-a-color: rgb(232, 235, 236);
+}
+
+/* Header colors - same for both light and dark mode */
+.md-header {
+  background-color: rgb(22, 51, 65) !important;
+  color: rgb(229, 231, 235) !important;
+}
+
+.md-header__title,
+.md-header__button,
+.md-header .md-search__input,
+.md-header .md-search__icon,
+.md-tabs__link {
+  color: rgb(229, 231, 235) !important;
+}
+
+/* Ensure header text is visible */
+.md-header__title .md-header__ellipsis {
+  color: rgb(229, 231, 235) !important;
+}
+
+/* Tabs styling - same as header */
+.md-tabs {
+  background-color: rgb(22, 51, 65) !important;
+}
+
+/* Selected/active tab in header */
+.md-tabs__link--active,
+.md-tabs__link:hover {
+  color: rgb(0, 0, 0) !important;
+}
+
+/* Apply main text font to body and content */
+body,
+.md-typeset {
+  font-family: var(--md-text-font-family);
+}
+
+/* Apply monospace font to navigation/menu */
+.md-nav,
+.md-nav__title,
+.md-nav__link,
+.md-tabs__link,
+.md-header__title,
+.md-footer__title {
+  font-family: var(--md-code-font-family);
+}
+
+/* Apply monospace font to code elements */
+code,
+pre,
+.md-typeset code,
+.md-typeset pre,
+kbd,
+samp,
+tt {
+  font-family: var(--md-code-font-family);
+}
+
+/* Ensure headings use the main text font */
+h1, h2, h3, h4, h5, h6,
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+  font-family: var(--md-text-font-family);
+}
+
+/* Underline all links */
+.md-typeset a,
+.md-footer__link,
+.md-source {
+  text-decoration: underline !important;
+}
+
+/* Keep underline on hover */
+.md-typeset a:hover,
+.md-footer__link:hover {
+  text-decoration: underline !important;
+}
