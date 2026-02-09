@@ -207,5 +207,5 @@ lock.lock();
 - Require reactive/async support
 - Can accept single-instance locking
 
-For complete comparison, see [COMPARISON.md](https://github.com/tishun/redlock4j/blob/main/COMPARISON.md) in the repository.
+For complete comparison, see [COMPARISON.md](https://github.com/codarama/redlock4j/blob/main/COMPARISON.md) in the repository.
 

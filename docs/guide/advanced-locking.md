@@ -193,5 +193,5 @@ try {
 - [Best Practices](best-practices.md) - Follow recommended practices
 - [API Reference](../api/core.md) - Detailed API documentation
 
-For complete details, see [ADVANCED_LOCKING.md](https://github.com/tishun/redlock4j/blob/main/ADVANCED_LOCKING.md) in the repository.
+For complete details, see [ADVANCED_LOCKING.md](https://github.com/codarama/redlock4j/blob/main/ADVANCED_LOCKING.md) in the repository.
 

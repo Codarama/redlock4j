@@ -77,7 +77,7 @@ nav:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/tishun/redlock4j
+      link: https://github.com/codarama/redlock4j
   version:
     provider: mike
 
