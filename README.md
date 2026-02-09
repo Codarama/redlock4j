@@ -8,25 +8,27 @@
 > [!IMPORTANT]
 > This project is a personal project and is not currently affiliated or endorsed in any way with Redis or any other company. Use the software freely and at your own risk.
 
-A Java implementation of the [Redlock distributed locking algorithm](https://redis.io/docs/latest/develop/use/patterns/distributed-locks/) that implements the standard Java `java.util.concurrent.locks.Lock` interface.
+A Java implementation of the [Redlock distributed locking algorithm](https://redis.io/docs/latest/develop/use/patterns/distributed-locks/) that implements the standard Java locking interfaces.
 
 ## Features
 
-- **Standard Java Lock Interface**: Implements `java.util.concurrent.locks.Lock` for seamless integration
+- **Pure [Redlock distributed locking algorithm](https://redis.io/docs/latest/develop/use/patterns/distributed-locks/)** - Implementation based entirely on the Redlock algorithm as described by Redis.
+- **Multiple Redis Drivers**: Integrated supports for [Jedis](https://github.com/redis/jedis) and [Lettuce](https://github.com/redis/lettuce), extensible to other drivers
+- **Lightweight** - Minimum implementation, no extra scope outside locking
+- **Multi-interface API** - Supports standard `java.util.concurrent.locks.Lock` interface, as well as async and reactive APIs
 - **Advanced Locking Primitives**: Fair locks, multi-locks, read-write locks, semaphores, and countdown latches
-- **Asynchronous API**: CompletionStage-based async lock operations for non-blocking applications
-- **RxJava Reactive API**: Full RxJava 3 reactive types (Single, Completable, Observable)
 - **Lock Extension**: Extend lock validity time without releasing and re-acquiring
-- **Multiple Redis Drivers**: Supports both Jedis and Lettuce Redis clients
-- **Thread-Safe**: Proper thread-local lock state management
-- **Fault Tolerant**: Works with Redis node failures as long as quorum is maintained
-- **Configurable**: Customizable timeouts, retry logic, and clock drift compensation
+- **Atomic CAS/CAD Detection**: Auto-detects and uses native [Redis 8.4+ CAS/CAD commands](https://redis.io/docs/latest/operate/oss_and_stack/stack-with-enterprise/release-notes/redisce/redisos-8.4-release-notes/) when available
+- **Java 8+** - Compatible with Java 8 and higher
 
 ## Requirements
 
 - Java 8 or higher
 - At least 3 Redis instances for proper Redlock operation
-- Either Jedis or Lettuce Redis client library
+
+## Guide
+
+Visit the complete Redlock4j documentation at [redlock4j.codarama.org](https://redlock4j.codarama.org).
 
 ## Dependencies
 
