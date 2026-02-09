@@ -59,6 +59,9 @@ plugins:
   - git-revision-date-localized:
       enable_creation_date: true
 
+exclude_docs: |
+  README.md
+
 nav:
   - Home: index.md
   - Getting Started:
