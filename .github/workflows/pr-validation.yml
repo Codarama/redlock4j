@@ -53,15 +53,17 @@ jobs:
         echo "Code coverage: $COVERAGE"
         echo "## PR Validation Results" >> $GITHUB_STEP_SUMMARY
         echo "- **Code Coverage:** $COVERAGE" >> $GITHUB_STEP_SUMMARY
-        echo "- **Build Status:** ✅ Passed" >> $GITHUB_STEP_SUMMARY
+        echo "- **Build Status:** PASSED" >> $GITHUB_STEP_SUMMARY
         
     - name: Comment PR with results
       uses: actions/github-script@v7
       if: always()
+      env:
+        JOB_STATUS: ${{ job.status }}
       with:
         script: |
           const fs = require('fs');
-          
+
           // Read test results
           let testResults = "Tests completed";
           try {
@@ -72,39 +74,43 @@ jobs:
           } catch (error) {
             console.log('Could not read test results:', error);
           }
-          
+
+          const jobStatus = process.env.JOB_STATUS || 'unknown';
+          const statusIcon = jobStatus === 'success' ? 'PASSED' : 'FAILED';
+          const nextSteps = jobStatus === 'success'
+            ? 'All checks passed. This PR is ready for review.'
+            : 'Some checks failed. Please review the workflow logs and fix any issues.';
+
           const comment = `
-          ## 🔍 PR Validation Results
-          
+          ## PR Validation Results
+
           **Commit:** \`${{ github.event.pull_request.head.sha }}\`
-          **Status:** ${{ job.status == 'success' && '✅ Passed' || '❌ Failed' }}
-          
+          **Status:** ${statusIcon}
+
           ### Test Results
-          - ✅ Maven POM validation
-          - ✅ Project compilation
-          - ✅ Unit tests
-          - ✅ Integration tests with Testcontainers
-          - ✅ Code coverage analysis
-          
+          - Maven POM validation
+          - Project compilation
+          - Unit tests
+          - Integration tests with Testcontainers
+          - Code coverage analysis
+
           ### Next Steps
-          ${job.status == 'success' 
-            ? '🎉 All checks passed! This PR is ready for review.' 
-            : '⚠️ Some checks failed. Please review the workflow logs and fix any issues.'}
-          
+          ${nextSteps}
+
           **Workflow:** [${{ github.workflow }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           `;
-          
+
           // Find existing comment
           const comments = await github.rest.issues.listComments({
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: context.issue.number,
           });
-          
-          const existingComment = comments.data.find(comment => 
-            comment.body.includes('🔍 PR Validation Results')
+
+          const existingComment = comments.data.find(comment =>
+            comment.body.includes('PR Validation Results')
           );
-          
+
           if (existingComment) {
             // Update existing comment
             await github.rest.issues.updateComment({
@@ -176,42 +182,42 @@ jobs:
       run: |
         echo "Checking license headers in Java files..."
         MISSING_LICENSE=0
-        
+
         for file in $(find src -name "*.java"); do
           if ! head -5 "$file" | grep -q "MIT License"; then
-            echo "❌ Missing license header: $file"
+            echo "Missing license header: $file"
             MISSING_LICENSE=1
           fi
         done
-        
+
         if [ $MISSING_LICENSE -eq 0 ]; then
-          echo "✅ All Java files have proper license headers"
-          echo "- **License Headers:** ✅ All files compliant" >> $GITHUB_STEP_SUMMARY
+          echo "All Java files have proper license headers"
+          echo "- **License Headers:** All files compliant" >> $GITHUB_STEP_SUMMARY
         else
-          echo "❌ Some files are missing license headers"
-          echo "- **License Headers:** ❌ Some files missing headers" >> $GITHUB_STEP_SUMMARY
+          echo "Some files are missing license headers"
+          echo "- **License Headers:** Some files missing headers" >> $GITHUB_STEP_SUMMARY
           exit 1
         fi
         
     - name: Check code formatting
       run: |
         echo "Checking basic code formatting..."
-        
+
         # Check for tabs vs spaces
         if grep -r $'\t' src/ --include="*.java"; then
-          echo "❌ Found tab characters in Java files (should use spaces)"
-          echo "- **Code Formatting:** ❌ Tab characters found" >> $GITHUB_STEP_SUMMARY
+          echo "Found tab characters in Java files (should use spaces)"
+          echo "- **Code Formatting:** Tab characters found" >> $GITHUB_STEP_SUMMARY
           exit 1
         else
-          echo "✅ No tab characters found"
-          echo "- **Code Formatting:** ✅ No tab characters" >> $GITHUB_STEP_SUMMARY
+          echo "No tab characters found"
+          echo "- **Code Formatting:** No tab characters" >> $GITHUB_STEP_SUMMARY
         fi
-        
+
         # Check for trailing whitespace
         if grep -r '[[:space:]]$' src/ --include="*.java"; then
-          echo "⚠️ Found trailing whitespace in Java files"
-          echo "- **Trailing Whitespace:** ⚠️ Found in some files" >> $GITHUB_STEP_SUMMARY
+          echo "Found trailing whitespace in Java files"
+          echo "- **Trailing Whitespace:** Found in some files" >> $GITHUB_STEP_SUMMARY
         else
-          echo "✅ No trailing whitespace found"
-          echo "- **Trailing Whitespace:** ✅ None found" >> $GITHUB_STEP_SUMMARY
+          echo "No trailing whitespace found"
+          echo "- **Trailing Whitespace:** None found" >> $GITHUB_STEP_SUMMARY
         fi
