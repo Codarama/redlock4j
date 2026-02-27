@@ -206,6 +206,22 @@ public interface RedisDriver extends AutoCloseable {
     long decr(String key) throws RedisDriverException;
 
     /**
+     * Atomically decrements the value of a key and publishes a message to a channel if the new value is zero or less.
+     * This combines DECR and conditional PUBLISH into a single atomic operation.
+     *
+     * @param key
+     *            the key to decrement
+     * @param channel
+     *            the channel to publish to if count reaches zero
+     * @param message
+     *            the message to publish
+     * @return the value after decrementing
+     * @throws RedisDriverException
+     *             if there's an error communicating with Redis
+     */
+    long decrAndPublishIfZero(String key, String channel, String message) throws RedisDriverException;
+
+    /**
      * Gets the value of a key.
      *
      * @param key

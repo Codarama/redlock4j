@@ -41,6 +41,9 @@ public class LettuceRedisDriver implements RedisDriver {
     private static final String SET_IF_VALUE_MATCHES_SCRIPT = "if redis.call('get', KEYS[1]) == ARGV[1] then "
             + "    return redis.call('set', KEYS[1], ARGV[2], 'PX', ARGV[3]) " + "else " + "    return nil " + "end";
 
+    private static final String DECR_AND_PUBLISH_IF_ZERO_SCRIPT = "local v = redis.call('decr', KEYS[1]); "
+            + "if v <= 0 then redis.call('publish', KEYS[2], ARGV[1]) end; " + "return v";
+
     /**
      * Strategy for CAS/CAD operations.
      */
@@ -312,6 +315,17 @@ public class LettuceRedisDriver implements RedisDriver {
             return result != null ? result : 0;
         } catch (Exception e) {
             throw new RedisDriverException("Failed to execute DECR on " + identifier, e);
+        }
+    }
+
+    @Override
+    public long decrAndPublishIfZero(String key, String channel, String message) throws RedisDriverException {
+        try {
+            Object result = commands.eval(DECR_AND_PUBLISH_IF_ZERO_SCRIPT, io.lettuce.core.ScriptOutputType.INTEGER,
+                    new String[]{key, channel}, message);
+            return result != null ? ((Number) result).longValue() : 0;
+        } catch (Exception e) {
+            throw new RedisDriverException("Failed to execute DECR_AND_PUBLISH script on " + identifier, e);
         }
     }
 
