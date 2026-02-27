@@ -154,9 +154,10 @@ public class RedlockCountDownLatchTest {
 
     @Test
     void shouldReturnTrueWhenCountPositive() throws RedisDriverException {
-        when(mockDriver1.get(anyString())).thenReturn("3");
-        when(mockDriver2.get(anyString())).thenReturn("3");
-        when(mockDriver3.get(anyString())).thenReturn("3");
+        // Use lenient since quorum logic may not call all drivers
+        lenient().when(mockDriver1.get(anyString())).thenReturn("3");
+        lenient().when(mockDriver2.get(anyString())).thenReturn("3");
+        lenient().when(mockDriver3.get(anyString())).thenReturn("3");
 
         RedlockCountDownLatch latch = new RedlockCountDownLatch("test", 3, drivers, testConfig);
         assertTrue(latch.hasQueuedThreads());
