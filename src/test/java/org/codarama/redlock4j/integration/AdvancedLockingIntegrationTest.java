@@ -1,25 +1,6 @@
 /*
- * MIT License
- *
+ * SPDX-License-Identifier: MIT
  * Copyright (c) 2025 Codarama
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 package org.codarama.redlock4j.integration;
 
@@ -49,31 +30,24 @@ public class AdvancedLockingIntegrationTest {
 
     @Container
     static GenericContainer<?> redis1 = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
-            .withExposedPorts(6379)
-            .withCommand("redis-server", "--appendonly", "yes");
+            .withExposedPorts(6379).withCommand("redis-server", "--appendonly", "yes");
 
     @Container
     static GenericContainer<?> redis2 = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
-            .withExposedPorts(6379)
-            .withCommand("redis-server", "--appendonly", "yes");
+            .withExposedPorts(6379).withCommand("redis-server", "--appendonly", "yes");
 
     @Container
     static GenericContainer<?> redis3 = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
-            .withExposedPorts(6379)
-            .withCommand("redis-server", "--appendonly", "yes");
+            .withExposedPorts(6379).withCommand("redis-server", "--appendonly", "yes");
 
     private static RedlockConfiguration testConfiguration;
 
     @BeforeAll
     static void setUp() {
-        testConfiguration = RedlockConfiguration.builder()
-                .addRedisNode("localhost", redis1.getMappedPort(6379))
+        testConfiguration = RedlockConfiguration.builder().addRedisNode("localhost", redis1.getMappedPort(6379))
                 .addRedisNode("localhost", redis2.getMappedPort(6379))
-                .addRedisNode("localhost", redis3.getMappedPort(6379))
-                .defaultLockTimeout(Duration.ofSeconds(10))
-                .retryDelay(Duration.ofMillis(100))
-                .maxRetryAttempts(5)
-                .lockAcquisitionTimeout(Duration.ofSeconds(10))
+                .addRedisNode("localhost", redis3.getMappedPort(6379)).defaultLockTimeout(Duration.ofSeconds(10))
+                .retryDelay(Duration.ofMillis(100)).maxRetryAttempts(5).lockAcquisitionTimeout(Duration.ofSeconds(10))
                 .build();
     }
 
@@ -143,7 +117,7 @@ public class AdvancedLockingIntegrationTest {
             int permits = 2;
             int threadCount = 5;
             RedlockSemaphore semaphore = manager.createSemaphore("test-semaphore-concurrent", permits);
-            
+
             AtomicInteger successCount = new AtomicInteger(0);
             CountDownLatch startLatch = new CountDownLatch(1);
             CountDownLatch endLatch = new CountDownLatch(threadCount);
@@ -267,7 +241,7 @@ public class AdvancedLockingIntegrationTest {
     public void testMultipleConcurrentReaders() throws InterruptedException {
         try (RedlockManager manager = RedlockManager.withJedis(testConfiguration)) {
             RedlockReadWriteLock rwLock = manager.createReadWriteLock("test-rwlock-concurrent");
-            
+
             int readerCount = 3;
             AtomicInteger concurrentReaders = new AtomicInteger(0);
             AtomicInteger maxConcurrent = new AtomicInteger(0);
@@ -279,15 +253,15 @@ public class AdvancedLockingIntegrationTest {
                     try (RedlockManager mgr = RedlockManager.withJedis(testConfiguration)) {
                         RedlockReadWriteLock lock = mgr.createReadWriteLock("test-rwlock-concurrent");
                         Lock readLock = lock.readLock();
-                        
+
                         startLatch.await();
                         readLock.lock();
-                        
+
                         int current = concurrentReaders.incrementAndGet();
                         maxConcurrent.updateAndGet(max -> Math.max(max, current));
-                        
+
                         Thread.sleep(100);
-                        
+
                         concurrentReaders.decrementAndGet();
                         readLock.unlock();
                     } catch (InterruptedException e) {
@@ -304,4 +278,3 @@ public class AdvancedLockingIntegrationTest {
         }
     }
 }
-

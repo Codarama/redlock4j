@@ -1,25 +1,6 @@
 /*
- * MIT License
- *
+ * SPDX-License-Identifier: MIT
  * Copyright (c) 2025 Codarama
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 package org.codarama.redlock4j;
 
@@ -46,38 +27,40 @@ import java.util.concurrent.locks.Lock;
  */
 public class RedlockManager implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(RedlockManager.class);
-    
+
     public enum DriverType {
         JEDIS, LETTUCE
     }
-    
+
     private final RedlockConfiguration config;
     private final List<RedisDriver> redisDrivers;
     private final DriverType driverType;
     private final ExecutorService executorService;
     private final ScheduledExecutorService scheduledExecutorService;
     private volatile boolean closed = false;
-    
+
     /**
      * Creates a RedlockManager with Jedis drivers.
      * 
-     * @param config the Redlock configuration
+     * @param config
+     *            the Redlock configuration
      * @return a new RedlockManager instance
      */
     public static RedlockManager withJedis(RedlockConfiguration config) {
         return new RedlockManager(config, DriverType.JEDIS);
     }
-    
+
     /**
      * Creates a RedlockManager with Lettuce drivers.
      * 
-     * @param config the Redlock configuration
+     * @param config
+     *            the Redlock configuration
      * @return a new RedlockManager instance
      */
     public static RedlockManager withLettuce(RedlockConfiguration config) {
         return new RedlockManager(config, DriverType.LETTUCE);
     }
-    
+
     private RedlockManager(RedlockConfiguration config, DriverType driverType) {
         this.config = config;
         this.driverType = driverType;
@@ -93,61 +76,62 @@ public class RedlockManager implements AutoCloseable {
             return t;
         });
 
-        logger.info("Created RedlockManager with {} driver and {} Redis nodes",
-                   driverType, redisDrivers.size());
+        logger.info("Created RedlockManager with {} driver and {} Redis nodes", driverType, redisDrivers.size());
     }
-    
+
     private List<RedisDriver> createDrivers() {
         List<RedisDriver> drivers = new ArrayList<>();
-        
+
         for (RedisNodeConfiguration nodeConfig : config.getRedisNodes()) {
             try {
                 RedisDriver driver;
                 switch (driverType) {
-                    case JEDIS:
+                    case JEDIS :
                         driver = new JedisRedisDriver(nodeConfig);
                         break;
-                    case LETTUCE:
+                    case LETTUCE :
                         driver = new LettuceRedisDriver(nodeConfig);
                         break;
-                    default:
+                    default :
                         throw new IllegalArgumentException("Unsupported driver type: " + driverType);
                 }
-                
+
                 // Test the connection
                 if (!driver.isConnected()) {
                     logger.warn("Failed to connect to Redis node: {}", driver.getIdentifier());
                     driver.close();
                     continue;
                 }
-                
+
                 drivers.add(driver);
                 logger.debug("Successfully connected to Redis node: {}", driver.getIdentifier());
-                
+
             } catch (Exception e) {
-                logger.error("Failed to create driver for Redis node {}:{}", 
-                           nodeConfig.getHost(), nodeConfig.getPort(), e);
+                logger.error("Failed to create driver for Redis node {}:{}", nodeConfig.getHost(), nodeConfig.getPort(),
+                        e);
             }
         }
-        
+
         if (drivers.isEmpty()) {
             throw new RedlockException("Failed to connect to any Redis nodes");
         }
-        
+
         if (drivers.size() < config.getQuorum()) {
-            logger.warn("Connected to {} Redis nodes, but quorum requires {}. " +
-                       "Lock operations may fail.", drivers.size(), config.getQuorum());
+            logger.warn("Connected to {} Redis nodes, but quorum requires {}. " + "Lock operations may fail.",
+                    drivers.size(), config.getQuorum());
         }
-        
+
         return drivers;
     }
-    
+
     /**
      * Creates a new distributed lock for the given key.
      *
-     * @param lockKey the key to lock
+     * @param lockKey
+     *            the key to lock
      * @return a new Lock instance
-     * @throws RedlockException if the manager is closed
+     * @throws RedlockException
+     *             if the manager is closed
      */
     public Lock createLock(String lockKey) {
         if (closed) {
@@ -164,9 +148,11 @@ public class RedlockManager implements AutoCloseable {
     /**
      * Creates a new asynchronous distributed lock for the given key.
      *
-     * @param lockKey the key to lock
+     * @param lockKey
+     *            the key to lock
      * @return a new AsyncRedlock instance
-     * @throws RedlockException if the manager is closed
+     * @throws RedlockException
+     *             if the manager is closed
      */
     public AsyncRedlock createAsyncLock(String lockKey) {
         if (closed) {
@@ -183,9 +169,11 @@ public class RedlockManager implements AutoCloseable {
     /**
      * Creates a new RxJava reactive distributed lock for the given key.
      *
-     * @param lockKey the key to lock
+     * @param lockKey
+     *            the key to lock
      * @return a new AsyncRedlockImpl instance
-     * @throws RedlockException if the manager is closed
+     * @throws RedlockException
+     *             if the manager is closed
      */
     public RxRedlock createRxLock(String lockKey) {
         if (closed) {
@@ -200,12 +188,14 @@ public class RedlockManager implements AutoCloseable {
     }
 
     /**
-     * Creates a comprehensive lock that implements both async and reactive interfaces.
-     * This lock supports both CompletionStage and RxJava reactive types.
+     * Creates a comprehensive lock that implements both async and reactive interfaces. This lock supports both
+     * CompletionStage and RxJava reactive types.
      *
-     * @param lockKey the key to lock
+     * @param lockKey
+     *            the key to lock
      * @return a new lock instance implementing both AsyncRedlock and AsyncRedlockImpl
-     * @throws RedlockException if the manager is closed
+     * @throws RedlockException
+     *             if the manager is closed
      */
     public AsyncRedlockImpl createAsyncRxLock(String lockKey) {
         if (closed) {
@@ -220,12 +210,13 @@ public class RedlockManager implements AutoCloseable {
     }
 
     /**
-     * Creates a new distributed fair lock for the given key.
-     * Fair locks ensure FIFO ordering for lock acquisition.
+     * Creates a new distributed fair lock for the given key. Fair locks ensure FIFO ordering for lock acquisition.
      *
-     * @param lockKey the key to lock
+     * @param lockKey
+     *            the key to lock
      * @return a new FairLock instance
-     * @throws RedlockException if the manager is closed
+     * @throws RedlockException
+     *             if the manager is closed
      */
     public Lock createFairLock(String lockKey) {
         if (closed) {
@@ -240,12 +231,14 @@ public class RedlockManager implements AutoCloseable {
     }
 
     /**
-     * Creates a new distributed multi-lock for the given keys.
-     * Multi-locks allow atomic acquisition of multiple resources.
+     * Creates a new distributed multi-lock for the given keys. Multi-locks allow atomic acquisition of multiple
+     * resources.
      *
-     * @param lockKeys the keys to lock atomically
+     * @param lockKeys
+     *            the keys to lock atomically
      * @return a new MultiLock instance
-     * @throws RedlockException if the manager is closed
+     * @throws RedlockException
+     *             if the manager is closed
      */
     public Lock createMultiLock(List<String> lockKeys) {
         if (closed) {
@@ -260,12 +253,14 @@ public class RedlockManager implements AutoCloseable {
     }
 
     /**
-     * Creates a new distributed read-write lock for the given key.
-     * Read-write locks allow multiple concurrent readers or a single exclusive writer.
+     * Creates a new distributed read-write lock for the given key. Read-write locks allow multiple concurrent readers
+     * or a single exclusive writer.
      *
-     * @param resourceKey the resource key
+     * @param resourceKey
+     *            the resource key
      * @return a new RedlockReadWriteLock instance
-     * @throws RedlockException if the manager is closed
+     * @throws RedlockException
+     *             if the manager is closed
      */
     public RedlockReadWriteLock createReadWriteLock(String resourceKey) {
         if (closed) {
@@ -280,13 +275,16 @@ public class RedlockManager implements AutoCloseable {
     }
 
     /**
-     * Creates a new distributed semaphore with the specified number of permits.
-     * Semaphores control concurrent access to a resource with multiple permits.
+     * Creates a new distributed semaphore with the specified number of permits. Semaphores control concurrent access to
+     * a resource with multiple permits.
      *
-     * @param semaphoreKey the semaphore key
-     * @param permits the number of permits available
+     * @param semaphoreKey
+     *            the semaphore key
+     * @param permits
+     *            the number of permits available
      * @return a new RedlockSemaphore instance
-     * @throws RedlockException if the manager is closed
+     * @throws RedlockException
+     *             if the manager is closed
      */
     public RedlockSemaphore createSemaphore(String semaphoreKey, int permits) {
         if (closed) {
@@ -305,13 +303,16 @@ public class RedlockManager implements AutoCloseable {
     }
 
     /**
-     * Creates a new distributed countdown latch with the specified count.
-     * Countdown latches allow threads to wait until a set of operations completes.
+     * Creates a new distributed countdown latch with the specified count. Countdown latches allow threads to wait until
+     * a set of operations completes.
      *
-     * @param latchKey the latch key
-     * @param count the initial count
+     * @param latchKey
+     *            the latch key
+     * @param count
+     *            the initial count
      * @return a new RedlockCountDownLatch instance
-     * @throws RedlockException if the manager is closed
+     * @throws RedlockException
+     *             if the manager is closed
      */
     public RedlockCountDownLatch createCountDownLatch(String latchKey, int count) {
         if (closed) {
@@ -338,7 +339,7 @@ public class RedlockManager implements AutoCloseable {
         if (closed) {
             return 0;
         }
-        
+
         int connected = 0;
         for (RedisDriver driver : redisDrivers) {
             if (driver.isConnected()) {
@@ -347,7 +348,7 @@ public class RedlockManager implements AutoCloseable {
         }
         return connected;
     }
-    
+
     /**
      * Gets the required quorum size.
      * 
@@ -356,7 +357,7 @@ public class RedlockManager implements AutoCloseable {
     public int getQuorum() {
         return config.getQuorum();
     }
-    
+
     /**
      * Checks if the manager has enough connected nodes to potentially acquire locks.
      * 
@@ -365,7 +366,7 @@ public class RedlockManager implements AutoCloseable {
     public boolean isHealthy() {
         return !closed && getConnectedNodeCount() >= getQuorum();
     }
-    
+
     /**
      * Gets the driver type being used.
      * 
@@ -374,7 +375,7 @@ public class RedlockManager implements AutoCloseable {
     public DriverType getDriverType() {
         return driverType;
     }
-    
+
     @Override
     public void close() {
         if (closed) {

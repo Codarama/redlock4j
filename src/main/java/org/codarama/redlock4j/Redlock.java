@@ -1,25 +1,6 @@
 /*
- * MIT License
- *
+ * SPDX-License-Identifier: MIT
  * Copyright (c) 2025 Codarama
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 package org.codarama.redlock4j;
 
@@ -41,15 +22,15 @@ import java.util.concurrent.locks.Lock;
  */
 public class Redlock implements Lock {
     private static final Logger logger = LoggerFactory.getLogger(Redlock.class);
-    
+
     private final String lockKey;
     private final List<RedisDriver> redisDrivers;
     private final RedlockConfiguration config;
     private final SecureRandom secureRandom;
-    
+
     // Thread-local storage for lock state
     private final ThreadLocal<LockState> lockState = new ThreadLocal<>();
-    
+
     private static class LockState {
         final String lockValue;
         final long acquisitionTime;
@@ -75,14 +56,14 @@ public class Redlock implements Lock {
             return --holdCount;
         }
     }
-    
+
     public Redlock(String lockKey, List<RedisDriver> redisDrivers, RedlockConfiguration config) {
         this.lockKey = lockKey;
         this.redisDrivers = redisDrivers;
         this.config = config;
         this.secureRandom = new SecureRandom();
     }
-    
+
     @Override
     public void lock() {
         try {
@@ -94,14 +75,14 @@ public class Redlock implements Lock {
             throw new RedlockException("Interrupted while acquiring lock: " + lockKey, e);
         }
     }
-    
+
     @Override
     public void lockInterruptibly() throws InterruptedException {
         if (!tryLock(config.getLockAcquisitionTimeoutMs(), TimeUnit.MILLISECONDS)) {
             throw new RedlockException("Failed to acquire lock within timeout: " + lockKey);
         }
     }
-    
+
     @Override
     public boolean tryLock() {
         try {
@@ -111,7 +92,7 @@ public class Redlock implements Lock {
             return false;
         }
     }
-    
+
     @Override
     public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
         // Check if current thread already holds the lock (reentrancy)
@@ -132,7 +113,8 @@ public class Redlock implements Lock {
 
             LockResult result = attemptLock();
             if (result.isAcquired()) {
-                lockState.set(new LockState(result.getLockValue(), System.currentTimeMillis(), result.getValidityTimeMs()));
+                lockState.set(
+                        new LockState(result.getLockValue(), System.currentTimeMillis(), result.getValidityTimeMs()));
                 logger.debug("Successfully acquired lock {} on attempt {}", lockKey, attempt + 1);
                 return true;
             }
@@ -153,12 +135,12 @@ public class Redlock implements Lock {
         logger.debug("Failed to acquire lock {} after {} attempts", lockKey, config.getMaxRetryAttempts() + 1);
         return false;
     }
-    
+
     private LockResult attemptLock() {
         String lockValue = generateLockValue();
         long startTime = System.currentTimeMillis();
         int successfulNodes = 0;
-        
+
         // Try to acquire the lock on all nodes
         for (RedisDriver driver : redisDrivers) {
             try {
@@ -169,21 +151,21 @@ public class Redlock implements Lock {
                 logger.warn("Failed to acquire lock on {}: {}", driver.getIdentifier(), e.getMessage());
             }
         }
-        
+
         long elapsedTime = System.currentTimeMillis() - startTime;
         long driftTime = (long) (config.getDefaultLockTimeoutMs() * config.getClockDriftFactor()) + 2;
         long validityTime = config.getDefaultLockTimeoutMs() - elapsedTime - driftTime;
-        
+
         boolean acquired = successfulNodes >= config.getQuorum() && validityTime > 0;
-        
+
         if (!acquired) {
             // Release any locks we managed to acquire
             releaseLock(lockValue);
         }
-        
+
         return new LockResult(acquired, validityTime, lockValue, successfulNodes, redisDrivers.size());
     }
-    
+
     @Override
     public void unlock() {
         LockState state = lockState.get();
@@ -210,7 +192,7 @@ public class Redlock implements Lock {
         lockState.remove();
         logger.debug("Successfully released lock {}", lockKey);
     }
-    
+
     private void releaseLock(String lockValue) {
         for (RedisDriver driver : redisDrivers) {
             try {
@@ -220,7 +202,7 @@ public class Redlock implements Lock {
             }
         }
     }
-    
+
     private String generateLockValue() {
         byte[] bytes = new byte[20];
         secureRandom.nextBytes(bytes);
@@ -230,12 +212,12 @@ public class Redlock implements Lock {
         }
         return sb.toString();
     }
-    
+
     @Override
     public Condition newCondition() {
         throw new UnsupportedOperationException("Conditions are not supported by distributed locks");
     }
-    
+
     /**
      * Checks if the current thread holds this lock.
      * 
@@ -245,7 +227,7 @@ public class Redlock implements Lock {
         LockState state = lockState.get();
         return state != null && state.isValid();
     }
-    
+
     /**
      * Gets the remaining validity time of the lock for the current thread.
      *
@@ -261,8 +243,8 @@ public class Redlock implements Lock {
     }
 
     /**
-     * Gets the hold count for the current thread.
-     * This indicates how many times the current thread has acquired this lock.
+     * Gets the hold count for the current thread. This indicates how many times the current thread has acquired this
+     * lock.
      *
      * @return hold count, or 0 if not held by current thread
      */
@@ -274,23 +256,25 @@ public class Redlock implements Lock {
     /**
      * Extends the validity time of the lock held by the current thread.
      * <p>
-     * This method attempts to extend the lock on a quorum of Redis nodes using the same
-     * lock value. The extension is only successful if:
+     * This method attempts to extend the lock on a quorum of Redis nodes using the same lock value. The extension is
+     * only successful if:
      * <ul>
-     *   <li>The current thread holds a valid lock</li>
-     *   <li>The extension succeeds on at least a quorum (N/2+1) of nodes</li>
-     *   <li>The new validity time (after accounting for clock drift) is positive</li>
+     * <li>The current thread holds a valid lock</li>
+     * <li>The extension succeeds on at least a quorum (N/2+1) of nodes</li>
+     * <li>The new validity time (after accounting for clock drift) is positive</li>
      * </ul>
      * <p>
      * <b>Important limitations:</b>
      * <ul>
-     *   <li>Lock extension is for efficiency, not correctness</li>
-     *   <li>Should not be used as a substitute for proper timeout configuration</li>
+     * <li>Lock extension is for efficiency, not correctness</li>
+     * <li>Should not be used as a substitute for proper timeout configuration</li>
      * </ul>
      *
-     * @param additionalTimeMs additional time in milliseconds to extend the lock
+     * @param additionalTimeMs
+     *            additional time in milliseconds to extend the lock
      * @return true if the lock was successfully extended on a quorum of nodes, false otherwise
-     * @throws IllegalArgumentException if additionalTimeMs is negative or zero
+     * @throws IllegalArgumentException
+     *             if additionalTimeMs is negative or zero
      */
     public boolean extend(long additionalTimeMs) {
         if (additionalTimeMs <= 0) {
@@ -331,11 +315,11 @@ public class Redlock implements Lock {
             LockState newState = new LockState(state.lockValue, System.currentTimeMillis(), newValidityTime);
             newState.holdCount = state.holdCount; // Preserve hold count
             lockState.set(newState);
-            logger.debug("Successfully extended lock {} on {}/{} nodes (new validity: {}ms)",
-                    lockKey, successfulNodes, redisDrivers.size(), newValidityTime);
+            logger.debug("Successfully extended lock {} on {}/{} nodes (new validity: {}ms)", lockKey, successfulNodes,
+                    redisDrivers.size(), newValidityTime);
         } else {
-            logger.debug("Failed to extend lock {} - only {}/{} nodes succeeded (quorum: {})",
-                    lockKey, successfulNodes, redisDrivers.size(), config.getQuorum());
+            logger.debug("Failed to extend lock {} - only {}/{} nodes succeeded (quorum: {})", lockKey, successfulNodes,
+                    redisDrivers.size(), config.getQuorum());
         }
 
         return extended;
