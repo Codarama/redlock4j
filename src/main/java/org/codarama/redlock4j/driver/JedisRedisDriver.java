@@ -1,25 +1,6 @@
 /*
- * MIT License
- *
+ * SPDX-License-Identifier: MIT
  * Copyright (c) 2025 Codarama
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 package org.codarama.redlock4j.driver;
 
@@ -40,29 +21,23 @@ import java.util.Set;
 /**
  * Jedis implementation of the RedisDriver interface with automatic CAS/CAD detection.
  *
- * <p>This driver automatically detects and uses the best available method for each operation:
+ * <p>
+ * This driver automatically detects and uses the best available method for each operation:
  * <ul>
- *   <li>Native Redis 8.4+ CAS/CAD commands (DELEX, SET IFEQ) when available</li>
- *   <li>Lua script-based operations for older Redis versions</li>
+ * <li>Native Redis 8.4+ CAS/CAD commands (DELEX, SET IFEQ) when available</li>
+ * <li>Lua script-based operations for older Redis versions</li>
  * </ul>
- * Detection happens once at driver initialization.</p>
+ * Detection happens once at driver initialization.
+ * </p>
  */
 public class JedisRedisDriver implements RedisDriver {
     private static final Logger logger = LoggerFactory.getLogger(JedisRedisDriver.class);
 
-    private static final String DELETE_IF_VALUE_MATCHES_SCRIPT =
-        "if redis.call('get', KEYS[1]) == ARGV[1] then " +
-        "    return redis.call('del', KEYS[1]) " +
-        "else " +
-        "    return 0 " +
-        "end";
+    private static final String DELETE_IF_VALUE_MATCHES_SCRIPT = "if redis.call('get', KEYS[1]) == ARGV[1] then "
+            + "    return redis.call('del', KEYS[1]) " + "else " + "    return 0 " + "end";
 
-    private static final String SET_IF_VALUE_MATCHES_SCRIPT =
-        "if redis.call('get', KEYS[1]) == ARGV[1] then " +
-        "    return redis.call('set', KEYS[1], ARGV[2], 'PX', ARGV[3]) " +
-        "else " +
-        "    return nil " +
-        "end";
+    private static final String SET_IF_VALUE_MATCHES_SCRIPT = "if redis.call('get', KEYS[1]) == ARGV[1] then "
+            + "    return redis.call('set', KEYS[1], ARGV[2], 'PX', ARGV[3]) " + "else " + "    return nil " + "end";
 
     /**
      * Strategy for CAS/CAD operations.
@@ -77,7 +52,7 @@ public class JedisRedisDriver implements RedisDriver {
     private final JedisPool jedisPool;
     private final String identifier;
     private final CADStrategy cadStrategy;
-    
+
     public JedisRedisDriver(RedisNodeConfiguration config) {
         this.identifier = "redis://" + config.getHost() + ":" + config.getPort();
 
@@ -101,12 +76,8 @@ public class JedisRedisDriver implements RedisDriver {
 
         try {
             java.net.URI redisUri = java.net.URI.create(uriBuilder.toString());
-            this.jedisPool = new JedisPool(
-                poolConfig,
-                redisUri,
-                config.getConnectionTimeoutMs(),
-                config.getSocketTimeoutMs()
-            );
+            this.jedisPool = new JedisPool(poolConfig, redisUri, config.getConnectionTimeoutMs(),
+                    config.getSocketTimeoutMs());
         } catch (Exception e) {
             throw new RuntimeException("Failed to create Jedis pool for " + identifier, e);
         }
@@ -119,26 +90,22 @@ public class JedisRedisDriver implements RedisDriver {
     }
 
     /**
-     * Detects whether native CAS/CAD commands are available.
-     * This is called once during driver initialization.
+     * Detects whether native CAS/CAD commands are available. This is called once during driver initialization.
      */
     private CADStrategy detectCADStrategy() {
         try (Jedis jedis = jedisPool.getResource()) {
             // Try to execute DELEX on a test key
             String testKey = "__redlock4j_cad_test__" + System.currentTimeMillis();
-            jedis.sendCommand(
-                redis.clients.jedis.Protocol.Command.DELEX,
-                testKey, "IFEQ", "test_value"
-            );
+            jedis.sendCommand(redis.clients.jedis.Protocol.Command.DELEX, testKey, "IFEQ", "test_value");
             logger.debug("Native CAS/CAD commands detected for {}", identifier);
             return CADStrategy.NATIVE;
         } catch (Exception e) {
-            logger.debug("Native CAS/CAD commands not available for {}, using Lua scripts: {}",
-                identifier, e.getMessage());
+            logger.debug("Native CAS/CAD commands not available for {}, using Lua scripts: {}", identifier,
+                    e.getMessage());
             return CADStrategy.SCRIPT;
         }
     }
-    
+
     @Override
     public boolean setIfNotExists(String key, String value, long expireTimeMs) throws RedisDriverException {
         try (Jedis jedis = jedisPool.getResource()) {
@@ -149,15 +116,15 @@ public class JedisRedisDriver implements RedisDriver {
             throw new RedisDriverException("Failed to execute SET NX PX command on " + identifier, e);
         }
     }
-    
+
     @Override
     public boolean deleteIfValueMatches(String key, String expectedValue) throws RedisDriverException {
         switch (cadStrategy) {
-            case NATIVE:
+            case NATIVE :
                 return deleteIfValueMatchesNative(key, expectedValue);
-            case SCRIPT:
+            case SCRIPT :
                 return deleteIfValueMatchesScript(key, expectedValue);
-            default:
+            default :
                 throw new IllegalStateException("Unknown CAD strategy: " + cadStrategy);
         }
     }
@@ -167,10 +134,7 @@ public class JedisRedisDriver implements RedisDriver {
      */
     private boolean deleteIfValueMatchesNative(String key, String expectedValue) throws RedisDriverException {
         try (Jedis jedis = jedisPool.getResource()) {
-            Object result = jedis.sendCommand(
-                redis.clients.jedis.Protocol.Command.DELEX,
-                key, "IFEQ", expectedValue
-            );
+            Object result = jedis.sendCommand(redis.clients.jedis.Protocol.Command.DELEX, key, "IFEQ", expectedValue);
             return Long.valueOf(1).equals(result);
         } catch (JedisException e) {
             throw new RedisDriverException("Failed to execute DELEX command on " + identifier, e);
@@ -182,17 +146,14 @@ public class JedisRedisDriver implements RedisDriver {
      */
     private boolean deleteIfValueMatchesScript(String key, String expectedValue) throws RedisDriverException {
         try (Jedis jedis = jedisPool.getResource()) {
-            Object result = jedis.eval(
-                DELETE_IF_VALUE_MATCHES_SCRIPT,
-                Collections.singletonList(key),
-                Collections.singletonList(expectedValue)
-            );
+            Object result = jedis.eval(DELETE_IF_VALUE_MATCHES_SCRIPT, Collections.singletonList(key),
+                    Collections.singletonList(expectedValue));
             return Long.valueOf(1).equals(result);
         } catch (JedisException e) {
             throw new RedisDriverException("Failed to execute delete script on " + identifier, e);
         }
     }
-    
+
     @Override
     public boolean isConnected() {
         try (Jedis jedis = jedisPool.getResource()) {
@@ -202,12 +163,12 @@ public class JedisRedisDriver implements RedisDriver {
             return false;
         }
     }
-    
+
     @Override
     public String getIdentifier() {
         return identifier;
     }
-    
+
     @Override
     public void close() {
         if (jedisPool != null && !jedisPool.isClosed()) {
@@ -217,14 +178,14 @@ public class JedisRedisDriver implements RedisDriver {
     }
 
     @Override
-    public boolean setIfValueMatches(String key, String newValue, String expectedCurrentValue,
-                                    long expireTimeMs) throws RedisDriverException {
+    public boolean setIfValueMatches(String key, String newValue, String expectedCurrentValue, long expireTimeMs)
+            throws RedisDriverException {
         switch (cadStrategy) {
-            case NATIVE:
+            case NATIVE :
                 return setIfValueMatchesNative(key, newValue, expectedCurrentValue, expireTimeMs);
-            case SCRIPT:
+            case SCRIPT :
                 return setIfValueMatchesScript(key, newValue, expectedCurrentValue, expireTimeMs);
-            default:
+            default :
                 throw new IllegalStateException("Unknown CAD strategy: " + cadStrategy);
         }
     }
@@ -232,13 +193,11 @@ public class JedisRedisDriver implements RedisDriver {
     /**
      * Sets a key using native SET IFEQ command (Redis 8.4+).
      */
-    private boolean setIfValueMatchesNative(String key, String newValue, String expectedCurrentValue,
-                                           long expireTimeMs) throws RedisDriverException {
+    private boolean setIfValueMatchesNative(String key, String newValue, String expectedCurrentValue, long expireTimeMs)
+            throws RedisDriverException {
         try (Jedis jedis = jedisPool.getResource()) {
-            Object result = jedis.sendCommand(
-                redis.clients.jedis.Protocol.Command.SET,
-                key, newValue, "IFEQ", expectedCurrentValue, "PX", String.valueOf(expireTimeMs)
-            );
+            Object result = jedis.sendCommand(redis.clients.jedis.Protocol.Command.SET, key, newValue, "IFEQ",
+                    expectedCurrentValue, "PX", String.valueOf(expireTimeMs));
             return "OK".equals(result);
         } catch (JedisException e) {
             throw new RedisDriverException("Failed to execute SET IFEQ command on " + identifier, e);
@@ -248,14 +207,11 @@ public class JedisRedisDriver implements RedisDriver {
     /**
      * Sets a key using Lua script (legacy compatibility).
      */
-    private boolean setIfValueMatchesScript(String key, String newValue, String expectedCurrentValue,
-                                           long expireTimeMs) throws RedisDriverException {
+    private boolean setIfValueMatchesScript(String key, String newValue, String expectedCurrentValue, long expireTimeMs)
+            throws RedisDriverException {
         try (Jedis jedis = jedisPool.getResource()) {
-            Object result = jedis.eval(
-                SET_IF_VALUE_MATCHES_SCRIPT,
-                Collections.singletonList(key),
-                java.util.Arrays.asList(expectedCurrentValue, newValue, String.valueOf(expireTimeMs))
-            );
+            Object result = jedis.eval(SET_IF_VALUE_MATCHES_SCRIPT, Collections.singletonList(key),
+                    java.util.Arrays.asList(expectedCurrentValue, newValue, String.valueOf(expireTimeMs)));
             return "OK".equals(result);
         } catch (JedisException e) {
             throw new RedisDriverException("Failed to execute SET script on " + identifier, e);

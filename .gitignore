@@ -9,6 +9,7 @@ target/
 .idea/compiler.xml
 .idea/libraries/
 .idea/AugmentWebviewStateStore.xml
+.idea/*
 
 *.iws
 *.iml

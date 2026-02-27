@@ -1,25 +1,6 @@
 /*
- * MIT License
- *
+ * SPDX-License-Identifier: MIT
  * Copyright (c) 2025 Codarama
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 package org.codarama.redlock4j.driver;
 
@@ -39,8 +20,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for LettuceRedisDriver using Mockito mocks.
- * These tests do not require a working Redis server.
+ * Unit tests for LettuceRedisDriver using Mockito mocks. These tests do not require a working Redis server.
  */
 @ExtendWith(MockitoExtension.class)
 public class LettuceRedisDriverTest {
@@ -56,15 +36,11 @@ public class LettuceRedisDriverTest {
 
     private RedisNodeConfiguration testConfig;
     private LettuceRedisDriver driver;
-    
+
     @BeforeEach
     void setUp() {
-        testConfig = RedisNodeConfiguration.builder()
-            .host("localhost")
-            .port(6379)
-            .connectionTimeoutMs(5000)
-            .socketTimeoutMs(5000)
-            .build();
+        testConfig = RedisNodeConfiguration.builder().host("localhost").port(6379).connectionTimeoutMs(5000)
+                .socketTimeoutMs(5000).build();
     }
 
     @Test
@@ -77,36 +53,26 @@ public class LettuceRedisDriverTest {
 
     @Test
     public void testDriverCreationWithPassword() {
-        RedisNodeConfiguration configWithPassword = RedisNodeConfiguration.builder()
-            .host("localhost")
-            .port(6379)
-            .password("testpass")
-            .connectionTimeoutMs(5000)
-            .socketTimeoutMs(5000)
-            .build();
+        RedisNodeConfiguration configWithPassword = RedisNodeConfiguration.builder().host("localhost").port(6379)
+                .password("testpass").connectionTimeoutMs(5000).socketTimeoutMs(5000).build();
 
         driver = new LettuceRedisDriver(configWithPassword, mockRedisClient, mockConnection, mockCommands);
 
         assertNotNull(driver);
         assertEquals("redis://localhost:6379", driver.getIdentifier());
     }
-    
+
     @Test
     public void testDriverCreationWithDatabase() {
-        RedisNodeConfiguration configWithDb = RedisNodeConfiguration.builder()
-            .host("localhost")
-            .port(6379)
-            .database(2)
-            .connectionTimeoutMs(5000)
-            .socketTimeoutMs(5000)
-            .build();
-        
+        RedisNodeConfiguration configWithDb = RedisNodeConfiguration.builder().host("localhost").port(6379).database(2)
+                .connectionTimeoutMs(5000).socketTimeoutMs(5000).build();
+
         driver = new LettuceRedisDriver(configWithDb, mockRedisClient, mockConnection, mockCommands);
-        
+
         assertNotNull(driver);
         assertEquals("redis://localhost:6379", driver.getIdentifier());
     }
-    
+
     @Test
     public void testGetIdentifierFormat() {
         // Test identifier format without creating multiple drivers
@@ -114,13 +80,13 @@ public class LettuceRedisDriverTest {
         assertEquals("redis://localhost:6379", driver.getIdentifier());
         driver.close();
     }
-    
+
     @Test
     public void testDriverCreationWithNullConfig() {
-        assertThrows(NullPointerException.class, () ->
-            new LettuceRedisDriver(null, mockRedisClient, mockConnection, mockCommands));
+        assertThrows(NullPointerException.class,
+                () -> new LettuceRedisDriver(null, mockRedisClient, mockConnection, mockCommands));
     }
-    
+
     @Test
     public void testCloseDoesNotThrowException() {
         driver = new LettuceRedisDriver(testConfig, mockRedisClient, mockConnection, mockCommands);
@@ -132,7 +98,7 @@ public class LettuceRedisDriverTest {
         verify(mockConnection).close();
         verify(mockRedisClient).shutdown();
     }
-    
+
     @Test
     public void testMultipleCloseCallsAreIdempotent() {
         driver = new LettuceRedisDriver(testConfig, mockRedisClient, mockConnection, mockCommands);
@@ -178,9 +144,10 @@ public class LettuceRedisDriverTest {
         driver = new LettuceRedisDriver(testConfig, mockRedisClient, mockConnection, mockCommands);
 
         when(mockCommands.set(eq("test-key"), eq("test-value"), any(SetArgs.class)))
-            .thenThrow(new RuntimeException("Connection failed"));
+                .thenThrow(new RuntimeException("Connection failed"));
 
-        RedisDriverException exception = assertThrows(RedisDriverException.class, () -> driver.setIfNotExists("test-key", "test-value", 10000));
+        RedisDriverException exception = assertThrows(RedisDriverException.class,
+                () -> driver.setIfNotExists("test-key", "test-value", 10000));
 
         assertTrue(exception.getMessage().contains("Failed to execute SET NX PX command"));
         assertTrue(exception.getMessage().contains("redis://localhost:6379"));
@@ -218,13 +185,13 @@ public class LettuceRedisDriverTest {
     public void testDeleteIfValueMatchesException() {
         // Mock dispatch() for CAD detection (returns success, indicating native support)
         // Then throw exception for the actual delete
-        when(mockCommands.dispatch(any(), any(), any()))
-            .thenReturn(1L)
-            .thenThrow(new RuntimeException("DELEX execution failed"));
+        when(mockCommands.dispatch(any(), any(), any())).thenReturn(1L)
+                .thenThrow(new RuntimeException("DELEX execution failed"));
 
         driver = new LettuceRedisDriver(testConfig, mockRedisClient, mockConnection, mockCommands);
 
-        RedisDriverException exception = assertThrows(RedisDriverException.class, () -> driver.deleteIfValueMatches("test-key", "test-value"));
+        RedisDriverException exception = assertThrows(RedisDriverException.class,
+                () -> driver.deleteIfValueMatches("test-key", "test-value"));
 
         assertTrue(exception.getMessage().contains("Failed to execute DELEX command"));
         assertTrue(exception.getMessage().contains("redis://localhost:6379"));
@@ -256,15 +223,9 @@ public class LettuceRedisDriverTest {
 
     @Test
     public void testGetIdentifierWithDifferentConfigurations() {
-        RedisNodeConfiguration config1 = RedisNodeConfiguration.builder()
-            .host("redis1.example.com")
-            .port(6379)
-            .build();
+        RedisNodeConfiguration config1 = RedisNodeConfiguration.builder().host("redis1.example.com").port(6379).build();
 
-        RedisNodeConfiguration config2 = RedisNodeConfiguration.builder()
-            .host("redis2.example.com")
-            .port(6380)
-            .build();
+        RedisNodeConfiguration config2 = RedisNodeConfiguration.builder().host("redis2.example.com").port(6380).build();
 
         LettuceRedisDriver driver1 = new LettuceRedisDriver(config1, mockRedisClient, mockConnection, mockCommands);
         LettuceRedisDriver driver2 = new LettuceRedisDriver(config2, mockRedisClient, mockConnection, mockCommands);

@@ -11,6 +11,11 @@ on:
   workflow_dispatch:
     # Allow manual triggering
 
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
 jobs:
   test:
     name: Test on ubuntu-latest with Java ${{ matrix.java }}
@@ -58,7 +63,7 @@ jobs:
         
     - name: Generate test report
       uses: dorny/test-reporter@v1
-      if: success() || failure()
+      if: (success() || failure()) && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
       with:
         name: Maven Tests (ubuntu-latest, Java ${{ matrix.java }})
         path: target/surefire-reports/*.xml
@@ -141,7 +146,7 @@ jobs:
     - name: Check for Maven wrapper
       run: |
         if [ -f "mvnw" ]; then
-          echo "✅ Maven wrapper found" >> $GITHUB_STEP_SUMMARY
+          echo "Maven wrapper found" >> $GITHUB_STEP_SUMMARY
         else
-          echo "ℹ️ Maven wrapper not found (using system Maven)" >> $GITHUB_STEP_SUMMARY
+          echo "Maven wrapper not found (using system Maven)" >> $GITHUB_STEP_SUMMARY
         fi

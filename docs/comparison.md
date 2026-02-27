@@ -193,6 +193,16 @@ RedissonRedLock lock = new RedissonRedLock(lock1, lock2, lock3);
 lock.lock();
 ```
 
+## Detailed Comparisons
+
+For in-depth technical comparisons of specific features:
+
+- **[FairLock Implementation](comparison/fairlock-implementation.md)** - Detailed comparison of FairLock implementations between redlock4j and Redisson, including data structures, algorithms, and trade-offs
+- **[MultiLock Implementation](comparison/multilock-implementation.md)** - Comprehensive comparison of MultiLock implementations, covering deadlock prevention, acquisition strategies, and use cases
+- **[Semaphore Implementation](comparison/semaphore-implementation.md)** - In-depth comparison of distributed semaphore implementations, analyzing permit management, performance, and consistency models
+- **[ReadWriteLock Implementation](comparison/readwritelock-implementation.md)** - Detailed comparison of read-write lock implementations, covering reader/writer coordination, lock upgrade/downgrade, and performance characteristics
+- **[CountDownLatch Implementation](comparison/countdownlatch-implementation.md)** - Comprehensive comparison of countdown latch implementations, analyzing counting mechanisms, notification strategies, and consistency guarantees
+
 ## Conclusion
 
 **Redlock4j** is ideal for applications that:

@@ -7,8 +7,8 @@ on:
 
 permissions:
   contents: read
+  checks: write
   pull-requests: write
-  issues: write
 
 jobs:
   validate-pr:
@@ -57,15 +57,80 @@ jobs:
         COVERAGE=$(mvn jacoco:report | grep -o 'Total.*[0-9]*%' | tail -1 | grep -o '[0-9]*%' || echo "0%")
         echo "Code coverage: $COVERAGE"
         echo "## PR Validation Results" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "**Status:** PASSED" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### Test Results" >> $GITHUB_STEP_SUMMARY
-        echo "- Maven POM validation: PASSED" >> $GITHUB_STEP_SUMMARY
-        echo "- Project compilation: PASSED" >> $GITHUB_STEP_SUMMARY
-        echo "- Unit tests: PASSED" >> $GITHUB_STEP_SUMMARY
-        echo "- Integration tests: PASSED" >> $GITHUB_STEP_SUMMARY
-        echo "- Code coverage: $COVERAGE" >> $GITHUB_STEP_SUMMARY
+        echo "- **Code Coverage:** $COVERAGE" >> $GITHUB_STEP_SUMMARY
+        echo "- **Build Status:** Passed" >> $GITHUB_STEP_SUMMARY
+
+    - name: Comment PR with results
+      uses: actions/github-script@v7
+      if: always() && github.event.pull_request.head.repo.full_name == github.repository
+      with:
+        script: |
+          const fs = require('fs');
+
+          // Read test results
+          let testResults = "Tests completed";
+          try {
+            const summaryFile = process.env.GITHUB_STEP_SUMMARY;
+            if (fs.existsSync(summaryFile)) {
+              testResults = fs.readFileSync(summaryFile, 'utf8');
+            }
+          } catch (error) {
+            console.log('Could not read test results:', error);
+          }
+
+          const jobStatus = '${{ job.status }}';
+          const statusText = jobStatus === 'success' ? 'Passed' : 'Failed';
+          const nextSteps = jobStatus === 'success'
+            ? 'All checks passed! This PR is ready for review.'
+            : 'Some checks failed. Please review the workflow logs and fix any issues.';
+
+          const comment = `
+          ## PR Validation Results
+
+          **Commit:** \`${{ github.event.pull_request.head.sha }}\`
+          **Status:** ${statusText}
+
+          ### Test Results
+          - Maven POM validation
+          - Project compilation
+          - Unit tests
+          - Integration tests with Testcontainers
+          - Code coverage analysis
+
+          ### Next Steps
+          ${nextSteps}
+
+          **Workflow:** [${{ github.workflow }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          `;
+
+          // Find existing comment
+          const comments = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+
+          const existingComment = comments.data.find(comment =>
+            comment.body.includes('PR Validation Results')
+          );
+
+          if (existingComment) {
+            // Update existing comment
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: existingComment.id,
+              body: comment
+            });
+          } else {
+            // Create new comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+          }
 
   security-scan:
     name: Security Scan
@@ -118,22 +183,22 @@ jobs:
         
     - name: Check license headers
       run: |
-        echo "Checking license headers in Java files..."
+        echo "Checking SPDX-compliant license headers in Java files..."
         MISSING_LICENSE=0
 
         for file in $(find src -name "*.java"); do
-          if ! head -5 "$file" | grep -q "MIT License"; then
-            echo "Missing license header: $file"
+          if ! head -5 "$file" | grep -q "SPDX-License-Identifier: MIT"; then
+            echo "Missing SPDX license header: $file"
             MISSING_LICENSE=1
           fi
         done
 
         if [ $MISSING_LICENSE -eq 0 ]; then
-          echo "All Java files have proper license headers"
-          echo "- **License Headers:** All files compliant" >> $GITHUB_STEP_SUMMARY
+          echo "All Java files have proper SPDX license headers"
+          echo "- **License Headers:** All files SPDX-compliant" >> $GITHUB_STEP_SUMMARY
         else
-          echo "Some files are missing license headers"
-          echo "- **License Headers:** Some files missing headers" >> $GITHUB_STEP_SUMMARY
+          echo "Some files are missing SPDX license headers"
+          echo "- **License Headers:** Some files missing SPDX headers" >> $GITHUB_STEP_SUMMARY
           exit 1
         fi
         

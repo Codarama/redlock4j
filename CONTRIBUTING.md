@@ -33,52 +33,35 @@ mvn test jacoco:report
 mvn org.owasp:dependency-check-maven:check
 ```
 
-### Automated Testing
-Our CI/CD pipeline automatically runs:
-
-- ✅ **Compilation** on multiple platforms (Ubuntu, Windows, macOS)
-- ✅ **Unit tests** with Java 8, 11, 17, and 21
-- ✅ **Integration tests** with Testcontainers (Redis 6, 7, latest)
-- ✅ **Code coverage** analysis with JaCoCo
-- ✅ **Security scanning** with OWASP dependency check
-- ✅ **License header** validation
-- ✅ **Code style** checks
-
 ## 📝 Code Guidelines
 
 ### Code Style
-- Use **4 spaces** for indentation (no tabs)
-- Follow **Java naming conventions**
-- Add **Javadoc** for public APIs
-- Keep **line length** under 120 characters
-- Remove **trailing whitespace**
+We use automated code formatting to ensure consistency across the codebase:
+
+- **Formatter**: Eclipse formatter with custom configuration (`formatting.xml`)
+- **Indentation**: 4 spaces (no tabs)
+- **Line length**: 120 characters maximum
+- **Braces**: End-of-line style
+- **Javadoc**: Required for all public APIs
+
+#### Formatting Commands
+```bash
+# Format all code
+mvn formatter:format
+
+# Validate formatting (runs automatically during build)
+mvn formatter:validate
+```
+
+**Note**: The build will fail if code is not properly formatted. Always run `mvn formatter:format` before committing.
 
 ### License Headers
-All Java files must include the MIT license header:
+All Java files must include an [SPDX-compliant](https://spdx.dev/learn/handling-license-info/) license header:
 
 ```java
 /*
- * MIT License
- *
+ * SPDX-License-Identifier: MIT
  * Copyright (c) 2025 Codarama
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 ```
 
@@ -121,12 +104,6 @@ When you submit a PR, our automation will:
 - **Maven 3.6+**
 - **Docker** (for integration tests)
 - **Git**
-
-### IDE Setup
-We recommend:
-- **IntelliJ IDEA** or **Eclipse**
-- **Checkstyle** plugin for code style
-- **SonarLint** for code quality
 
 ### Environment Variables
 For local development:
@@ -188,11 +165,5 @@ We welcome contributions in:
 - **GitHub Discussions** - For questions and ideas
 - **Code Review** - Learn from PR feedback
 
-## 🏆 Recognition
-
-Contributors are recognized in:
-- **GitHub contributors** list
-- **Release notes** for significant contributions
-- **Documentation** acknowledgments
 
 Thank you for contributing to Redlock4j! 🚀

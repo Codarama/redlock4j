@@ -8,7 +8,7 @@
 > [!IMPORTANT]
 > This project is a personal project and is not currently affiliated or endorsed in any way with Redis or any other company. Use the software freely and at your own risk.
 
-A Java implementation of the [Redlock distributed locking algorithm](https://redis.io/docs/latest/develop/use/patterns/distributed-locks/) that implements the standard Java locking interfaces.
+A simple and lightweight Java implementation of the [Redlock distributed locking algorithm](https://redis.io/docs/latest/develop/use/patterns/distributed-locks/) that implements the standard Java locking interfaces.
 
 ## Features
 
@@ -19,7 +19,7 @@ A Java implementation of the [Redlock distributed locking algorithm](https://red
 - **Advanced Locking Primitives**: Fair locks, multi-locks, read-write locks, semaphores, and countdown latches
 - **Lock Extension**: Extend lock validity time without releasing and re-acquiring
 - **Atomic CAS/CAD Detection**: Auto-detects and uses native [Redis 8.4+ CAS/CAD commands](https://redis.io/docs/latest/operate/oss_and_stack/stack-with-enterprise/release-notes/redisce/redisos-8.4-release-notes/) when available
-- **Java 8+** - Compatible with Java 8 and higher
+- **Java 8+** - Compatible with Java 8 and higher, tested against Java 8, 11, 17, and 21
 
 ## Requirements
 
@@ -29,33 +29,6 @@ A Java implementation of the [Redlock distributed locking algorithm](https://red
 ## Guide
 
 Visit the complete Redlock4j documentation at [redlock4j.codarama.org](https://redlock4j.codarama.org).
-
-## Dependencies
-
-Add the following dependencies to your `pom.xml`:
-
-```xml
-<!-- For Jedis support -->
-<dependency>
-    <groupId>redis.clients</groupId>
-    <artifactId>jedis</artifactId>
-    <version>5.1.0</version>
-</dependency>
-
-<!-- OR for Lettuce support -->
-<dependency>
-    <groupId>io.lettuce</groupId>
-    <artifactId>lettuce-core</artifactId>
-    <version>6.7.1.RELEASE</version>
-</dependency>
-
-<!-- Logging -->
-<dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-api</artifactId>
-    <version>2.0.9</version>
-</dependency>
-```
 
 ## Quick Start
 
@@ -85,6 +58,25 @@ Add this library and your preferred Redis client to your `pom.xml`:
 </dependency>
 ```
 
+Optionally you can also add SLF4J for logging or RxJava to use the reactive APIs:
+
+```xml
+<!-- OPTIONAL: Logging -->
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>2.0.9</version>
+</dependency>
+
+<!-- OPTIONAL: RxJava for reactive API -->
+<dependency>
+    <groupId>io.reactivex.rxjava3</groupId>
+    <artifactId>rxjava</artifactId>
+    <version>3.1.8</version>
+</dependency>
+
+```
+
 ### 2. Configure Redis Nodes
 
 ```java
@@ -92,9 +84,9 @@ RedlockConfiguration config = RedlockConfiguration.builder()
     .addRedisNode("redis1.example.com", 6379)
     .addRedisNode("redis2.example.com", 6379)
     .addRedisNode("redis3.example.com", 6379)
-    .defaultLockTimeout(Duration.ofSeconds(30))
-    .retryDelay(Duration.ofMillis(200))
-    .maxRetryAttempts(3)
+    .defaultLockTimeout(Duration.ofSeconds(30))  // if not set would use a default of 30 seconds
+    .retryDelay(Duration.ofMillis(500))          // if not set would use a default of 200ms
+    .maxRetryAttempts(5)                         // if not set would use a default of 3 retries
     .build();
 ```
 
@@ -513,47 +505,6 @@ sequenceDiagram
 4. **Monitor Redis node health** and connection status
 5. **Consider lock validity time** for long-running operations
 6. **Use unique lock keys** to avoid conflicts between different resources
-
-## CI/CD and Testing
-
-This project uses GitHub Actions for continuous integration and comprehensive testing:
-
-### Automated Testing
-- **Pull Request Validation**: Every PR is automatically tested with compilation, unit tests, and integration tests
-- **Nightly Comprehensive Tests**: Full test suite including performance tests runs every night
-- **Multi-Platform Testing**: Tests run on Ubuntu, Windows, and macOS
-- **Multi-Java Version**: Tested against Java 8, 11, 17, and 21
-- **Multi-Redis Version**: Tested against Redis 6, 7, and latest versions
-
-### Security and Quality
-- **Dependency Security Scanning**: OWASP dependency check for known vulnerabilities
-- **Code Coverage**: JaCoCo integration for test coverage reporting
-- **License Compliance**: Automated verification of license headers
-- **Code Style**: Basic formatting and style checks
-
-### Workflows
-- **CI Workflow** (`.github/workflows/ci.yml`): Runs on every push and PR
-- **Nightly Workflow** (`.github/workflows/nightly.yml`): Comprehensive testing every night
-- **PR Validation** (`.github/workflows/pr-validation.yml`): Detailed PR validation with comments
-- **Release Workflow** (`.github/workflows/release.yml`): Automated Maven Central publishing
-
-### Running Tests Locally
-```bash
-# Run all tests
-mvn test
-
-# Run only unit tests
-mvn test -Dtest=RedlockConfigurationTest
-
-# Run only integration tests
-mvn test -Dtest=RedlockIntegrationTest
-
-# Run with coverage
-mvn test jacoco:report
-
-# Security scan
-mvn org.owasp:dependency-check-maven:check
-```
 
 ## Releases and Maven Central
 

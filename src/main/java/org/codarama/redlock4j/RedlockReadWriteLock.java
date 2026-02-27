@@ -1,25 +1,6 @@
 /*
- * MIT License
- *
+ * SPDX-License-Identifier: MIT
  * Copyright (c) 2025 Codarama
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 package org.codarama.redlock4j;
 
@@ -36,87 +17,95 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
 /**
- * A distributed read-write lock implementation that allows multiple concurrent readers
- * or a single exclusive writer. This is useful for scenarios where reads are frequent
- * and writes are infrequent.
+ * A distributed read-write lock implementation that allows multiple concurrent readers or a single exclusive writer.
+ * This is useful for scenarios where reads are frequent and writes are infrequent.
  * 
- * <p><b>Key Features:</b></p>
+ * <p>
+ * <b>Key Features:</b>
+ * </p>
  * <ul>
- *   <li>Multiple readers can hold the lock simultaneously</li>
- *   <li>Writers have exclusive access (no readers or other writers)</li>
- *   <li>Readers are blocked while a writer holds the lock</li>
- *   <li>Writers are blocked while any readers or writers hold the lock</li>
+ * <li>Multiple readers can hold the lock simultaneously</li>
+ * <li>Writers have exclusive access (no readers or other writers)</li>
+ * <li>Readers are blocked while a writer holds the lock</li>
+ * <li>Writers are blocked while any readers or writers hold the lock</li>
  * </ul>
  * 
- * <p><b>Implementation Details:</b></p>
+ * <p>
+ * <b>Implementation Details:</b>
+ * </p>
  * <ul>
- *   <li>Uses Redis counters to track the number of active readers</li>
- *   <li>Uses a separate key for the write lock</li>
- *   <li>Readers increment/decrement the reader count atomically</li>
- *   <li>Writers must wait for reader count to reach zero</li>
+ * <li>Uses Redis counters to track the number of active readers</li>
+ * <li>Uses a separate key for the write lock</li>
+ * <li>Readers increment/decrement the reader count atomically</li>
+ * <li>Writers must wait for reader count to reach zero</li>
  * </ul>
  * 
- * <p><b>Example Usage:</b></p>
- * <pre>{@code
- * RedlockReadWriteLock rwLock = new RedlockReadWriteLock("resource", redisDrivers, config);
+ * <p>
+ * <b>Example Usage:</b>
+ * </p>
  * 
- * // Reading
- * rwLock.readLock().lock();
- * try {
- *     // Multiple threads can read simultaneously
- *     readData();
- * } finally {
- *     rwLock.readLock().unlock();
- * }
+ * <pre>
+ * {
+ *     &#64;code
+ *     RedlockReadWriteLock rwLock = new RedlockReadWriteLock("resource", redisDrivers, config);
  * 
- * // Writing
- * rwLock.writeLock().lock();
- * try {
- *     // Exclusive access for writing
- *     writeData();
- * } finally {
- *     rwLock.writeLock().unlock();
+ *     // Reading
+ *     rwLock.readLock().lock();
+ *     try {
+ *         // Multiple threads can read simultaneously
+ *         readData();
+ *     } finally {
+ *         rwLock.readLock().unlock();
+ *     }
+ * 
+ *     // Writing
+ *     rwLock.writeLock().lock();
+ *     try {
+ *         // Exclusive access for writing
+ *         writeData();
+ *     } finally {
+ *         rwLock.writeLock().unlock();
+ *     }
  * }
- * }</pre>
+ * </pre>
  */
 public class RedlockReadWriteLock implements ReadWriteLock {
     private static final Logger logger = LoggerFactory.getLogger(RedlockReadWriteLock.class);
-    
+
     private final String resourceKey;
     private final ReadLock readLock;
     private final WriteLock writeLock;
-    
-    public RedlockReadWriteLock(String resourceKey, List<RedisDriver> redisDrivers, 
-                                RedlockConfiguration config) {
+
+    public RedlockReadWriteLock(String resourceKey, List<RedisDriver> redisDrivers, RedlockConfiguration config) {
         this.resourceKey = resourceKey;
         this.readLock = new ReadLock(resourceKey, redisDrivers, config);
         this.writeLock = new WriteLock(resourceKey, redisDrivers, config);
     }
-    
+
     @Override
     public Lock readLock() {
         return readLock;
     }
-    
+
     @Override
     public Lock writeLock() {
         return writeLock;
     }
-    
+
     /**
      * Read lock implementation that allows multiple concurrent readers.
      */
     private static class ReadLock implements Lock {
         private static final Logger logger = LoggerFactory.getLogger(ReadLock.class);
-        
+
         private final String readCountKey;
         private final String writeLockKey;
         private final List<RedisDriver> redisDrivers;
         private final RedlockConfiguration config;
         private final SecureRandom secureRandom;
-        
+
         private final ThreadLocal<LockState> lockState = new ThreadLocal<>();
-        
+
         private static class LockState {
             final String lockValue;
             final long acquisitionTime;
@@ -142,7 +131,7 @@ public class RedlockReadWriteLock implements ReadWriteLock {
                 return --holdCount;
             }
         }
-        
+
         ReadLock(String resourceKey, List<RedisDriver> redisDrivers, RedlockConfiguration config) {
             this.readCountKey = resourceKey + ":readers";
             this.writeLockKey = resourceKey + ":write";
@@ -150,7 +139,7 @@ public class RedlockReadWriteLock implements ReadWriteLock {
             this.config = config;
             this.secureRandom = new SecureRandom();
         }
-        
+
         @Override
         public void lock() {
             try {
@@ -162,14 +151,14 @@ public class RedlockReadWriteLock implements ReadWriteLock {
                 throw new RedlockException("Interrupted while acquiring read lock", e);
             }
         }
-        
+
         @Override
         public void lockInterruptibly() throws InterruptedException {
             if (!tryLock(config.getLockAcquisitionTimeoutMs(), TimeUnit.MILLISECONDS)) {
                 throw new RedlockException("Failed to acquire read lock within timeout");
             }
         }
-        
+
         @Override
         public boolean tryLock() {
             try {
@@ -179,7 +168,7 @@ public class RedlockReadWriteLock implements ReadWriteLock {
                 return false;
             }
         }
-        
+
         @Override
         public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
             // Check if current thread already holds the lock (reentrancy)
@@ -203,8 +192,8 @@ public class RedlockReadWriteLock implements ReadWriteLock {
                     // Try to increment reader count
                     String lockValue = generateLockValue();
                     if (incrementReaderCount(lockValue)) {
-                        lockState.set(new LockState(lockValue, System.currentTimeMillis(), 
-                            config.getDefaultLockTimeoutMs()));
+                        lockState.set(
+                                new LockState(lockValue, System.currentTimeMillis(), config.getDefaultLockTimeoutMs()));
                         logger.debug("Successfully acquired read lock on attempt {}", attempt + 1);
                         return true;
                     }
@@ -224,7 +213,7 @@ public class RedlockReadWriteLock implements ReadWriteLock {
 
             return false;
         }
-        
+
         @Override
         public void unlock() {
             LockState state = lockState.get();
@@ -245,7 +234,7 @@ public class RedlockReadWriteLock implements ReadWriteLock {
             lockState.remove();
             logger.debug("Successfully released read lock");
         }
-        
+
         private boolean isWriteLockHeld() {
             // Check if write lock exists on a quorum of nodes using GET
             int nodesWithoutWriteLock = 0;
@@ -256,8 +245,7 @@ public class RedlockReadWriteLock implements ReadWriteLock {
                         nodesWithoutWriteLock++;
                     }
                 } catch (Exception e) {
-                    logger.debug("Failed to check write lock on {}: {}",
-                        driver.getIdentifier(), e.getMessage());
+                    logger.debug("Failed to check write lock on {}: {}", driver.getIdentifier(), e.getMessage());
                 }
             }
             // If a quorum of nodes don't have the write lock, it's not held
@@ -276,19 +264,16 @@ public class RedlockReadWriteLock implements ReadWriteLock {
                     // Set expiration on the counter key to prevent leaks
                     if (count == 1) {
                         // First reader, set expiration
-                        driver.setex(readCountKey, String.valueOf(count),
-                            config.getDefaultLockTimeoutMs() * 2);
+                        driver.setex(readCountKey, String.valueOf(count), config.getDefaultLockTimeoutMs() * 2);
                     }
 
                     // Store the lock value for this reader
-                    driver.setex(readCountKey + ":" + lockValue, "1",
-                        config.getDefaultLockTimeoutMs());
+                    driver.setex(readCountKey + ":" + lockValue, "1", config.getDefaultLockTimeoutMs());
 
                     successfulNodes++;
                     logger.debug("Incremented reader count to {} on {}", count, driver.getIdentifier());
                 } catch (Exception e) {
-                    logger.debug("Failed to increment reader count on {}: {}",
-                        driver.getIdentifier(), e.getMessage());
+                    logger.debug("Failed to increment reader count on {}: {}", driver.getIdentifier(), e.getMessage());
                 }
             }
 
@@ -312,12 +297,11 @@ public class RedlockReadWriteLock implements ReadWriteLock {
 
                     logger.debug("Decremented reader count to {} on {}", count, driver.getIdentifier());
                 } catch (Exception e) {
-                    logger.warn("Failed to decrement reader count on {}: {}",
-                        driver.getIdentifier(), e.getMessage());
+                    logger.warn("Failed to decrement reader count on {}: {}", driver.getIdentifier(), e.getMessage());
                 }
             }
         }
-        
+
         private String generateLockValue() {
             byte[] bytes = new byte[20];
             secureRandom.nextBytes(bytes);
@@ -327,16 +311,16 @@ public class RedlockReadWriteLock implements ReadWriteLock {
             }
             return sb.toString();
         }
-        
+
         @Override
         public Condition newCondition() {
             throw new UnsupportedOperationException("Conditions are not supported");
         }
     }
-    
+
     /**
-     * Write lock implementation that provides exclusive access.
-     * Writers must wait for all readers to finish before acquiring the lock.
+     * Write lock implementation that provides exclusive access. Writers must wait for all readers to finish before
+     * acquiring the lock.
      */
     private static class WriteLock implements Lock {
         private static final Logger logger = LoggerFactory.getLogger(WriteLock.class);
@@ -435,8 +419,7 @@ public class RedlockReadWriteLock implements ReadWriteLock {
                         nodesWithoutReaders++;
                     }
                 } catch (Exception e) {
-                    logger.debug("Failed to check reader count on {}: {}",
-                        driver.getIdentifier(), e.getMessage());
+                    logger.debug("Failed to check reader count on {}: {}", driver.getIdentifier(), e.getMessage());
                 }
             }
 
@@ -445,4 +428,3 @@ public class RedlockReadWriteLock implements ReadWriteLock {
         }
     }
 }
-
