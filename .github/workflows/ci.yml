@@ -141,7 +141,7 @@ jobs:
     - name: Check for Maven wrapper
       run: |
         if [ -f "mvnw" ]; then
-          echo "✅ Maven wrapper found" >> $GITHUB_STEP_SUMMARY
+          echo "Maven wrapper found" >> $GITHUB_STEP_SUMMARY
         else
-          echo "ℹ️ Maven wrapper not found (using system Maven)" >> $GITHUB_STEP_SUMMARY
+          echo "Maven wrapper not found (using system Maven)" >> $GITHUB_STEP_SUMMARY
         fi

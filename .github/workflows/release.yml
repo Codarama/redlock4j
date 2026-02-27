@@ -53,11 +53,11 @@ jobs:
       run: |
         echo "Running tests before release..."
         mvn --no-transfer-progress --batch-mode clean test -Dtest=RedlockConfigurationTest
-        echo "✅ Unit tests passed"
-        
+        echo "Unit tests passed"
+
         # Run integration tests
         mvn --no-transfer-progress --batch-mode test -Dtest=RedlockIntegrationTest
-        echo "✅ Integration tests passed"
+        echo "Integration tests passed"
         
     - name: Install GPG key
       run: |
@@ -76,7 +76,7 @@ jobs:
           
     - name: Create release summary
       run: |
-        echo "## 🎉 Release Published Successfully" >> $GITHUB_STEP_SUMMARY
+        echo "## Release Published Successfully" >> $GITHUB_STEP_SUMMARY
         echo "- **Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Repository:** Maven Central" >> $GITHUB_STEP_SUMMARY
         echo "- **Group ID:** org.codarama" >> $GITHUB_STEP_SUMMARY
@@ -105,7 +105,7 @@ jobs:
         script: |
           const version = '${{ steps.version.outputs.version }}';
           const comment = `
-          ## 🎉 Successfully Published to Maven Central!
+          ## Successfully Published to Maven Central!
           
           **Version:** \`${version}\`
           

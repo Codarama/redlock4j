@@ -80,8 +80,8 @@ jobs:
             }
         }
         EOF
-        
-        echo "✅ Stress test configuration validated" >> $GITHUB_STEP_SUMMARY
+
+        echo "Stress test configuration validated" >> $GITHUB_STEP_SUMMARY
         
     - name: Generate comprehensive test report
       run: |
@@ -99,11 +99,11 @@ jobs:
           echo "- **Total Tests:** ${TOTAL_TESTS:-0}" >> $GITHUB_STEP_SUMMARY
           echo "- **Failed Tests:** ${FAILED_TESTS:-0}" >> $GITHUB_STEP_SUMMARY
           echo "- **Error Tests:** ${ERROR_TESTS:-0}" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ "${FAILED_TESTS:-0}" -eq 0 ] && [ "${ERROR_TESTS:-0}" -eq 0 ]; then
-            echo "- **Status:** ✅ All tests passed" >> $GITHUB_STEP_SUMMARY
+            echo "- **Status:** All tests passed" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **Status:** ❌ Some tests failed" >> $GITHUB_STEP_SUMMARY
+            echo "- **Status:** Some tests failed" >> $GITHUB_STEP_SUMMARY
           fi
         fi
         
@@ -157,9 +157,9 @@ jobs:
       run: |
         echo "## Redis ${{ matrix.redis-version }} Test Results" >> $GITHUB_STEP_SUMMARY
         if [ $? -eq 0 ]; then
-          echo "✅ Tests passed with Redis ${{ matrix.redis-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "Tests passed with Redis ${{ matrix.redis-version }}" >> $GITHUB_STEP_SUMMARY
         else
-          echo "❌ Tests failed with Redis ${{ matrix.redis-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "Tests failed with Redis ${{ matrix.redis-version }}" >> $GITHUB_STEP_SUMMARY
         fi
 
   notification:
@@ -174,10 +174,10 @@ jobs:
       run: |
         if [[ "${{ needs.comprehensive-test.result }}" == "success" && "${{ needs.multi-redis-version-test.result }}" == "success" ]]; then
           echo "status=success" >> $GITHUB_OUTPUT
-          echo "message=✅ All nightly tests passed successfully" >> $GITHUB_OUTPUT
+          echo "message=All nightly tests passed successfully" >> $GITHUB_OUTPUT
         else
           echo "status=failure" >> $GITHUB_OUTPUT
-          echo "message=❌ Some nightly tests failed" >> $GITHUB_OUTPUT
+          echo "message=Some nightly tests failed" >> $GITHUB_OUTPUT
         fi
         
     - name: Create issue on failure
