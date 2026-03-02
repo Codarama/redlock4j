@@ -79,9 +79,10 @@ public class RedlockCountDownLatchTest {
 
     @Test
     void shouldReturnCountFromQuorum() throws RedisDriverException, InterruptedException {
-        when(mockDriver1.get(anyString())).thenReturn("5");
-        when(mockDriver2.get(anyString())).thenReturn("5");
-        when(mockDriver3.get(anyString())).thenReturn("5");
+        // Use lenient stubs since quorum logic may not call all drivers
+        lenient().when(mockDriver1.get(anyString())).thenReturn("5");
+        lenient().when(mockDriver2.get(anyString())).thenReturn("5");
+        lenient().when(mockDriver3.get(anyString())).thenReturn("5");
 
         RedlockCountDownLatch latch = new RedlockCountDownLatch("test", 5, drivers, testConfig);
         long count = latch.getCount();
