@@ -37,18 +37,15 @@ jobs:
         
     - name: Validate Maven POM
       run: mvn validate
-      
-    - name: Compile project
-      run: mvn clean compile test-compile
-      
+
     - name: Run unit tests
-      run: mvn test -Dgroups=unit
+      run: mvn test
 
     - name: Run integration tests
-      run: mvn test -Dgroups=integration
+      run: mvn verify -Dmaven.test.skip.exec=false
       env:
         TESTCONTAINERS_RYUK_DISABLED: false
-        
+
     - name: Generate test coverage
       run: mvn jacoco:report
       

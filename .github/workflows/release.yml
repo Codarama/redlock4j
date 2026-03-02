@@ -52,11 +52,11 @@ jobs:
     - name: Run tests before release
       run: |
         echo "Running tests before release..."
-        mvn --no-transfer-progress --batch-mode clean test -Dgroups=unit
+        mvn --no-transfer-progress --batch-mode clean test
         echo "Unit tests passed"
 
         # Run integration tests
-        mvn --no-transfer-progress --batch-mode test -Dgroups=integration
+        mvn --no-transfer-progress --batch-mode verify -Dmaven.test.skip.exec=false
         echo "Integration tests passed"
         
     - name: Install GPG key

@@ -13,21 +13,31 @@ Thank you for your interest in contributing to Redlock4j! This document provides
 
 ## 🧪 Testing
 
+### Test Organization
+Tests are organized using JUnit 5 `@Tag` annotations and Maven lifecycle phases:
+
+- **Unit tests** (`@Tag("unit")`) - Run during `test` phase via maven-surefire-plugin
+- **Integration tests** (`@Tag("integration")`) - Run during `integration-test` phase via maven-failsafe-plugin
+- **Performance tests** (`@Tag("performance")`) - Run on-demand or during nightly builds
+
 ### Local Testing
 Before submitting a PR, run the tests locally:
 
 ```bash
-# Run all tests
+# Run unit tests only (fast, no Docker required)
 mvn test
 
-# Run only unit tests
-mvn test -Dtest=RedlockConfigurationTest
+# Run unit + integration tests (requires Docker for Testcontainers)
+mvn verify
 
-# Run only integration tests (requires Docker)
-mvn test -Dtest=RedlockIntegrationTest
+# Run only integration tests (skip unit tests)
+mvn failsafe:integration-test failsafe:verify
+
+# Run performance tests
+mvn test -Dgroups=performance
 
 # Run with coverage
-mvn test jacoco:report
+mvn verify jacoco:report
 
 # Security scan
 mvn org.owasp:dependency-check-maven:check

@@ -36,14 +36,11 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
         
-    - name: Clean and compile
-      run: mvn clean compile test-compile
-      
-    - name: Run all unit tests
-      run: mvn test -Dgroups=unit
+    - name: Run unit tests
+      run: mvn test
 
-    - name: Run all integration tests
-      run: mvn test -Dgroups=integration
+    - name: Run integration tests
+      run: mvn verify -Dmaven.test.skip.exec=false
       env:
         TESTCONTAINERS_RYUK_DISABLED: false
 
@@ -61,10 +58,10 @@ jobs:
         echo "- **Java Version:** $(java -version 2>&1 | head -n 1)" >> $GITHUB_STEP_SUMMARY
         
         # Count test results
-        if [ -d "target/surefire-reports" ]; then
-          TOTAL_TESTS=$(find target/surefire-reports -name "*.xml" -exec grep -h "tests=" {} \; | sed 's/.*tests="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
-          FAILED_TESTS=$(find target/surefire-reports -name "*.xml" -exec grep -h "failures=" {} \; | sed 's/.*failures="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
-          ERROR_TESTS=$(find target/surefire-reports -name "*.xml" -exec grep -h "errors=" {} \; | sed 's/.*errors="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
+        if [ -d "target/surefire-reports" ] || [ -d "target/failsafe-reports" ]; then
+          TOTAL_TESTS=$(find target/surefire-reports target/failsafe-reports -name "*.xml" 2>/dev/null -exec grep -h "tests=" {} \; | sed 's/.*tests="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
+          FAILED_TESTS=$(find target/surefire-reports target/failsafe-reports -name "*.xml" 2>/dev/null -exec grep -h "failures=" {} \; | sed 's/.*failures="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
+          ERROR_TESTS=$(find target/surefire-reports target/failsafe-reports -name "*.xml" 2>/dev/null -exec grep -h "errors=" {} \; | sed 's/.*errors="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
           
           echo "- **Total Tests:** ${TOTAL_TESTS:-0}" >> $GITHUB_STEP_SUMMARY
           echo "- **Failed Tests:** ${FAILED_TESTS:-0}" >> $GITHUB_STEP_SUMMARY
@@ -84,6 +81,7 @@ jobs:
         name: nightly-test-results-${{ github.run_number }}
         path: |
           target/surefire-reports/
+          target/failsafe-reports/
           target/site/
         retention-days: 7
 
@@ -119,7 +117,7 @@ jobs:
         sed -i 's/redis:7-alpine/redis:${{ matrix.redis-version }}/g' src/test/java/org/codarama/redlock4j/performance/RedlockPerformanceTest.java
         
     - name: Run integration tests with Redis ${{ matrix.redis-version }}
-      run: mvn test -Dgroups=integration
+      run: mvn verify -Dmaven.test.skip.exec=false
       env:
         TESTCONTAINERS_RYUK_DISABLED: false
         
