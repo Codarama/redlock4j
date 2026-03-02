@@ -141,17 +141,40 @@
         </configuration>
       </plugin>
       
+      <!-- Unit tests run in the test phase -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.2.2</version>
         <configuration>
+          <groups>unit</groups>
           <includes>
             <include>**/*Test.java</include>
           </includes>
         </configuration>
       </plugin>
-      
+
+      <!-- Integration tests run in the integration-test phase -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.2.2</version>
+        <configuration>
+          <groups>integration</groups>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <!-- JaCoCo for code coverage -->
       <plugin>
         <groupId>org.jacoco</groupId>
@@ -332,6 +355,29 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+
+    <!-- Profile for Java 17+ to use Mockito 5.x which supports modern JVMs -->
+    <profile>
+      <id>java17plus</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+      <dependencies>
+        <!-- Override Mockito with version 5.x for Java 17+ compatibility -->
+        <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-core</artifactId>
+          <version>5.14.2</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-junit-jupiter</artifactId>
+          <version>5.14.2</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
 </project>

@@ -8,6 +8,7 @@ import org.codarama.redlock4j.configuration.RedlockConfiguration;
 import org.codarama.redlock4j.driver.RedisDriver;
 import org.codarama.redlock4j.driver.RedisDriverException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for RedlockCountDownLatch using Mockito mocks.
  */
+@Tag("unit")
 @ExtendWith(MockitoExtension.class)
 public class RedlockCountDownLatchTest {
 
@@ -77,9 +79,10 @@ public class RedlockCountDownLatchTest {
 
     @Test
     void shouldReturnCountFromQuorum() throws RedisDriverException, InterruptedException {
-        when(mockDriver1.get(anyString())).thenReturn("5");
-        when(mockDriver2.get(anyString())).thenReturn("5");
-        when(mockDriver3.get(anyString())).thenReturn("5");
+        // Use lenient stubs since quorum logic may not call all drivers
+        lenient().when(mockDriver1.get(anyString())).thenReturn("5");
+        lenient().when(mockDriver2.get(anyString())).thenReturn("5");
+        lenient().when(mockDriver3.get(anyString())).thenReturn("5");
 
         RedlockCountDownLatch latch = new RedlockCountDownLatch("test", 5, drivers, testConfig);
         long count = latch.getCount();

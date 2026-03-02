@@ -7,6 +7,7 @@ package org.codarama.redlock4j.integration;
 import org.codarama.redlock4j.*;
 import org.codarama.redlock4j.configuration.RedlockConfiguration;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Integration tests for advanced locking primitives.
  */
+@Tag("integration")
 @Testcontainers
 public class AdvancedLockingIntegrationTest {
 

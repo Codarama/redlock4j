@@ -7,8 +7,9 @@ package org.codarama.redlock4j;
 import org.codarama.redlock4j.configuration.RedlockConfiguration;
 import org.codarama.redlock4j.driver.RedisDriver;
 import org.codarama.redlock4j.driver.RedisDriverException;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for reentrant functionality of Redlock using Mockito mocks.
  */
+@Tag("unit")
 @ExtendWith(MockitoExtension.class)
 public class ReentrantRedlockTest {
 

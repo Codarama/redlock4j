@@ -4,6 +4,7 @@
  */
 package org.codarama.redlock4j.configuration;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.time.Duration;
@@ -11,6 +12,7 @@ import java.time.Duration;
 /**
  * Unit tests for RedlockConfiguration.
  */
+@Tag("unit")
 public class RedlockConfigurationTest {
 
     @Test

@@ -7,9 +7,10 @@ package org.codarama.redlock4j.async;
 import io.reactivex.rxjava3.observers.TestObserver;
 import org.codarama.redlock4j.configuration.RedlockConfiguration;
 import org.codarama.redlock4j.driver.RedisDriver;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for async lock extension functionality.
  */
+@Tag("unit")
 @ExtendWith(MockitoExtension.class)
 public class AsyncLockExtensionTest {
 

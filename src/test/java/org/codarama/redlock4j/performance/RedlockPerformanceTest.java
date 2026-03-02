@@ -7,9 +7,9 @@ package org.codarama.redlock4j.performance;
 import org.codarama.redlock4j.Redlock;
 import org.codarama.redlock4j.RedlockManager;
 import org.codarama.redlock4j.configuration.RedlockConfiguration;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -27,7 +27,7 @@ import java.util.concurrent.locks.Lock;
  * Performance tests for Redlock functionality using Testcontainers. These tests are disabled by default as they are for
  * performance analysis.
  */
-@Disabled("Performance tests - enable manually when needed")
+@Tag("performance")
 @Testcontainers
 public class RedlockPerformanceTest {
 

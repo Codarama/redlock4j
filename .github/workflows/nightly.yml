@@ -36,52 +36,19 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
         
-    - name: Clean and compile
-      run: mvn clean compile test-compile
-      
-    - name: Run all unit tests
-      run: mvn test -Dtest=RedlockConfigurationTest
-      
-    - name: Run all integration tests
-      run: mvn test -Dtest=RedlockIntegrationTest
+    - name: Run unit tests
+      run: mvn test
+
+    - name: Run integration tests
+      run: mvn verify -Dmaven.test.skip.exec=false
       env:
         TESTCONTAINERS_RYUK_DISABLED: false
-        
+
     - name: Run performance tests
       if: github.event.inputs.run_performance_tests == 'true' || github.event_name == 'schedule'
-      run: |
-        # Enable performance tests by removing @Disabled annotation temporarily
-        sed -i 's/@Disabled("Performance tests - enable manually when needed")/\/\/@Disabled("Performance tests - enable manually when needed")/g' src/test/java/org/codarama/redlock4j/performance/RedlockPerformanceTest.java
-        mvn test -Dtest=RedlockPerformanceTest
+      run: mvn test -Dgroups=performance
       env:
         TESTCONTAINERS_RYUK_DISABLED: false
-        
-    - name: Run stress tests
-      run: |
-        echo "## Stress Test Results" >> $GITHUB_STEP_SUMMARY
-        echo "Running extended stress tests..." >> $GITHUB_STEP_SUMMARY
-        
-        # Create a simple stress test
-        cat > stress-test.java << 'EOF'
-        import org.codarama.redlock4j.*;
-        import java.util.concurrent.*;
-        import java.util.concurrent.locks.Lock;
-        
-        public class StressTest {
-            public static void main(String[] args) throws Exception {
-                RedlockConfiguration config = RedlockConfiguration.builder()
-                    .addRedisNode("localhost", 6379)
-                    .addRedisNode("localhost", 6380) 
-                    .addRedisNode("localhost", 6381)
-                    .defaultLockTimeout(5, TimeUnit.SECONDS)
-                    .build();
-                    
-                System.out.println("Stress test completed successfully");
-            }
-        }
-        EOF
-
-        echo "Stress test configuration validated" >> $GITHUB_STEP_SUMMARY
         
     - name: Generate comprehensive test report
       run: |
@@ -91,10 +58,10 @@ jobs:
         echo "- **Java Version:** $(java -version 2>&1 | head -n 1)" >> $GITHUB_STEP_SUMMARY
         
         # Count test results
-        if [ -d "target/surefire-reports" ]; then
-          TOTAL_TESTS=$(find target/surefire-reports -name "*.xml" -exec grep -h "tests=" {} \; | sed 's/.*tests="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
-          FAILED_TESTS=$(find target/surefire-reports -name "*.xml" -exec grep -h "failures=" {} \; | sed 's/.*failures="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
-          ERROR_TESTS=$(find target/surefire-reports -name "*.xml" -exec grep -h "errors=" {} \; | sed 's/.*errors="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
+        if [ -d "target/surefire-reports" ] || [ -d "target/failsafe-reports" ]; then
+          TOTAL_TESTS=$(find target/surefire-reports target/failsafe-reports -name "*.xml" 2>/dev/null -exec grep -h "tests=" {} \; | sed 's/.*tests="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
+          FAILED_TESTS=$(find target/surefire-reports target/failsafe-reports -name "*.xml" 2>/dev/null -exec grep -h "failures=" {} \; | sed 's/.*failures="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
+          ERROR_TESTS=$(find target/surefire-reports target/failsafe-reports -name "*.xml" 2>/dev/null -exec grep -h "errors=" {} \; | sed 's/.*errors="\([0-9]*\)".*/\1/' | awk '{sum+=$1} END {print sum}')
           
           echo "- **Total Tests:** ${TOTAL_TESTS:-0}" >> $GITHUB_STEP_SUMMARY
           echo "- **Failed Tests:** ${FAILED_TESTS:-0}" >> $GITHUB_STEP_SUMMARY
@@ -114,6 +81,7 @@ jobs:
         name: nightly-test-results-${{ github.run_number }}
         path: |
           target/surefire-reports/
+          target/failsafe-reports/
           target/site/
         retention-days: 7
 
@@ -149,7 +117,7 @@ jobs:
         sed -i 's/redis:7-alpine/redis:${{ matrix.redis-version }}/g' src/test/java/org/codarama/redlock4j/performance/RedlockPerformanceTest.java
         
     - name: Run integration tests with Redis ${{ matrix.redis-version }}
-      run: mvn test -Dtest=RedlockIntegrationTest
+      run: mvn verify -Dmaven.test.skip.exec=false
       env:
         TESTCONTAINERS_RYUK_DISABLED: false
         
@@ -161,69 +129,3 @@ jobs:
         else
           echo "Tests failed with Redis ${{ matrix.redis-version }}" >> $GITHUB_STEP_SUMMARY
         fi
-
-  notification:
-    name: Send Notifications
-    runs-on: ubuntu-latest
-    needs: [comprehensive-test, multi-redis-version-test]
-    if: always()
-    
-    steps:
-    - name: Determine overall status
-      id: status
-      run: |
-        if [[ "${{ needs.comprehensive-test.result }}" == "success" && "${{ needs.multi-redis-version-test.result }}" == "success" ]]; then
-          echo "status=success" >> $GITHUB_OUTPUT
-          echo "message=All nightly tests passed successfully" >> $GITHUB_OUTPUT
-        else
-          echo "status=failure" >> $GITHUB_OUTPUT
-          echo "message=Some nightly tests failed" >> $GITHUB_OUTPUT
-        fi
-        
-    - name: Create issue on failure
-      if: steps.status.outputs.status == 'failure'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const title = `Nightly Tests Failed - ${new Date().toISOString().split('T')[0]}`;
-          const body = `
-          ## Nightly Test Failure Report
-          
-          **Date:** ${new Date().toISOString()}
-          **Workflow:** ${{ github.workflow }}
-          **Run ID:** ${{ github.run_id }}
-          **Commit:** ${{ github.sha }}
-          
-          ### Failed Jobs:
-          - Comprehensive Test: ${{ needs.comprehensive-test.result }}
-          - Multi Redis Version Test: ${{ needs.multi-redis-version-test.result }}
-          
-          ### Action Required:
-          Please investigate the test failures and fix any issues.
-          
-          **Workflow URL:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          `;
-          
-          // Check if issue already exists
-          const issues = await github.rest.issues.listForRepo({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            labels: ['nightly-test-failure'],
-            state: 'open'
-          });
-          
-          if (issues.data.length === 0) {
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body,
-              labels: ['nightly-test-failure', 'bug']
-            });
-          }
-          
-    - name: Summary
-      run: |
-        echo "## Nightly Test Summary" >> $GITHUB_STEP_SUMMARY
-        echo "${{ steps.status.outputs.message }}" >> $GITHUB_STEP_SUMMARY
-        echo "**Workflow completed at:** $(date)" >> $GITHUB_STEP_SUMMARY
