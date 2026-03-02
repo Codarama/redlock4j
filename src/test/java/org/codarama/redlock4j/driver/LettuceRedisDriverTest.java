@@ -9,8 +9,9 @@ import io.lettuce.core.SetArgs;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
 import org.codarama.redlock4j.configuration.RedisNodeConfiguration;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for LettuceRedisDriver using Mockito mocks. These tests do not require a working Redis server.
  */
+@Tag("unit")
 @ExtendWith(MockitoExtension.class)
 public class LettuceRedisDriverTest {
 

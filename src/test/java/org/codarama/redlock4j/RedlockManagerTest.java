@@ -5,8 +5,9 @@
 package org.codarama.redlock4j;
 
 import org.codarama.redlock4j.configuration.RedlockConfiguration;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for RedlockManager. These tests focus on the manager's public interface and configuration handling.
  */
+@Tag("unit")
 public class RedlockManagerTest {
 
     private RedlockConfiguration testConfig;

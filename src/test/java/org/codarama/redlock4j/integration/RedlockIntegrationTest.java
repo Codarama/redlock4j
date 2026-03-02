@@ -9,6 +9,7 @@ import org.codarama.redlock4j.RedlockException;
 import org.codarama.redlock4j.RedlockManager;
 import org.codarama.redlock4j.configuration.RedisNodeConfiguration;
 import org.codarama.redlock4j.configuration.RedlockConfiguration;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
@@ -26,6 +27,7 @@ import java.util.concurrent.locks.Lock;
  * Integration tests for Redlock functionality using Testcontainers. These tests automatically spin up Redis containers
  * for testing.
  */
+@Tag("integration")
 @Testcontainers
 public class RedlockIntegrationTest {
 

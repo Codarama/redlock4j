@@ -47,17 +47,17 @@ jobs:
       run: mvn clean compile test-compile
       
     - name: Run unit tests
-      run: mvn test -Dtest=RedlockConfigurationTest
-      
+      run: mvn test -Dgroups=unit
+
     - name: Run integration tests with Testcontainers
-      run: mvn test -Dtest=RedlockIntegrationTest
+      run: mvn test -Dgroups=integration
       env:
         # Ensure Docker is available for Testcontainers
         TESTCONTAINERS_RYUK_DISABLED: false
-        
-    - name: Run all tests (including performance tests on nightly)
+
+    - name: Run performance tests (on nightly schedule only)
       if: github.event_name == 'schedule'
-      run: mvn test -Dtest=RedlockPerformanceTest
+      run: mvn test -Dgroups=performance
       env:
         TESTCONTAINERS_RYUK_DISABLED: false
         

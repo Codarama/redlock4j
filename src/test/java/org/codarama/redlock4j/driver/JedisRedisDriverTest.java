@@ -5,14 +5,16 @@
 package org.codarama.redlock4j.driver;
 
 import org.codarama.redlock4j.configuration.RedisNodeConfiguration;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for JedisRedisDriver. These tests focus on the driver's public interface and configuration handling.
  */
+@Tag("unit")
 public class JedisRedisDriverTest {
 
     private RedisNodeConfiguration testConfig;

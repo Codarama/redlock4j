@@ -10,8 +10,9 @@ import org.codarama.redlock4j.async.AsyncRedlock;
 import org.codarama.redlock4j.async.AsyncRedlockImpl;
 import org.codarama.redlock4j.async.RxRedlock;
 import org.codarama.redlock4j.configuration.RedlockConfiguration;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Simple tests to verify async and reactive APIs work correctly.
  */
+@Tag("integration")
 @Testcontainers
 public class AsyncRedlockIntegrationTest {
 

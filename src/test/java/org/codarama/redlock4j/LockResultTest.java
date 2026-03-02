@@ -4,6 +4,7 @@
  */
 package org.codarama.redlock4j;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for LockResult value object.
  */
+@Tag("unit")
 public class LockResultTest {
 
     @Test

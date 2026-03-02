@@ -42,10 +42,10 @@ jobs:
       run: mvn clean compile test-compile
       
     - name: Run unit tests
-      run: mvn test -Dtest=RedlockConfigurationTest
-      
+      run: mvn test -Dgroups=unit
+
     - name: Run integration tests
-      run: mvn test -Dtest=RedlockIntegrationTest
+      run: mvn test -Dgroups=integration
       env:
         TESTCONTAINERS_RYUK_DISABLED: false
         

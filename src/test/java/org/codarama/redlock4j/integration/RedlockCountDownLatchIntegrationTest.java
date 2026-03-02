@@ -8,6 +8,7 @@ import org.codarama.redlock4j.RedlockCountDownLatch;
 import org.codarama.redlock4j.RedlockManager;
 import org.codarama.redlock4j.configuration.RedlockConfiguration;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -28,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Comprehensive integration tests for {@link RedlockCountDownLatch}. Verifies the distributed countdown latch honors
  * its contract.
  */
+@Tag("integration")
 @Testcontainers
 public class RedlockCountDownLatchIntegrationTest {
 

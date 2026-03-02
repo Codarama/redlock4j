@@ -7,8 +7,9 @@ package org.codarama.redlock4j.async;
 import io.reactivex.rxjava3.observers.TestObserver;
 import org.codarama.redlock4j.RedlockManager;
 import org.codarama.redlock4j.configuration.RedlockConfiguration;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Tests for asynchronous CompletionStage and RxJava reactive APIs.
  */
+@Tag("integration")
 @Testcontainers
 public class AsyncRedlockImplTest {
 
