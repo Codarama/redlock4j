@@ -12,24 +12,24 @@
         <meta name="author" content="Codarama">
       
       
-        <link rel="canonical" href="https://codarama.github.io/redlock4j/api/core/">
+        <link rel="canonical" href="https://codarama.github.io/redlock4j/api/lock-types/">
       
       
-        <link rel="prev" href="../../guide/best-practices/">
+        <link rel="prev" href="../redlock-manager/">
       
       
-        <link rel="next" href="../configuration/">
+        <link rel="next" href="../async-reactive/">
       
       
         
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+      <link rel="icon" href="../../logo-dark.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Core API - Redlock4j</title>
+        <title>Lock Types - Redlock4j</title>
       
     
     
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#core-api-reference" class="md-skip">
+        <a href="#lock-types-api-reference" class="md-skip">
           Skip to content
         </a>
       
@@ -102,8 +102,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Redlock4j" class="md-header__button md-logo" aria-label="Redlock4j" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <img src="../../logo-dark.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -120,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Core API
+              Lock Types
             
           </span>
         </div>
@@ -296,7 +295,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+        <a href="../redlock-manager/" class="md-tabs__link">
           
   
   
@@ -305,25 +304,6 @@
         </a>
       </li>
     
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../comparison/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Comparison
-
-      </a>
-    </li>
   
 
       
@@ -351,8 +331,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Redlock4j" class="md-nav__button md-logo" aria-label="Redlock4j" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <img src="../../logo-dark.svg" alt="logo">
 
     </a>
     Redlock4j
@@ -661,6 +640,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../guide/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../guide/best-practices/" class="md-nav__link">
         
   
@@ -669,6 +676,34 @@
     
   
     Best Practices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
   
 
     
@@ -750,6 +785,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../redlock-manager/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RedlockManager
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -769,7 +832,7 @@
   <span class="md-ellipsis">
     
   
-    Core API
+    Lock Types
   
 
     
@@ -787,7 +850,7 @@
   <span class="md-ellipsis">
     
   
-    Core API
+    Lock Types
   
 
     
@@ -813,98 +876,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#redlock-class" class="md-nav__link">
+  <a href="#redlock-standard-lock" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Redlock Class
+        Redlock (Standard Lock)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Redlock Class">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#constructor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Constructor
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#lock" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        lock()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#trylock" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        tryLock()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#unlock" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        unlock()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#extend" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        extend()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#isvalid" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        isValid()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#lock-interface" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Lock Interface
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Lock Interface">
+    <nav class="md-nav" aria-label="Redlock (Standard Lock)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -918,28 +898,50 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reentrancy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reentrancy
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#redlockconfiguration-class" class="md-nav__link">
+  <a href="#fairlock" class="md-nav__link">
     <span class="md-ellipsis">
       
-        RedlockConfiguration Class
+        FairLock
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="RedlockConfiguration Class">
+    <nav class="md-nav" aria-label="FairLock">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#builder" class="md-nav__link">
+  <a href="#methods_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Builder
+        Methods
       
     </span>
   </a>
@@ -947,10 +949,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#properties" class="md-nav__link">
+  <a href="#example_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Properties
+        Example
       
     </span>
   </a>
@@ -963,22 +965,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#exceptions" class="md-nav__link">
+  <a href="#multilock" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Exceptions
+        MultiLock
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Exceptions">
+    <nav class="md-nav" aria-label="MultiLock">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#redlockexception" class="md-nav__link">
+  <a href="#methods_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        RedlockException
+        Methods
       
     </span>
   </a>
@@ -986,10 +988,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#lockacquisitionexception" class="md-nav__link">
+  <a href="#example_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        LockAcquisitionException
+        Example
       
     </span>
   </a>
@@ -1002,13 +1004,119 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#thread-safety" class="md-nav__link">
+  <a href="#redlockreadwritelock" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Thread Safety
+        RedlockReadWriteLock
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="RedlockReadWriteLock">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methods_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#redlocksemaphore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RedlockSemaphore
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RedlockSemaphore">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methods_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#redlockcountdownlatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RedlockCountDownLatch
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RedlockCountDownLatch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methods_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1027,6 +1135,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../async-reactive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Async & Reactive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1067,33 +1203,6 @@
   
 
     
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../comparison/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Comparison
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
   </ul>
 </nav>
                   </div>
@@ -1121,98 +1230,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#redlock-class" class="md-nav__link">
+  <a href="#redlock-standard-lock" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Redlock Class
+        Redlock (Standard Lock)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Redlock Class">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#constructor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Constructor
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#lock" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        lock()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#trylock" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        tryLock()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#unlock" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        unlock()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#extend" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        extend()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#isvalid" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        isValid()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#lock-interface" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Lock Interface
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Lock Interface">
+    <nav class="md-nav" aria-label="Redlock (Standard Lock)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1226,28 +1252,50 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reentrancy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reentrancy
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#redlockconfiguration-class" class="md-nav__link">
+  <a href="#fairlock" class="md-nav__link">
     <span class="md-ellipsis">
       
-        RedlockConfiguration Class
+        FairLock
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="RedlockConfiguration Class">
+    <nav class="md-nav" aria-label="FairLock">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#builder" class="md-nav__link">
+  <a href="#methods_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Builder
+        Methods
       
     </span>
   </a>
@@ -1255,10 +1303,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#properties" class="md-nav__link">
+  <a href="#example_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Properties
+        Example
       
     </span>
   </a>
@@ -1271,22 +1319,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#exceptions" class="md-nav__link">
+  <a href="#multilock" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Exceptions
+        MultiLock
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Exceptions">
+    <nav class="md-nav" aria-label="MultiLock">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#redlockexception" class="md-nav__link">
+  <a href="#methods_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        RedlockException
+        Methods
       
     </span>
   </a>
@@ -1294,10 +1342,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#lockacquisitionexception" class="md-nav__link">
+  <a href="#example_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        LockAcquisitionException
+        Example
       
     </span>
   </a>
@@ -1310,13 +1358,119 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#thread-safety" class="md-nav__link">
+  <a href="#redlockreadwritelock" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Thread Safety
+        RedlockReadWriteLock
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="RedlockReadWriteLock">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methods_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#redlocksemaphore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RedlockSemaphore
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RedlockSemaphore">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methods_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#redlockcountdownlatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RedlockCountDownLatch
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RedlockCountDownLatch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methods_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1351,179 +1505,262 @@
   
 
 
-<h1 id="core-api-reference">Core API Reference<a class="headerlink" href="#core-api-reference" title="Permanent link">&para;</a></h1>
-<p>This page documents the core API of Redlock4j.</p>
-<h2 id="redlock-class">Redlock Class<a class="headerlink" href="#redlock-class" title="Permanent link">&para;</a></h2>
-<p>The main class for creating and managing distributed locks.</p>
-<h3 id="constructor">Constructor<a class="headerlink" href="#constructor" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">public</span><span class="w"> </span><span class="nf">Redlock</span><span class="p">(</span><span class="n">JedisPool</span><span class="p">...</span><span class="w"> </span><span class="n">pools</span><span class="p">)</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kd">public</span><span class="w"> </span><span class="nf">Redlock</span><span class="p">(</span><span class="n">RedisClient</span><span class="p">...</span><span class="w"> </span><span class="n">clients</span><span class="p">)</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">public</span><span class="w"> </span><span class="nf">Redlock</span><span class="p">(</span><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="n">JedisPool</span><span class="p">...</span><span class="w"> </span><span class="n">pools</span><span class="p">)</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kd">public</span><span class="w"> </span><span class="nf">Redlock</span><span class="p">(</span><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="n">RedisClient</span><span class="p">...</span><span class="w"> </span><span class="n">clients</span><span class="p">)</span>
-</code></pre></div>
-<p><strong>Parameters:</strong>
-- <code>config</code> - Configuration for Redlock behavior (optional)
-- <code>pools</code> - Jedis connection pools for Redis instances
-- <code>clients</code> - Lettuce Redis clients</p>
-<p><strong>Example:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">Redlock</span><span class="w"> </span><span class="n">redlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Redlock</span><span class="p">(</span><span class="n">pool1</span><span class="p">,</span><span class="w"> </span><span class="n">pool2</span><span class="p">,</span><span class="w"> </span><span class="n">pool3</span><span class="p">);</span>
-</code></pre></div></p>
-<h3 id="lock">lock()<a class="headerlink" href="#lock" title="Permanent link">&para;</a></h3>
-<p>Acquire a lock with retries.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">public</span><span class="w"> </span><span class="n">Lock</span><span class="w"> </span><span class="nf">lock</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">resource</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ttl</span><span class="p">)</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kd">public</span><span class="w"> </span><span class="n">Lock</span><span class="w"> </span><span class="nf">lock</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">resource</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ttl</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">timeout</span><span class="p">)</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kd">public</span><span class="w"> </span><span class="n">Lock</span><span class="w"> </span><span class="nf">lock</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">resources</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ttl</span><span class="p">)</span>
-</code></pre></div>
-<p><strong>Parameters:</strong>
-- <code>resource</code> - Resource identifier to lock
-- <code>resources</code> - Multiple resources to lock atomically
-- <code>ttl</code> - Time-to-live in milliseconds
-- <code>timeout</code> - Maximum time to wait for lock acquisition (optional)</p>
-<p><strong>Returns:</strong>
-- <code>Lock</code> object if successful, <code>null</code> if failed</p>
-<p><strong>Example:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;my-resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-</code></pre></div></p>
-<h3 id="trylock">tryLock()<a class="headerlink" href="#trylock" title="Permanent link">&para;</a></h3>
-<p>Attempt to acquire a lock without retries.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">public</span><span class="w"> </span><span class="n">Lock</span><span class="w"> </span><span class="nf">tryLock</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">resource</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ttl</span><span class="p">)</span>
-</code></pre></div>
-<p><strong>Parameters:</strong>
-- <code>resource</code> - Resource identifier to lock
-- <code>ttl</code> - Time-to-live in milliseconds</p>
-<p><strong>Returns:</strong>
-- <code>Lock</code> object if successful, <code>null</code> if failed</p>
-<p><strong>Example:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">tryLock</span><span class="p">(</span><span class="s">&quot;my-resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-</code></pre></div></p>
-<h3 id="unlock">unlock()<a class="headerlink" href="#unlock" title="Permanent link">&para;</a></h3>
-<p>Release a previously acquired lock.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">unlock</span><span class="p">(</span><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="p">)</span>
-</code></pre></div>
-<p><strong>Parameters:</strong>
-- <code>lock</code> - Lock object to release</p>
-<p><strong>Example:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">redlock</span><span class="p">.</span><span class="na">unlock</span><span class="p">(</span><span class="n">lock</span><span class="p">);</span>
-</code></pre></div></p>
-<h3 id="extend">extend()<a class="headerlink" href="#extend" title="Permanent link">&para;</a></h3>
-<p>Extend the TTL of an existing lock.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">extend</span><span class="p">(</span><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">additionalTtl</span><span class="p">)</span>
-</code></pre></div>
-<p><strong>Parameters:</strong>
-- <code>lock</code> - Lock to extend
-- <code>additionalTtl</code> - Additional time in milliseconds</p>
-<p><strong>Returns:</strong>
-- <code>true</code> if extension successful, <code>false</code> otherwise</p>
-<p><strong>Example:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kt">boolean</span><span class="w"> </span><span class="n">extended</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">extend</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span><span class="w"> </span><span class="mi">5000</span><span class="p">);</span>
-</code></pre></div></p>
-<h3 id="isvalid">isValid()<a class="headerlink" href="#isvalid" title="Permanent link">&para;</a></h3>
-<p>Check if a lock is still valid.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isValid</span><span class="p">(</span><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="p">)</span>
-</code></pre></div>
-<p><strong>Parameters:</strong>
-- <code>lock</code> - Lock to check</p>
-<p><strong>Returns:</strong>
-- <code>true</code> if lock is still valid, <code>false</code> otherwise</p>
-<p><strong>Example:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">redlock</span><span class="p">.</span><span class="na">isValid</span><span class="p">(</span><span class="n">lock</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="c1">// Lock is still valid</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">}</span>
-</code></pre></div></p>
-<h2 id="lock-interface">Lock Interface<a class="headerlink" href="#lock-interface" title="Permanent link">&para;</a></h2>
-<p>Represents a distributed lock.</p>
+<h1 id="lock-types-api-reference">Lock Types API Reference<a class="headerlink" href="#lock-types-api-reference" title="Permanent link">&para;</a></h1>
+<p>This page documents all distributed lock types provided by Redlock4j.</p>
+<h2 id="redlock-standard-lock">Redlock (Standard Lock)<a class="headerlink" href="#redlock-standard-lock" title="Permanent link">&para;</a></h2>
+<p>The standard distributed lock implementing <code>java.util.concurrent.locks.Lock</code>.</p>
 <h3 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getResource</span><span class="p">()</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getValue</span><span class="p">()</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="kd">public</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="nf">getValidityTime</span><span class="p">()</span>
-</code></pre></div>
-<p><strong>Example:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">String</span><span class="w"> </span><span class="n">resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lock</span><span class="p">.</span><span class="na">getResource</span><span class="p">();</span><span class="w">  </span><span class="c1">// &quot;resource&quot;</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">String</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lock</span><span class="p">.</span><span class="na">getValue</span><span class="p">();</span><span class="w">        </span><span class="c1">// Unique lock value</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="kt">long</span><span class="w"> </span><span class="n">validity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lock</span><span class="p">.</span><span class="na">getValidityTime</span><span class="p">();</span><span class="w"> </span><span class="c1">// Remaining validity in ms</span>
-</code></pre></div></p>
-<h2 id="redlockconfiguration-class">RedlockConfiguration Class<a class="headerlink" href="#redlockconfiguration-class" title="Permanent link">&para;</a></h2>
-<p>Configuration for Redlock behavior.</p>
-<h3 id="builder">Builder<a class="headerlink" href="#builder" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span><span class="p">.</span><span class="na">retryCount</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="p">.</span><span class="na">retryDelay</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="p">.</span><span class="na">clockDriftFactor</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</code></pre></div>
-<h3 id="properties">Properties<a class="headerlink" href="#properties" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Property</th>
-<th>Type</th>
-<th>Default</th>
+<th>Method</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>retryCount</code></td>
-<td>int</td>
-<td>3</td>
-<td>Number of retry attempts</td>
+<td><code>void lock()</code></td>
+<td>Acquires the lock, blocking until available</td>
 </tr>
 <tr>
-<td><code>retryDelay</code></td>
-<td>int</td>
-<td>200</td>
-<td>Delay between retries (ms)</td>
+<td><code>void lockInterruptibly()</code></td>
+<td>Acquires the lock, can be interrupted</td>
 </tr>
 <tr>
-<td><code>clockDriftFactor</code></td>
-<td>double</td>
-<td>0.01</td>
-<td>Clock drift compensation factor</td>
+<td><code>boolean tryLock()</code></td>
+<td>Tries to acquire immediately, returns false if unavailable</td>
+</tr>
+<tr>
+<td><code>boolean tryLock(long time, TimeUnit unit)</code></td>
+<td>Tries to acquire within timeout</td>
+</tr>
+<tr>
+<td><code>boolean tryLock(Duration timeout)</code></td>
+<td>Tries to acquire within timeout</td>
+</tr>
+<tr>
+<td><code>void unlock()</code></td>
+<td>Releases the lock</td>
+</tr>
+<tr>
+<td><code>boolean isHeldByCurrentThread()</code></td>
+<td>Returns true if current thread holds the lock</td>
+</tr>
+<tr>
+<td><code>String getLockKey()</code></td>
+<td>Returns the lock key</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Example:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="p">.</span><span class="na">retryCount</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="p">.</span><span class="na">retryDelay</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="p">.</span><span class="na">clockDriftFactor</span><span class="p">(</span><span class="mf">0.02</span><span class="p">)</span>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
-<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="n">Redlock</span><span class="w"> </span><span class="n">redlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Redlock</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="n">pool1</span><span class="p">,</span><span class="w"> </span><span class="n">pool2</span><span class="p">,</span><span class="w"> </span><span class="n">pool3</span><span class="p">);</span>
-</code></pre></div></p>
-<h2 id="exceptions">Exceptions<a class="headerlink" href="#exceptions" title="Permanent link">&para;</a></h2>
-<h3 id="redlockexception">RedlockException<a class="headerlink" href="#redlockexception" title="Permanent link">&para;</a></h3>
-<p>Base exception for Redlock operations.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">RedlockException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="n">logger</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">&quot;Redlock error&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="p">}</span>
+<h3 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">Redlock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="s">&quot;my-resource&quot;</span><span class="p">);</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">// Blocking acquisition</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">lock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="n">performCriticalOperation</span><span class="p">();</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="n">lock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">}</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1">// Non-blocking with timeout</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">lock</span><span class="p">.</span><span class="na">tryLock</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">SECONDS</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">        </span><span class="n">performCriticalOperation</span><span class="p">();</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">        </span><span class="n">lock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">    </span><span class="n">handleLockUnavailable</span><span class="p">();</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="lockacquisitionexception">LockAcquisitionException<a class="headerlink" href="#lockacquisitionexception" title="Permanent link">&para;</a></h3>
-<p>Thrown when lock acquisition fails critically.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">LockAcquisitionException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">    </span><span class="n">logger</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">&quot;Failed to acquire lock&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
-<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="p">}</span>
+<h3 id="reentrancy">Reentrancy<a class="headerlink" href="#reentrancy" title="Permanent link">&para;</a></h3>
+<p>Redlock supports reentrant locking - the same thread can acquire the lock multiple times:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">lock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span><span class="w">       </span><span class="c1">// hold count = 1</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">lock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span><span class="w">       </span><span class="c1">// hold count = 2</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">lock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span><span class="w">     </span><span class="c1">// hold count = 1</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">lock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span><span class="w">     </span><span class="c1">// hold count = 0, lock released</span>
 </code></pre></div>
-<h2 id="thread-safety">Thread Safety<a class="headerlink" href="#thread-safety" title="Permanent link">&para;</a></h2>
-<p>All Redlock methods are thread-safe and can be called concurrently from multiple threads.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1">// Safe to use from multiple threads</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">Redlock</span><span class="w"> </span><span class="n">redlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Redlock</span><span class="p">(</span><span class="n">pool1</span><span class="p">,</span><span class="w"> </span><span class="n">pool2</span><span class="p">,</span><span class="w"> </span><span class="n">pool3</span><span class="p">);</span>
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1">// Thread 1</span>
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;resource-1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="c1">// Thread 2 (concurrent)</span>
-<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;resource-2&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
+<hr />
+<h2 id="fairlock">FairLock<a class="headerlink" href="#fairlock" title="Permanent link">&para;</a></h2>
+<p>A distributed lock with FIFO ordering guarantees.</p>
+<h3 id="methods_1">Methods<a class="headerlink" href="#methods_1" title="Permanent link">&para;</a></h3>
+<p>Same as <code>Redlock</code> - implements <code>java.util.concurrent.locks.Lock</code>.</p>
+<h3 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">fairLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createFairLock</span><span class="p">(</span><span class="s">&quot;fair-resource&quot;</span><span class="p">);</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">fairLock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="c1">// Threads acquire in request order</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="n">fairLock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">}</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Use Polling</p>
+<p>FairLock performs ~60x better with polling. Configure with <code>.usePolling()</code>.</p>
+</div>
+<hr />
+<h2 id="multilock">MultiLock<a class="headerlink" href="#multilock" title="Permanent link">&para;</a></h2>
+<p>Atomically acquires multiple resources to prevent deadlocks.</p>
+<h3 id="methods_2">Methods<a class="headerlink" href="#methods_2" title="Permanent link">&para;</a></h3>
+<p>Same as <code>Redlock</code> - implements <code>java.util.concurrent.locks.Lock</code>.</p>
+<h3 id="example_2">Example<a class="headerlink" href="#example_2" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">multiLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createMultiLock</span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;account:A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:B&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:C&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">);</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">multiLock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="c1">// All three resources locked atomically</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="n">transferFunds</span><span class="p">(</span><span class="n">accountA</span><span class="p">,</span><span class="w"> </span><span class="n">accountB</span><span class="p">,</span><span class="w"> </span><span class="n">accountC</span><span class="p">);</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="n">multiLock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="p">}</span>
+</code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Deadlock Prevention</p>
+<p>Keys are sorted internally to ensure consistent ordering across all clients.</p>
+</div>
+<hr />
+<h2 id="redlockreadwritelock">RedlockReadWriteLock<a class="headerlink" href="#redlockreadwritelock" title="Permanent link">&para;</a></h2>
+<p>Allows multiple concurrent readers or a single exclusive writer.</p>
+<h3 id="methods_3">Methods<a class="headerlink" href="#methods_3" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Lock readLock()</code></td>
+<td>Returns the read lock</td>
+</tr>
+<tr>
+<td><code>Lock writeLock()</code></td>
+<td>Returns the write lock</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example_3">Example<a class="headerlink" href="#example_3" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">RedlockReadWriteLock</span><span class="w"> </span><span class="n">rwLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createReadWriteLock</span><span class="p">(</span><span class="s">&quot;shared-data&quot;</span><span class="p">);</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="c1">// Multiple readers can hold simultaneously</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">rwLock</span><span class="p">.</span><span class="na">readLock</span><span class="p">().</span><span class="na">lock</span><span class="p">();</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="n">readSharedData</span><span class="p">();</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="n">rwLock</span><span class="p">.</span><span class="na">readLock</span><span class="p">().</span><span class="na">unlock</span><span class="p">();</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">}</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1">// Writers get exclusive access</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="n">rwLock</span><span class="p">.</span><span class="na">writeLock</span><span class="p">().</span><span class="na">lock</span><span class="p">();</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="n">writeSharedData</span><span class="p">();</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="n">rwLock</span><span class="p">.</span><span class="na">writeLock</span><span class="p">().</span><span class="na">unlock</span><span class="p">();</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="redlocksemaphore">RedlockSemaphore<a class="headerlink" href="#redlocksemaphore" title="Permanent link">&para;</a></h2>
+<p>A distributed semaphore with a fixed number of permits.</p>
+<h3 id="methods_4">Methods<a class="headerlink" href="#methods_4" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>void acquire()</code></td>
+<td>Acquires one permit, blocking</td>
+</tr>
+<tr>
+<td><code>void acquire(int permits)</code></td>
+<td>Acquires multiple permits, blocking</td>
+</tr>
+<tr>
+<td><code>boolean tryAcquire(Duration timeout)</code></td>
+<td>Tries to acquire one permit</td>
+</tr>
+<tr>
+<td><code>boolean tryAcquire(int permits, Duration timeout)</code></td>
+<td>Tries to acquire multiple permits</td>
+</tr>
+<tr>
+<td><code>void release()</code></td>
+<td>Releases one permit</td>
+</tr>
+<tr>
+<td><code>void release(int permits)</code></td>
+<td>Releases multiple permits</td>
+</tr>
+<tr>
+<td><code>int availablePermits()</code></td>
+<td>Returns estimated available permits</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example_4">Example<a class="headerlink" href="#example_4" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// Rate limiting: max 10 concurrent API calls</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">RedlockSemaphore</span><span class="w"> </span><span class="n">semaphore</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createSemaphore</span><span class="p">(</span><span class="s">&quot;api-limit&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">semaphore</span><span class="p">.</span><span class="na">tryAcquire</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofSeconds</span><span class="p">(</span><span class="mi">5</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="n">callExternalAPI</span><span class="p">();</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">        </span><span class="n">semaphore</span><span class="p">.</span><span class="na">release</span><span class="p">();</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="redlockcountdownlatch">RedlockCountDownLatch<a class="headerlink" href="#redlockcountdownlatch" title="Permanent link">&para;</a></h2>
+<p>A distributed countdown latch for coordinating multiple processes.</p>
+<h3 id="methods_5">Methods<a class="headerlink" href="#methods_5" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>void countDown()</code></td>
+<td>Decrements the count by one</td>
+</tr>
+<tr>
+<td><code>void await()</code></td>
+<td>Waits until count reaches zero</td>
+</tr>
+<tr>
+<td><code>boolean await(Duration timeout)</code></td>
+<td>Waits with timeout</td>
+</tr>
+<tr>
+<td><code>long getCount()</code></td>
+<td>Returns current count</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example_5">Example<a class="headerlink" href="#example_5" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// Coordinator creates latch</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">RedlockCountDownLatch</span><span class="w"> </span><span class="n">latch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createCountDownLatch</span><span class="p">(</span><span class="s">&quot;startup&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1">// Each service signals completion</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">latch</span><span class="p">.</span><span class="na">countDown</span><span class="p">();</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1">// Main thread waits for all</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="n">latch</span><span class="p">.</span><span class="na">await</span><span class="p">();</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;All services ready!&quot;</span><span class="p">);</span>
 </code></pre></div>
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../configuration/">Configuration API</a> - Configuration details</li>
-<li><a href="../../guide/basic-usage/">Basic Usage</a> - Usage examples</li>
+<li><a href="../async-reactive/">Async &amp; Reactive</a> - Async and reactive APIs</li>
+<li><a href="../configuration/">Configuration</a> - Configuration options</li>
 </ul>
 
 
@@ -1547,7 +1784,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="February 9, 2026 16:44:59 UTC">February 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="April 22, 2026 21:03:58 UTC">April 22, 2026</span>
   </span>
 
     
@@ -1557,7 +1794,7 @@
     <span class="md-icon" title="Created">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="February 9, 2026 16:44:59 UTC">February 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="April 22, 2026 21:03:58 UTC">April 22, 2026</span>
   </span>
 
     
@@ -1632,6 +1869,8 @@
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       
     
   </body>

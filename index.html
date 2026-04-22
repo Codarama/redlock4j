@@ -22,8 +22,8 @@
         
       
       
-      <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+      <link rel="icon" href="logo-dark.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -100,8 +100,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="." title="Redlock4j" class="md-header__button md-logo" aria-label="Redlock4j" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <img src="logo-dark.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -294,7 +293,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="api/core/" class="md-tabs__link">
+        <a href="api/redlock-manager/" class="md-tabs__link">
           
   
   
@@ -303,25 +302,6 @@
         </a>
       </li>
     
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="comparison/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Comparison
-
-      </a>
-    </li>
   
 
       
@@ -349,8 +329,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="." title="Redlock4j" class="md-nav__button md-logo" aria-label="Redlock4j" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <img src="logo-dark.svg" alt="logo">
 
     </a>
     Redlock4j
@@ -800,6 +779,34 @@
   
   
     <li class="md-nav__item">
+      <a href="guide/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="guide/best-practices/" class="md-nav__link">
         
   
@@ -808,6 +815,34 @@
     
   
     Best Practices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
   
 
     
@@ -889,14 +924,70 @@
   
   
     <li class="md-nav__item">
-      <a href="api/core/" class="md-nav__link">
+      <a href="api/redlock-manager/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Core API
+    RedlockManager
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="api/lock-types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lock Types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="api/async-reactive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Async & Reactive
   
 
     
@@ -941,33 +1032,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="comparison/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Comparison
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1118,14 +1182,14 @@
 <p>Redlock4j provides a reliable distributed locking mechanism using Redis, implementing the Redlock algorithm proposed by Redis creator Antirez. It ensures mutual exclusion across distributed systems with high availability and fault tolerance.</p>
 <h2 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Pure <a href="https://redis.io/docs/latest/develop/use/patterns/distributed-locks/">Redlock distributed locking algorithm</a></strong> - entirely based on Redis definition</li>
-<li><strong>Multiple Redis Drivers</strong>: Integrated supports for <a href="https://github.com/redis/jedis">Jedis</a> and <a href="https://github.com/redis/lettuce">Lettuce</a>, extensible to other drivers</li>
-<li><strong>Lightweight</strong> - Minimum implementation, no extra scope outside locking</li>
-<li><strong>Multi-interface API</strong> - Supports standard <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/Lock.html">Lock</a>, as well as async and reactive APIs</li>
-<li><strong>Advanced Locking</strong>: Fair, multi &amp; read-write locks, semaphores, and countdown latches</li>
-<li><strong>Lock Extension</strong>: Extend lock validity time without releasing and re-acquiring</li>
-<li><strong>Atomic CAS/CAD</strong>: Auto-detects native <a href="https://redis.io/docs/latest/operate/oss_and_stack/stack-with-enterprise/release-notes/redisce/redisos-8.4-release-notes/">Redis 8.4+ CAS/CAD commands</a> when available</li>
-<li><strong>Java 8+</strong> - Compatible with Java 8 and higher</li>
+<li><strong>Flexible Deployment</strong> - Works as a <a href="https://redlock4j.codarama.org/guide/configuration/#single-node-mode">full Redlock implementation</a> with multiple Redis nodes for high availability, or as a <a href="https://redlock4j.codarama.org/guide/configuration/#single-node-mode">standalone distributed lock</a> with a single Redis node</li>
+<li><strong>Multiple Redis Drivers</strong> - Integrated support for <a href="https://github.com/redis/jedis">Jedis</a> and <a href="https://github.com/redis/lettuce">Lettuce</a>, extensible to other drivers</li>
+<li><strong><a href="https://redis.io/docs/latest/develop/use/keyspace-notifications/">Keyspace Notifications</a></strong> - Uses Redis pub/sub for instant lock release detection (20-50x faster than polling under contention)</li>
+<li><strong>Multi-interface API</strong> - Supports standard <code>java.util.concurrent.locks.Lock</code> interface, as well as <a href="https://redlock4j.codarama.org/guide/async-reactive/">async</a> and <a href="https://redlock4j.codarama.org/guide/async-reactive/">reactive</a> APIs</li>
+<li><strong>Advanced Locking Primitives</strong> - <a href="https://redlock4j.codarama.org/guide/lock-types/#fair-lock">Fair locks</a>, <a href="https://redlock4j.codarama.org/guide/lock-types/#multi-lock">multi-locks</a>, <a href="https://redlock4j.codarama.org/guide/lock-types/#read-write-lock">read-write locks</a>, <a href="https://redlock4j.codarama.org/guide/lock-types/#semaphore">semaphores</a>, and <a href="https://redlock4j.codarama.org/guide/lock-types/#countdown-latch">countdown latches</a></li>
+<li><strong>Lock Extension</strong> - Extend lock validity time without releasing and re-acquiring</li>
+<li><strong>Atomic CAS/CAD Detection</strong> - Auto-detects and uses native <a href="https://redis.io/docs/latest/operate/oss_and_stack/stack-with-enterprise/release-notes/redisce/redisos-8.4-release-notes/">Redis 8.4+ CAS/CAD commands</a> when available</li>
+<li><strong>Java 8+</strong> - Compatible with Java 8 and higher, tested against Java 8, 11, 17, and 21</li>
 </ul>
 <h2 id="quick-example">Quick Example<a class="headerlink" href="#quick-example" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// Create a Redlock instance</span>
@@ -1189,7 +1253,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="February 9, 2026 16:44:59 UTC">February 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="April 22, 2026 21:03:58 UTC">April 22, 2026</span>
   </span>
 
     
@@ -1274,6 +1338,8 @@
     
     
       <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       
     
   </body>

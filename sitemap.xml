@@ -2,62 +2,74 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://codarama.github.io/redlock4j/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
-         <loc>https://codarama.github.io/redlock4j/comparison/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <loc>https://codarama.github.io/redlock4j/api/async-reactive/</loc>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
          <loc>https://codarama.github.io/redlock4j/api/configuration/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
-         <loc>https://codarama.github.io/redlock4j/api/core/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <loc>https://codarama.github.io/redlock4j/api/lock-types/</loc>
+         <lastmod>2026-04-22</lastmod>
+    </url>
+    <url>
+         <loc>https://codarama.github.io/redlock4j/api/redlock-manager/</loc>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
          <loc>https://codarama.github.io/redlock4j/comparison/countdownlatch-implementation/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
          <loc>https://codarama.github.io/redlock4j/comparison/fairlock-implementation/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
          <loc>https://codarama.github.io/redlock4j/comparison/multilock-implementation/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
          <loc>https://codarama.github.io/redlock4j/comparison/readwritelock-implementation/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
          <loc>https://codarama.github.io/redlock4j/comparison/semaphore-implementation/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
          <loc>https://codarama.github.io/redlock4j/getting-started/installation/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
          <loc>https://codarama.github.io/redlock4j/getting-started/quick-start/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
          <loc>https://codarama.github.io/redlock4j/guide/advanced-locking/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <lastmod>2026-04-22</lastmod>
+    </url>
+    <url>
+         <loc>https://codarama.github.io/redlock4j/guide/architecture/</loc>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
          <loc>https://codarama.github.io/redlock4j/guide/basic-usage/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <lastmod>2026-04-22</lastmod>
+    </url>
+    <url>
+         <loc>https://codarama.github.io/redlock4j/guide/benchmarks/</loc>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
          <loc>https://codarama.github.io/redlock4j/guide/best-practices/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <lastmod>2026-04-22</lastmod>
     </url>
     <url>
          <loc>https://codarama.github.io/redlock4j/guide/redis-clients/</loc>
-         <lastmod>2026-03-02</lastmod>
+         <lastmod>2026-04-22</lastmod>
     </url>
 </urlset>

@@ -1,0 +1,2416 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Java implementation of the Redlock distributed locking algorithm">
+      
+      
+        <meta name="author" content="Codarama">
+      
+      
+        <link rel="canonical" href="https://codarama.github.io/redlock4j/guide/architecture/">
+      
+      
+        <link rel="prev" href="../redis-clients/">
+      
+      
+        <link rel="next" href="../best-practices/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../logo-dark.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Architecture - Redlock4j</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#architecture" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Redlock4j" class="md-header__button md-logo" aria-label="Redlock4j" data-md-component="logo">
+      
+  <img src="../../logo-dark.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Redlock4j
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Architecture
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/codarama/redlock4j" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    codarama/redlock4j
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../basic-usage/" class="md-tabs__link">
+          
+  
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api/redlock-manager/" class="md-tabs__link">
+          
+  
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Redlock4j" class="md-nav__button md-logo" aria-label="Redlock4j" data-md-component="logo">
+      
+  <img src="../../logo-dark.svg" alt="logo">
+
+    </a>
+    Redlock4j
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/codarama/redlock4j" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    codarama/redlock4j
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basic-usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced-locking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced Locking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../redis-clients/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redis Clients
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#wait-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wait Strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Wait Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#available-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available Strategies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keyspace-notifications-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keyspace Notifications (Default)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#polling-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Polling (Fallback)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thundering-herd-tradeoff" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thundering Herd Tradeoff
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-to-use-each-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Each Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resp3-protocol-requirement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RESP3 Protocol Requirement
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RESP3 Protocol Requirement">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-resp3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why RESP3?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-library-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client Library Support
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#redis-server-auto-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Redis Server Auto-Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Redis Server Auto-Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Flags
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flag-merging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flag Merging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#permission-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Permission Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connection-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connection Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Connection Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-connection-per-lock-operation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single Connection per Lock Operation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-node-architecture-redlock-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Node Architecture (Redlock Algorithm)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cascad-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAS/CAD Operations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CAS/CAD Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-solution-atomic-cad" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Solution: Atomic CAD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Strategies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-comparison_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cas-for-lock-extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAS for Lock Extension
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-this-matters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Matters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../best-practices/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Best Practices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/redlock-manager/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RedlockManager
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/lock-types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lock Types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/async-reactive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Async & Reactive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#wait-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wait Strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Wait Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#available-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available Strategies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keyspace-notifications-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keyspace Notifications (Default)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#polling-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Polling (Fallback)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thundering-herd-tradeoff" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thundering Herd Tradeoff
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-to-use-each-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Each Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resp3-protocol-requirement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RESP3 Protocol Requirement
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RESP3 Protocol Requirement">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-resp3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why RESP3?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-library-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client Library Support
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#redis-server-auto-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Redis Server Auto-Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Redis Server Auto-Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Flags
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flag-merging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flag Merging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#permission-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Permission Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connection-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connection Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Connection Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-connection-per-lock-operation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single Connection per Lock Operation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-node-architecture-redlock-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Node Architecture (Redlock Algorithm)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cascad-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAS/CAD Operations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CAS/CAD Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-solution-atomic-cad" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Solution: Atomic CAD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Strategies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-comparison_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cas-for-lock-extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAS for Lock Extension
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-this-matters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Matters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h1>
+<p>This document explains the key architectural decisions in redlock4j.</p>
+<h2 id="wait-strategy">Wait Strategy<a class="headerlink" href="#wait-strategy" title="Permanent link">&para;</a></h2>
+<p>When a lock is contended (another client holds it), redlock4j needs to wait for the lock to be released. The <strong>wait strategy</strong> determines how this waiting is implemented.</p>
+<h3 id="available-strategies">Available Strategies<a class="headerlink" href="#available-strategies" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Description</th>
+<th style="text-align: center;">Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KEYSPACE_NOTIFICATIONS</code></td>
+<td>Uses Redis pub/sub to get instant notification when lock is released</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr>
+<td><code>POLLING</code></td>
+<td>Polls Redis every 50ms to check if lock is available</td>
+<td style="text-align: center;">No</td>
+</tr>
+</tbody>
+</table>
+<h3 id="keyspace-notifications-default">Keyspace Notifications (Default)<a class="headerlink" href="#keyspace-notifications-default" title="Permanent link">&para;</a></h3>
+<p>Redis <a href="https://redis.io/docs/latest/develop/use/keyspace-notifications/">Keyspace Notifications</a> allow clients to subscribe to events when keys are modified. When a lock is released (via <code>DEL</code> or expiration), Redis automatically publishes an event.</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant A as Client A&lt;br/&gt;(holds lock)
+    participant R as Redis
+    participant B as Client B&lt;br/&gt;(waiting)
+
+    A-&gt;&gt;R: DEL lock:resource
+    R--&gt;&gt;B: __keyspace@0__:lock:resource&lt;br/&gt;event: "del"
+    B-&gt;&gt;R: SET NX lock:resource
+    R--&gt;&gt;B: OK</code></pre>
+<p><strong>Advantages:</strong></p>
+<ul>
+<li>Instant notification (1-5ms latency vs 50-100ms polling)</li>
+<li>Lower CPU usage (no busy-waiting)</li>
+<li>Efficient under high contention</li>
+<li>Automatic TTL expiry detection</li>
+</ul>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li>RESP3 protocol (required)</li>
+<li>Redis 6.0+ (recommended for best RESP3 support)</li>
+</ul>
+<h3 id="polling-fallback">Polling (Fallback)<a class="headerlink" href="#polling-fallback" title="Permanent link">&para;</a></h3>
+<p>The polling strategy checks lock availability at regular intervals. Use this only if:</p>
+<ul>
+<li>Your Redis deployment restricts <code>CONFIG</code> commands</li>
+<li>You're using a Redis-compatible service that doesn't support keyspace notifications</li>
+<li>You need to support legacy RESP2 clients (not recommended)</li>
+</ul>
+<pre class="mermaid"><code>sequenceDiagram
+    participant A as Client A&lt;br/&gt;(holds lock)
+    participant R as Redis
+    participant B as Client B&lt;br/&gt;(waiting)
+
+    B-&gt;&gt;R: SET NX lock:resource
+    R--&gt;&gt;B: nil
+    Note over B: sleep 50ms
+    B-&gt;&gt;R: SET NX lock:resource
+    R--&gt;&gt;B: nil
+    Note over B: sleep 50ms
+    A-&gt;&gt;R: DEL lock:resource
+    B-&gt;&gt;R: SET NX lock:resource
+    R--&gt;&gt;B: OK</code></pre>
+<h3 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// Default: Keyspace notifications (recommended)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1">// Explicit: Polling fallback</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="p">.</span><span class="na">waitStrategy</span><span class="p">(</span><span class="n">WaitStrategy</span><span class="p">.</span><span class="na">POLLING</span><span class="p">)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</code></pre></div>
+<h3 id="performance-comparison">Performance Comparison<a class="headerlink" href="#performance-comparison" title="Permanent link">&para;</a></h3>
+<p>The two strategies optimize for different things:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th style="text-align: center;">Keyspace Notifications</th>
+<th style="text-align: center;">Polling</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Wake-up latency</strong></td>
+<td style="text-align: center;">~6ms</td>
+<td style="text-align: center;">~18-50ms (poll interval)</td>
+</tr>
+<tr>
+<td><strong>Throughput under contention</strong></td>
+<td style="text-align: center;">Lower (thundering herd)</td>
+<td style="text-align: center;">Higher (staggered retries)</td>
+</tr>
+<tr>
+<td><strong>CPU usage</strong></td>
+<td style="text-align: center;">Lower (event-driven)</td>
+<td style="text-align: center;">Higher (busy-wait)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Latency benchmark</strong> (time from lock release to waiter acquiring):</p>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th style="text-align: center;">Wake-up Latency</th>
+<th style="text-align: center;">Speedup</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Keyspace Notifications</td>
+<td style="text-align: center;">6.78ms</td>
+<td style="text-align: center;"><strong>2.7x faster</strong></td>
+</tr>
+<tr>
+<td>Polling (50ms interval)</td>
+<td style="text-align: center;">18.02ms</td>
+<td style="text-align: center;">baseline</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Throughput benchmark</strong> (10 waiters, 20ms lock hold):</p>
+<table>
+<thead>
+<tr>
+<th>Lock Type</th>
+<th style="text-align: center;">Mode</th>
+<th style="text-align: center;">Keyspace (ops/s)</th>
+<th style="text-align: center;">Polling (ops/s)</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Distributed Lock</td>
+<td style="text-align: center;">Single</td>
+<td style="text-align: center;">39.00</td>
+<td style="text-align: center;">41.00</td>
+<td>~Equal (throughput bounded by lock hold time)</td>
+</tr>
+<tr>
+<td>ReadWriteLock</td>
+<td style="text-align: center;">Single</td>
+<td style="text-align: center;">151.80</td>
+<td style="text-align: center;">137.10</td>
+<td>Keyspace 10% better (readers benefit)</td>
+</tr>
+<tr>
+<td>Semaphore</td>
+<td style="text-align: center;">Single</td>
+<td style="text-align: center;">400.35</td>
+<td style="text-align: center;">402.55</td>
+<td>~Equal</td>
+</tr>
+<tr>
+<td>FairLock</td>
+<td style="text-align: center;">Single</td>
+<td style="text-align: center;">0.50</td>
+<td style="text-align: center;">30.15</td>
+<td><strong>Polling required</strong> (see note)</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition info">
+<p class="admonition-title">Understanding the Results</p>
+<p>When lock hold times are short (20ms), throughput is bounded by hold time, not wait time. Both strategies achieve similar throughput (~40 ops/s for a single lock with 20ms hold).</p>
+<p>The <strong>latency benefit</strong> of keyspace notifications becomes important when:</p>
+<ul>
+<li>Lock hold times are longer</li>
+<li>Latency sensitivity is high</li>
+<li>You need instant lock expiry detection</li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">FairLock Recommendation</p>
+<p>FairLock should always use polling. Keyspace notifications cause severe performance degradation due to queue management interactions.</p>
+</div>
+<h3 id="thundering-herd-tradeoff">Thundering Herd Tradeoff<a class="headerlink" href="#thundering-herd-tradeoff" title="Permanent link">&para;</a></h3>
+<p>When using keyspace notifications, a "thundering herd" problem can occur: when a lock is released, ALL waiting threads wake up simultaneously, even though only ONE can acquire the lock.</p>
+<pre class="mermaid"><code>flowchart TB
+    A[Lock Released] --&gt; B[All 10 threads wake up simultaneously]
+    B --&gt; C[All 10 threads attempt to acquire lock]
+    C --&gt; D[1 thread succeeds, 9 threads fail]
+    D --&gt; E[9 threads go back to waiting]
+    E --&gt; A</code></pre>
+<p><strong>Why this happens:</strong> The implementation uses a shared <code>CountDownLatch</code> per lock key. When <code>countDown()</code> is called, all waiting threads wake up at once.</p>
+<p><strong>The tradeoff:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Keyspace Notifications</th>
+<th>Polling</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wakeup behavior</td>
+<td>All waiters wake simultaneously</td>
+<td>Waiters check independently (staggered)</td>
+</tr>
+<tr>
+<td>Wakeup overhead (10 waiters)</td>
+<td>10 wakeups per release</td>
+<td>1 wakeup per release</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>~1-10ms</td>
+<td>Up to poll interval</td>
+</tr>
+<tr>
+<td>CPU usage</td>
+<td>Low (event-driven)</td>
+<td>Higher (busy-wait)</td>
+</tr>
+</tbody>
+</table>
+<p>This design was chosen for <strong>simplicity</strong>, <strong>correctness</strong> (no missed wakeups), and <strong>memory efficiency</strong> (O(keys) not O(keys × waiters)).</p>
+<p><strong>When thundering herd matters:</strong></p>
+<ul>
+<li><strong>High contention</strong> (&gt; 20 concurrent waiters) - significant overhead</li>
+<li><strong>Short lock hold times</strong> (&lt; 10ms) - frequent releases cause frequent herds</li>
+<li><strong>Resource-constrained environments</strong> - extra context switches add up</li>
+</ul>
+<h3 id="when-to-use-each-strategy">When to Use Each Strategy<a class="headerlink" href="#when-to-use-each-strategy" title="Permanent link">&para;</a></h3>
+<p>Based on comprehensive benchmarks:</p>
+<table>
+<thead>
+<tr>
+<th>Lock Type</th>
+<th>Recommended Strategy</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>FairLock</strong></td>
+<td><strong>Polling (required)</strong></td>
+<td>Queue management conflicts with keyspace</td>
+</tr>
+<tr>
+<td><strong>Distributed Lock</strong></td>
+<td>Either</td>
+<td>Similar throughput; keyspace has lower latency</td>
+</tr>
+<tr>
+<td><strong>ReadWriteLock</strong></td>
+<td>Keyspace</td>
+<td>Readers benefit from instant wake-up</td>
+</tr>
+<tr>
+<td><strong>Semaphore</strong></td>
+<td>Either</td>
+<td>Similar performance</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Choose Keyspace Notifications (default) when:</strong></p>
+<ul>
+<li>✅ Wake-up latency matters (~3x faster than polling)</li>
+<li>✅ Using ReadWriteLock (readers wake up together instantly)</li>
+<li>✅ Lock expiry detection must be instant</li>
+<li>✅ Long lock hold times (latency benefit more noticeable)</li>
+<li>✅ Low CPU usage is important (event-driven, not busy-wait)</li>
+</ul>
+<p><strong>Choose Polling when:</strong></p>
+<ul>
+<li>✅ Using FairLock (required - keyspace has severe issues)</li>
+<li>✅ Redis doesn't support keyspace notifications (some managed services)</li>
+<li>✅ Network reliability concerns (polling is more resilient)</li>
+<li>✅ Consistent retry timing is needed</li>
+</ul>
+<p><strong>Decision flowchart:</strong></p>
+<pre class="mermaid"><code>flowchart TB
+    A{Which lock type?}
+    A --&gt;|FairLock| B[Use Polling&lt;br/&gt;Required]
+    A --&gt;|ReadWriteLock| C[Use Keyspace&lt;br/&gt;Readers benefit]
+    A --&gt;|Distributed Lock| D{Latency critical?}
+    A --&gt;|Semaphore| D
+
+    D --&gt;|Yes| E[Use Keyspace&lt;br/&gt;3x faster wake-up]
+    D --&gt;|No| F[Either works]</code></pre>
+<p><strong>Configuration examples:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// Polling (recommended for FairLock and most use cases)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultLockTimeout</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofSeconds</span><span class="p">(</span><span class="mi">30</span><span class="p">))</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">.</span><span class="na">retryDelay</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofMillis</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span><span class="w">  </span><span class="c1">// Poll every 10ms</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p">.</span><span class="na">usePolling</span><span class="p">()</span><span class="w">                        </span><span class="c1">// Better throughput for most lock types</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1">// Keyspace Notifications (for ReadWriteLock in single-node mode)</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultLockTimeout</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofSeconds</span><span class="p">(</span><span class="mi">30</span><span class="p">))</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="p">.</span><span class="na">retryDelay</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofMillis</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span><span class="w">  </span><span class="c1">// Fallback delay</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="c1">// Keyspace notifications are enabled by default</span>
+</code></pre></div>
+<hr />
+<h2 id="resp3-protocol-requirement">RESP3 Protocol Requirement<a class="headerlink" href="#resp3-protocol-requirement" title="Permanent link">&para;</a></h2>
+<p>redlock4j requires RESP3 (Redis Serialization Protocol 3) for the keyspace notifications strategy. RESP3 is <strong>not</strong> a Redis version—it's a protocol version.</p>
+<h3 id="why-resp3">Why RESP3?<a class="headerlink" href="#why-resp3" title="Permanent link">&para;</a></h3>
+<p>In RESP2, subscribing to a pub/sub channel puts the connection into "subscription mode," making it unusable for regular commands. This forces applications to maintain separate connection pools for pub/sub and commands.</p>
+<p>RESP3 introduces <strong>push notifications</strong>, allowing pub/sub messages to arrive on the same connection used for commands:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// RESP2: Connection blocked after SUBSCRIBE</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">connection</span><span class="p">.</span><span class="na">subscribe</span><span class="p">(</span><span class="n">channel</span><span class="p">);</span><span class="w">    </span><span class="c1">// Connection now in subscription mode</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">connection</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;key&quot;</span><span class="p">);</span><span class="w">            </span><span class="c1">// ERROR: Cannot run commands!</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1">// RESP3: Push notifications on same connection  </span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">connection</span><span class="p">.</span><span class="na">subscribe</span><span class="p">(</span><span class="n">channel</span><span class="p">);</span><span class="w">    </span><span class="c1">// Push messages arrive asynchronously</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">connection</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;key&quot;</span><span class="p">);</span><span class="w">            </span><span class="c1">// WORKS: Same connection handles both!</span>
+</code></pre></div>
+<h3 id="client-library-support">Client Library Support<a class="headerlink" href="#client-library-support" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Driver</th>
+<th style="text-align: center;">RESP3 Support</th>
+<th style="text-align: center;">Minimum Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lettuce</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">6.0+</td>
+</tr>
+<tr>
+<td>Jedis</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">5.0+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h3>
+<p>If a RESP2 connection is detected, redlock4j fails fast with a clear error:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// This will throw Resp2NotSupportedException</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">RedlockManager</span><span class="w"> </span><span class="n">manager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockManager</span><span class="p">.</span><span class="na">withLettuce</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1">// Exception: &quot;RESP3 required for keyspace notifications. </span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1">//             Connection is using RESP2 which is not supported.&quot;</span>
+</code></pre></div>
+<p><strong>Solutions:</strong>
+1. Upgrade your Redis client library to a version supporting RESP3
+2. Configure your client to use RESP3 protocol
+3. Use <code>WaitStrategy.POLLING</code> as a fallback (not recommended)</p>
+<hr />
+<h2 id="redis-server-auto-configuration">Redis Server Auto-Configuration<a class="headerlink" href="#redis-server-auto-configuration" title="Permanent link">&para;</a></h2>
+<p>When using the keyspace notifications strategy (default), redlock4j automatically configures the Redis server:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// redlock4j sends this on startup:</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">CONFIG</span><span class="w"> </span><span class="n">SET</span><span class="w"> </span><span class="n">notify</span><span class="o">-</span><span class="n">keyspace</span><span class="o">-</span><span class="n">events</span><span class="w"> </span><span class="s">&quot;Kgx&quot;</span>
+</code></pre></div>
+<h3 id="configuration-flags">Configuration Flags<a class="headerlink" href="#configuration-flags" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Flag</th>
+<th>Meaning</th>
+<th>Why We Need It</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><code>K</code></td>
+<td>Keyspace events</td>
+<td>Subscribe to specific key channels</td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>g</code></td>
+<td>Generic commands</td>
+<td>Detect <code>DEL</code>, <code>RENAME</code>, <code>MOVE</code></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>x</code></td>
+<td>Expired events</td>
+<td>Detect TTL expiration</td>
+</tr>
+</tbody>
+</table>
+<h3 id="flag-merging">Flag Merging<a class="headerlink" href="#flag-merging" title="Permanent link">&para;</a></h3>
+<p>If your Redis server already has keyspace notifications configured, redlock4j merges flags rather than overwriting:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Existing: &quot;Ex&quot;     (expired keyevents)
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>Required: &quot;Kgx&quot;    (keyspace + generic + expired)
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>Result:   &quot;EKgx&quot;   (merged - preserves existing config)
+</code></pre></div>
+<h3 id="permission-errors">Permission Errors<a class="headerlink" href="#permission-errors" title="Permanent link">&para;</a></h3>
+<p>If your Redis deployment restricts <code>CONFIG</code> commands (common in managed services), you'll see:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>RedlockException: Cannot configure keyspace notifications.
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>Please run: CONFIG SET notify-keyspace-events &quot;Kgx&quot;
+</code></pre></div>
+<p>In this case, either:
+1. Configure Redis manually via <code>redis.conf</code> or admin console
+2. Use <code>WaitStrategy.POLLING</code> to avoid the <code>CONFIG</code> requirement</p>
+<hr />
+<h2 id="connection-architecture">Connection Architecture<a class="headerlink" href="#connection-architecture" title="Permanent link">&para;</a></h2>
+<h3 id="single-connection-per-lock-operation">Single Connection per Lock Operation<a class="headerlink" href="#single-connection-per-lock-operation" title="Permanent link">&para;</a></h3>
+<p>redlock4j uses a single connection for both commands and pub/sub subscriptions (thanks to RESP3):</p>
+<pre class="mermaid"><code>graph TB
+    subgraph RedlockManager
+        subgraph pool["Connection Pool (Lettuce/Jedis)"]
+            conn1["Connection 1 (RESP3)&lt;br/&gt;• Regular commands (SET, DEL)&lt;br/&gt;• Pub/sub subscriptions&lt;br/&gt;• Push notifications"]
+            conn2["Connection 2 (RESP3)&lt;br/&gt;• ..."]
+        end
+    end</code></pre>
+<h3 id="multi-node-architecture-redlock-algorithm">Multi-Node Architecture (Redlock Algorithm)<a class="headerlink" href="#multi-node-architecture-redlock-algorithm" title="Permanent link">&para;</a></h3>
+<p>For true distributed locking, redlock4j connects to multiple independent Redis nodes:</p>
+<pre class="mermaid"><code>graph TB
+    subgraph RedlockManager
+        subgraph node1["Redis #1 (master)"]
+            pool1["Connection Pool #1"]
+        end
+        subgraph node2["Redis #2 (master)"]
+            pool2["Connection Pool #2"]
+        end
+        subgraph node3["Redis #3 (master)"]
+            pool3["Connection Pool #3"]
+        end
+    end
+
+    note["Lock acquired when: majority (N/2 + 1) nodes grant the lock&lt;br/&gt;With 3 nodes: need 2 to agree&lt;br/&gt;With 5 nodes: need 3 to agree"]</code></pre>
+<hr />
+<h2 id="cascad-operations">CAS/CAD Operations<a class="headerlink" href="#cascad-operations" title="Permanent link">&para;</a></h2>
+<p>Distributed locks require atomic operations to safely release locks. redlock4j uses <strong>Compare-And-Set (CAS)</strong> and <strong>Compare-And-Delete (CAD)</strong> operations to ensure only the lock owner can modify or release the lock.</p>
+<h3 id="the-problem">The Problem<a class="headerlink" href="#the-problem" title="Permanent link">&para;</a></h3>
+<p>Without atomic operations, releasing a lock is unsafe:</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant A as Client A
+    participant R as Redis
+    participant B as Client B
+
+    A-&gt;&gt;R: GET lock:resource
+    R--&gt;&gt;A: "token-A"
+    Note over A: network delay
+    Note over R: Lock expires (TTL)
+    B-&gt;&gt;R: SET lock:resource "token-B"
+    R--&gt;&gt;B: OK
+    A-&gt;&gt;R: DEL lock:resource
+    Note over R: ⚠️ DELETES CLIENT B's LOCK!</code></pre>
+<p><strong>Result</strong>: Client A accidentally deletes Client B's lock!</p>
+<h3 id="the-solution-atomic-cad">The Solution: Atomic CAD<a class="headerlink" href="#the-solution-atomic-cad" title="Permanent link">&para;</a></h3>
+<p>Compare-And-Delete ensures the lock is only deleted if the value matches:</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant A as Client A
+    participant R as Redis
+    participant B as Client B
+
+    A-&gt;&gt;R: DELEX lock:resource IFEQ "token-A"
+    Note over R: Lock value is "token-B" ≠ "token-A"
+    R--&gt;&gt;A: 0 (not deleted)
+    Note over A: ✅ Client B's lock safe!</code></pre>
+<h3 id="implementation-strategies">Implementation Strategies<a class="headerlink" href="#implementation-strategies" title="Permanent link">&para;</a></h3>
+<p>redlock4j automatically detects and uses the best available method:</p>
+<table>
+<thead>
+<tr>
+<th>Redis Version</th>
+<th>Strategy</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8.0+</td>
+<td>Native</td>
+<td><code>DELEX key IFEQ value</code></td>
+</tr>
+<tr>
+<td>&lt; 8.0</td>
+<td>Lua Script</td>
+<td><code>EVAL "if get==expected then del"</code></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// Automatic detection at driver initialization</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">private</span><span class="w"> </span><span class="n">CADStrategy</span><span class="w"> </span><span class="nf">detectCADStrategy</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">        </span><span class="c1">// Try native DELEX command</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">        </span><span class="n">redis</span><span class="p">.</span><span class="na">dispatch</span><span class="p">(</span><span class="n">CommandType</span><span class="p">.</span><span class="na">DELEX</span><span class="p">,</span><span class="w"> </span><span class="n">testKey</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IFEQ&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;test&quot;</span><span class="p">);</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">CADStrategy</span><span class="p">.</span><span class="na">NATIVE</span><span class="p">;</span><span class="w">  </span><span class="c1">// Redis 8.0+</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">CADStrategy</span><span class="p">.</span><span class="na">SCRIPT</span><span class="p">;</span><span class="w">  </span><span class="c1">// Fallback to Lua</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="performance-comparison_1">Performance Comparison<a class="headerlink" href="#performance-comparison_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th style="text-align: center;">Native (Redis 8.0+)</th>
+<th style="text-align: center;">Lua Script</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Commands</strong></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1 (EVAL)</td>
+</tr>
+<tr>
+<td><strong>Network round-trips</strong></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td><strong>Server-side parsing</strong></td>
+<td style="text-align: center;">Optimized C</td>
+<td style="text-align: center;">Lua interpreter</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td style="text-align: center;">~0.1ms</td>
+<td style="text-align: center;">~0.2-0.3ms</td>
+</tr>
+</tbody>
+</table>
+<p>Both approaches have identical network characteristics, but native commands have lower server-side overhead.</p>
+<h3 id="cas-for-lock-extension">CAS for Lock Extension<a class="headerlink" href="#cas-for-lock-extension" title="Permanent link">&para;</a></h3>
+<p>When extending a lock's TTL, CAS ensures only the current owner can extend:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">// Extend lock only if we still own it</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kt">boolean</span><span class="w"> </span><span class="n">extended</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">driver</span><span class="p">.</span><span class="na">setIfValueMatches</span><span class="p">(</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="n">lockKey</span><span class="p">,</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="n">currentToken</span><span class="p">,</span><span class="w">      </span><span class="c1">// Expected current value</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="n">currentToken</span><span class="p">,</span><span class="w">      </span><span class="c1">// New value (same token)</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="n">newExpireTimeMs</span><span class="w">    </span><span class="c1">// New TTL</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="p">);</span>
+</code></pre></div>
+<p><strong>Redis 8.0+ command:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>SET lock:resource &quot;token-A&quot; IFEQ &quot;token-A&quot; PX 30000
+</code></pre></div></p>
+<p><strong>Lua script fallback:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kr">if</span><span class="w"> </span><span class="nv">redis</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span><span class="w"> </span><span class="nv">KEYS</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">ARGV</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="kr">then</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">redis</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="s1">&#39;set&#39;</span><span class="p">,</span><span class="w"> </span><span class="nv">KEYS</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="nv">ARGV</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="s1">&#39;PX&#39;</span><span class="p">,</span><span class="w"> </span><span class="nv">ARGV</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kr">else</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="kc">nil</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="kr">end</span>
+</code></pre></div></p>
+<h3 id="why-this-matters">Why This Matters<a class="headerlink" href="#why-this-matters" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Without CAS/CAD</th>
+<th>With CAS/CAD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lock expires during operation</td>
+<td>❌ May delete wrong lock</td>
+<td>✅ Safely fails</td>
+</tr>
+<tr>
+<td>Network partition during unlock</td>
+<td>❌ Unpredictable</td>
+<td>✅ Atomic check</td>
+</tr>
+<tr>
+<td>Concurrent lock extension</td>
+<td>❌ Race condition</td>
+<td>✅ Only owner extends</td>
+</tr>
+<tr>
+<td>Lock ownership verification</td>
+<td>❌ Separate GET+DEL</td>
+<td>✅ Single atomic op</td>
+</tr>
+</tbody>
+</table>
+<h3 id="configuration_1">Configuration<a class="headerlink" href="#configuration_1" title="Permanent link">&para;</a></h3>
+<p>CAS/CAD strategy is automatically detected—no configuration needed:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// Driver auto-detects Redis version capabilities</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">RedlockManager</span><span class="w"> </span><span class="n">manager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockManager</span><span class="p">.</span><span class="na">withJedis</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="c1">// Native commands used if Redis 8.0+ detected</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1">// Lua scripts used otherwise</span>
+</code></pre></div>
+<p>To verify which strategy is active, enable debug logging:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>DEBUG o.c.r.driver.JedisRedisDriver - Native CAS/CAD commands detected for redis://localhost:6379
+</code></pre></div>
+<p>or</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>DEBUG o.c.r.driver.JedisRedisDriver - Native CAS/CAD not available for redis://localhost:6379, using Lua scripts
+</code></pre></div>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Choice</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Default wait strategy</td>
+<td>Keyspace Notifications</td>
+<td>20-50x faster under contention</td>
+</tr>
+<tr>
+<td>Protocol requirement</td>
+<td>RESP3</td>
+<td>Single connection for commands + pub/sub</td>
+</tr>
+<tr>
+<td>Server configuration</td>
+<td>Auto-configure</td>
+<td>Zero manual setup required</td>
+</tr>
+<tr>
+<td>Fallback option</td>
+<td>Polling</td>
+<td>For restricted environments</td>
+</tr>
+<tr>
+<td>CAS/CAD operations</td>
+<td>Auto-detect</td>
+<td>Native commands on Redis 8.0+, Lua fallback</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="April 22, 2026 21:03:58 UTC">April 22, 2026</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="April 22, 2026 21:03:58 UTC">April 22, 2026</span>
+  </span>
+
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/codarama/redlock4j" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

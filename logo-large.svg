@@ -1,0 +1,59 @@
+<svg width="600" height="140" viewBox="0 0 600 140" xmlns="http://www.w3.org/2000/svg" role="img">
+    <title>redlock4j wordmark lockup</title>
+    <desc>Full wordmark lockup: small pixel-art boss key mark paired with redlock4j in monospace.</desc>
+
+    <!-- PALETTE:
+      Poppy      #D82C20
+      San Diego  #A41E11
+      Barn Red   #7A0C00
+      Grey       #636466
+      White      #FFFFFF
+    -->
+
+    <rect x="0" y="0" width="600" height="140" rx="12" fill="none" stroke="#E5E5E5" stroke-width="1"/>
+
+    <!-- Small key mark, 8x8px cells -->
+    <g transform="translate(40,34)" shape-rendering="crispEdges">
+        <!-- bow -->
+        <rect x="24" y="0"  width="8" height="8" fill="#7A0C00"/>
+        <rect x="32" y="0"  width="8" height="8" fill="#7A0C00"/>
+        <rect x="16" y="8"  width="8" height="8" fill="#7A0C00"/>
+        <rect x="24" y="8"  width="8" height="8" fill="#D82C20"/>
+        <rect x="32" y="8"  width="8" height="8" fill="#D82C20"/>
+        <rect x="40" y="8"  width="8" height="8" fill="#7A0C00"/>
+        <rect x="8"  y="16" width="8" height="8" fill="#7A0C00"/>
+        <rect x="16" y="16" width="8" height="8" fill="#D82C20"/>
+        <rect x="24" y="16" width="8" height="8" fill="#FFFFFF"/>
+        <rect x="32" y="16" width="8" height="8" fill="#FFFFFF"/>
+        <rect x="40" y="16" width="8" height="8" fill="#A41E11"/>
+        <rect x="48" y="16" width="8" height="8" fill="#7A0C00"/>
+        <rect x="8"  y="24" width="8" height="8" fill="#7A0C00"/>
+        <rect x="16" y="24" width="8" height="8" fill="#D82C20"/>
+        <rect x="24" y="24" width="8" height="8" fill="#FFFFFF"/>
+        <rect x="32" y="24" width="8" height="8" fill="#FFFFFF"/>
+        <rect x="40" y="24" width="8" height="8" fill="#A41E11"/>
+        <rect x="48" y="24" width="8" height="8" fill="#7A0C00"/>
+        <rect x="16" y="32" width="8" height="8" fill="#7A0C00"/>
+        <rect x="24" y="32" width="8" height="8" fill="#D82C20"/>
+        <rect x="32" y="32" width="8" height="8" fill="#A41E11"/>
+        <rect x="40" y="32" width="8" height="8" fill="#7A0C00"/>
+        <!-- shaft -->
+        <rect x="24" y="40" width="8" height="8" fill="#7A0C00"/>
+        <rect x="32" y="40" width="8" height="8" fill="#7A0C00"/>
+        <rect x="24" y="48" width="8" height="8" fill="#7A0C00"/>
+        <rect x="32" y="48" width="8" height="8" fill="#A41E11"/>
+        <!-- tooth -->
+        <rect x="24" y="56" width="8" height="8" fill="#7A0C00"/>
+        <rect x="32" y="56" width="8" height="8" fill="#A41E11"/>
+        <rect x="40" y="56" width="8" height="8" fill="#7A0C00"/>
+        <rect x="24" y="64" width="8" height="8" fill="#7A0C00"/>
+        <rect x="32" y="64" width="8" height="8" fill="#7A0C00"/>
+    </g>
+
+    <!-- divider -->
+    <line x1="140" y1="40" x2="140" y2="100" stroke="#E5E5E5" stroke-width="1"/>
+
+    <!-- wordmark -->
+    <text x="165" y="72" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="34" font-weight="700" fill="#A41E11" letter-spacing="-0.5">redlock4j</text>
+    <text x="165" y="98" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#636466" letter-spacing="1.5">DISTRIBUTED LOCKS FOR REDIS</text>
+</svg>
