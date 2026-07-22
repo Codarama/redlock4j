@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../logo-dark.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -33,7 +33,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1462,6 +1462,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#measured-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measured Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2329,6 +2340,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#measured-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measured Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2607,18 +2629,16 @@
 <h3 id="redlock4j-multilock">redlock4j MultiLock<a class="headerlink" href="#redlock4j-multilock" title="Permanent link">&para;</a></h3>
 <p><strong>Purpose</strong>: Atomic acquisition of multiple independent resources with deadlock prevention</p>
 <p><strong>Use Case</strong>: When you need to lock multiple resources simultaneously (e.g., transferring between multiple bank accounts)</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">MultiLock</span><span class="w"> </span><span class="n">multiLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MultiLock</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;account:1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:3&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">redisDrivers</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="n">config</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">);</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">multiLock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="c1">// All three accounts are now locked</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="n">transferBetweenAccounts</span><span class="p">();</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="n">multiLock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">multiLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createMultiLock</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;account:1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:3&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">);</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">multiLock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="c1">// All three accounts are now locked</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="n">transferBetweenAccounts</span><span class="p">();</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="n">multiLock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="redisson-redissonmultilock">Redisson RedissonMultiLock<a class="headerlink" href="#redisson-redissonmultilock" title="Permanent link">&para;</a></h3>
 <p><strong>Purpose</strong>: Group multiple RLock objects and manage them as a single lock</p>
@@ -2646,7 +2666,7 @@
 <p><strong>Architecture</strong>:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>MultiLock
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  ├─ List&lt;String&gt; lockKeys (sorted)
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  ├─ List&lt;RedisDriver&gt; redisDrivers (shared cluster)
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  ├─ LockExecutionStrategy (node fan-out + quorum)
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  ├─ Quorum-based acquisition per resource
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>  └─ Thread-local state tracking
 </code></pre></div></p>
@@ -2703,16 +2723,16 @@
 <a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">        </span><span class="n">lockValues</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">generateLockValue</span><span class="p">());</span>
 <a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">    </span><span class="c1">// 2. Try to acquire ALL locks on EACH Redis node</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">successfulNodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">RedisDriver</span><span class="w"> </span><span class="n">driver</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">redisDrivers</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">acquireAllOnNode</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span><span class="w"> </span><span class="n">lockValues</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">            </span><span class="n">successfulNodes</span><span class="o">++</span><span class="p">;</span>
-<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">        </span><span class="p">}</span>
-<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>
-<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">    </span><span class="c1">// 3. Check quorum and validity</span>
-<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">acquired</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">successfulNodes</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="na">getQuorum</span><span class="p">()</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">    </span><span class="c1">// 2. Try to acquire ALL locks on EACH Redis node.</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">    </span><span class="c1">//    The execution strategy fans out to the nodes and returns how many</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">    </span><span class="c1">//    succeeded.</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">successfulNodes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">executionStrategy</span><span class="p">.</span><span class="na">executeOnNodes</span><span class="p">(</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">        </span><span class="n">driver</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">acquireAllOnNode</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span><span class="w"> </span><span class="n">lockValues</span><span class="p">));</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">    </span><span class="c1">// 3. Check quorum (via the strategy) and validity</span>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">validityTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">executionStrategy</span><span class="p">.</span><span class="na">calculateValidityTime</span><span class="p">(</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">        </span><span class="n">config</span><span class="p">.</span><span class="na">getDefaultLockTimeout</span><span class="p">().</span><span class="na">toMillis</span><span class="p">(),</span><span class="w"> </span><span class="n">startTime</span><span class="p">);</span>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">acquired</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">executionStrategy</span><span class="p">.</span><span class="na">isSuccessful</span><span class="p">(</span><span class="n">successfulNodes</span><span class="p">)</span>
 <a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">                    </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">validityTime</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>
 <a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">    </span><span class="c1">// 4. Rollback if failed</span>
@@ -2883,8 +2903,8 @@
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
 <a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">LockState</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">lockValues</span><span class="p">;</span><span class="w"> </span><span class="c1">// All lock values</span>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">acquisitionTime</span><span class="p">;</span>
-<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">validityTime</span><span class="p">;</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">Instant</span><span class="w"> </span><span class="n">acquisitionTime</span><span class="p">;</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">Duration</span><span class="w"> </span><span class="n">validityDuration</span><span class="p">;</span>
 <a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">holdCount</span><span class="p">;</span>
 <a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="p">}</span>
 <a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>
@@ -2938,11 +2958,12 @@
 <a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
 <a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="c1">// Acquire all locks...</span>
 <a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="kt">long</span><span class="w"> </span><span class="n">elapsedTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">startTime</span><span class="p">;</span>
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="kt">long</span><span class="w"> </span><span class="n">driftTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">long</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">config</span><span class="p">.</span><span class="na">getDefaultLockTimeoutMs</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="na">getClockDriftFactor</span><span class="p">())</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="kt">long</span><span class="w"> </span><span class="n">validityTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="na">getDefaultLockTimeoutMs</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">elapsedTime</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">driftTime</span><span class="p">;</span>
-<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>
-<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="kt">boolean</span><span class="w"> </span><span class="n">acquired</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">successfulNodes</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="na">getQuorum</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">validityTime</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1">// The execution strategy computes the remaining validity, applying clock-drift</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="c1">// compensation to the configured lock timeout (a Duration).</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="kt">long</span><span class="w"> </span><span class="n">validityTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">executionStrategy</span><span class="p">.</span><span class="na">calculateValidityTime</span><span class="p">(</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">    </span><span class="n">config</span><span class="p">.</span><span class="na">getDefaultLockTimeout</span><span class="p">().</span><span class="na">toMillis</span><span class="p">(),</span><span class="w"> </span><span class="n">startTime</span><span class="p">);</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="kt">boolean</span><span class="w"> </span><span class="n">acquired</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">executionStrategy</span><span class="p">.</span><span class="na">isSuccessful</span><span class="p">(</span><span class="n">successfulNodes</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">validityTime</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 </code></pre></div>
 <p><strong>Characteristics</strong>:
 - Single validity calculation for entire multi-lock
@@ -3005,6 +3026,47 @@
 <a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>  lock3.tryLock() → Redis operations
 <a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>Total: Variable, sequential
 </code></pre></div></p>
+<h3 id="measured-performance">Measured Performance<a class="headerlink" href="#measured-performance" title="Permanent link">&para;</a></h3>
+<p>Benchmark: 5 clients, 5 resources per MultiLock, 50 ms work per cycle, 3-node Redis 7 cluster, 60 s measurement (full methodology in <a href="../../guide/architecture/#performance-analysis">Architecture › Performance Analysis</a>).</p>
+<table>
+<thead>
+<tr>
+<th>Implementation</th>
+<th style="text-align: right;">Ops/s</th>
+<th style="text-align: right;">p50 (ms)</th>
+<th style="text-align: right;">p99 (ms)</th>
+<th style="text-align: right;">mean (ms)</th>
+<th style="text-align: right;">success</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Redisson</td>
+<td style="text-align: right;">17.05</td>
+<td style="text-align: right;">190.2</td>
+<td style="text-align: right;">1,192.2</td>
+<td style="text-align: right;">272.9</td>
+<td style="text-align: right;">100 %</td>
+</tr>
+<tr>
+<td>redlock4j-singlenode</td>
+<td style="text-align: right;">16.97</td>
+<td style="text-align: right;">202.9</td>
+<td style="text-align: right;">1,709.5</td>
+<td style="text-align: right;">303.0</td>
+<td style="text-align: right;">100 %</td>
+</tr>
+<tr>
+<td><strong>redlock4j-3node</strong></td>
+<td style="text-align: right;"><strong>17.72</strong></td>
+<td style="text-align: right;"><strong>171.0</strong></td>
+<td style="text-align: right;"><strong>1,057.6</strong></td>
+<td style="text-align: right;"><strong>237.4</strong></td>
+<td style="text-align: right;">100 %</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reading the numbers</strong>: <code>redlock4j-3node</code> leads on throughput, p50, p99, and mean — the only primitive where the 3-node Redlock variant beats every single-node implementation in the field. The parallel multi-node I/O (each <code>SET NX</code> for all 5 resources fans out across all 3 nodes simultaneously) is what makes this possible.</p>
 <h2 id="use-case-differences">Use Case Differences<a class="headerlink" href="#use-case-differences" title="Permanent link">&para;</a></h2>
 <h3 id="redlock4j-multilock_1">redlock4j MultiLock<a class="headerlink" href="#redlock4j-multilock_1" title="Permanent link">&para;</a></h3>
 <p><strong>Best For</strong>:
@@ -3014,16 +3076,14 @@
 - Distributed systems with quorum requirements</p>
 <p><strong>Example Scenarios</strong>:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1">// Bank transfer between multiple accounts</span>
-<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="n">MultiLock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MultiLock</span><span class="p">(</span>
-<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">    </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;account:1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:3&quot;</span><span class="p">),</span>
-<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">    </span><span class="n">redisDrivers</span><span class="p">,</span><span class="w"> </span><span class="n">config</span>
-<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="p">);</span>
-<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
-<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="c1">// Inventory management across warehouses</span>
-<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="n">MultiLock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MultiLock</span><span class="p">(</span>
-<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">    </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;warehouse:A:item:123&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;warehouse:B:item:123&quot;</span><span class="p">),</span>
-<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="w">    </span><span class="n">redisDrivers</span><span class="p">,</span><span class="w"> </span><span class="n">config</span>
-<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="p">);</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createMultiLock</span><span class="p">(</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">    </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;account:1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:3&quot;</span><span class="p">)</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="p">);</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="c1">// Inventory management across warehouses</span>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createMultiLock</span><span class="p">(</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">    </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;warehouse:A:item:123&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;warehouse:B:item:123&quot;</span><span class="p">)</span>
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="p">);</span>
 </code></pre></div></p>
 <h3 id="redisson-redissonmultilock_1">Redisson RedissonMultiLock<a class="headerlink" href="#redisson-redissonmultilock_1" title="Permanent link">&para;</a></h3>
 <p><strong>Best For</strong>:
@@ -3046,53 +3106,53 @@
 <h2 id="safety-correctness">Safety &amp; Correctness<a class="headerlink" href="#safety-correctness" title="Permanent link">&para;</a></h2>
 <h3 id="redlock4j_7">redlock4j<a class="headerlink" href="#redlock4j_7" title="Permanent link">&para;</a></h3>
 <p><strong>Safety Guarantees</strong>:
-- ✅ Deadlock-free (automatic key sorting)
-- ✅ Quorum-based consistency
-- ✅ All-or-nothing atomicity
-- ✅ Clock drift compensation
-- ✅ Validity time enforcement</p>
+- Deadlock-free (automatic key sorting)
+- Quorum-based consistency
+- All-or-nothing atomicity
+- Clock drift compensation
+- Validity time enforcement</p>
 <p><strong>Potential Issues</strong>:
-- ⚠️ All resources must be on same Redis cluster
-- ⚠️ Higher latency due to quorum requirement
-- ⚠️ More network overhead (N×M operations)</p>
+- All resources must be on same Redis cluster
+- Higher latency due to quorum requirement
+- More network overhead (N×M operations)</p>
 <h3 id="redisson_7">Redisson<a class="headerlink" href="#redisson_7" title="Permanent link">&para;</a></h3>
 <p><strong>Safety Guarantees</strong>:
-- ✅ Flexible lock composition
-- ✅ Works across different Redis instances
-- ✅ Extensible failure tolerance
-- ✅ Async/reactive support</p>
+- Flexible lock composition
+- Works across different Redis instances
+- Extensible failure tolerance
+- Async/reactive support</p>
 <p><strong>Potential Issues</strong>:
-- ⚠️ No automatic deadlock prevention
-- ⚠️ Developer must ensure lock ordering
-- ⚠️ Sequential acquisition (slower for many locks)
-- ⚠️ No quorum mechanism by default</p>
+- No automatic deadlock prevention
+- Developer must ensure lock ordering
+- Sequential acquisition (slower for many locks)
+- No quorum mechanism by default</p>
 <h2 id="complexity-analysis">Complexity Analysis<a class="headerlink" href="#complexity-analysis" title="Permanent link">&para;</a></h2>
 <h3 id="redlock4j_8">redlock4j<a class="headerlink" href="#redlock4j_8" title="Permanent link">&para;</a></h3>
 <p><strong>Code Complexity</strong>: ~370 lines</p>
 <p><strong>Pros</strong>:
-- ✅ Integrated Redlock implementation
-- ✅ Automatic deadlock prevention
-- ✅ Clear all-or-nothing semantics
-- ✅ Single validity time
-- ✅ Thread-local state (fast reentrancy)</p>
+- Integrated Redlock implementation
+- Automatic deadlock prevention
+- Clear all-or-nothing semantics
+- Single validity time
+- Thread-local state (fast reentrancy)</p>
 <p><strong>Cons</strong>:
-- ❌ Limited to single Redis cluster
-- ❌ More Redis operations
-- ❌ Higher network overhead
-- ❌ Less flexible composition</p>
+- Limited to single Redis cluster
+- More Redis operations
+- Higher network overhead
+- Less flexible composition</p>
 <h3 id="redisson_8">Redisson<a class="headerlink" href="#redisson_8" title="Permanent link">&para;</a></h3>
 <p><strong>Code Complexity</strong>: ~450 lines (with async support)</p>
 <p><strong>Pros</strong>:
-- ✅ Works across multiple Redis instances
-- ✅ Flexible lock composition
-- ✅ Extensible (can override failedLocksLimit)
-- ✅ Async/reactive support
-- ✅ Can mix different lock types</p>
+- Works across multiple Redis instances
+- Flexible lock composition
+- Extensible (can override failedLocksLimit)
+- Async/reactive support
+- Can mix different lock types</p>
 <p><strong>Cons</strong>:
-- ❌ No deadlock prevention
-- ❌ Sequential acquisition
-- ❌ More complex retry logic
-- ❌ Requires careful lock ordering</p>
+- No deadlock prevention
+- Sequential acquisition
+- More complex retry logic
+- Requires careful lock ordering</p>
 <h2 id="redissonredlock-vs-redlock4j-multilock">RedissonRedLock vs redlock4j MultiLock<a class="headerlink" href="#redissonredlock-vs-redlock4j-multilock" title="Permanent link">&para;</a></h2>
 <p>Redisson also has <code>RedissonRedLock</code> which extends <code>RedissonMultiLock</code>:</p>
 <h3 id="redissonredlock">RedissonRedLock<a class="headerlink" href="#redissonredlock" title="Permanent link">&para;</a></h3>
@@ -3149,26 +3209,26 @@
 <h2 id="recommendations">Recommendations<a class="headerlink" href="#recommendations" title="Permanent link">&para;</a></h2>
 <h3 id="choose-redlock4j-multilock-when">Choose redlock4j MultiLock when:<a class="headerlink" href="#choose-redlock4j-multilock-when" title="Permanent link">&para;</a></h3>
 <ul>
-<li>✅ Locking multiple resources on the same Redis cluster</li>
-<li>✅ Need automatic deadlock prevention</li>
-<li>✅ Require strict all-or-nothing semantics</li>
-<li>✅ Want quorum-based safety per resource</li>
-<li>✅ Prefer simpler, integrated solution</li>
+<li>Locking multiple resources on the same Redis cluster</li>
+<li>Need automatic deadlock prevention</li>
+<li>Require strict all-or-nothing semantics</li>
+<li>Want quorum-based safety per resource</li>
+<li>Prefer simpler, integrated solution</li>
 </ul>
 <h3 id="choose-redisson-redissonmultilock-when">Choose Redisson RedissonMultiLock when:<a class="headerlink" href="#choose-redisson-redissonmultilock-when" title="Permanent link">&para;</a></h3>
 <ul>
-<li>✅ Need to coordinate locks across different Redis instances</li>
-<li>✅ Want to compose different lock types</li>
-<li>✅ Require async/reactive support</li>
-<li>✅ Can manage lock ordering manually</li>
-<li>✅ Need flexible failure tolerance</li>
+<li>Need to coordinate locks across different Redis instances</li>
+<li>Want to compose different lock types</li>
+<li>Require async/reactive support</li>
+<li>Can manage lock ordering manually</li>
+<li>Need flexible failure tolerance</li>
 </ul>
 <h3 id="choose-redisson-redissonredlock-when">Choose Redisson RedissonRedLock when:<a class="headerlink" href="#choose-redisson-redissonredlock-when" title="Permanent link">&para;</a></h3>
 <ul>
-<li>✅ Implementing Redlock across multiple Redis instances</li>
-<li>✅ Each lock represents a different Redis master</li>
-<li>✅ Need quorum-based distributed locking</li>
-<li>✅ Can ensure proper lock ordering</li>
+<li>Implementing Redlock across multiple Redis instances</li>
+<li>Each lock represents a different Redis master</li>
+<li>Need quorum-based distributed locking</li>
+<li>Can ensure proper lock ordering</li>
 </ul>
 <h2 id="migration-considerations">Migration Considerations<a class="headerlink" href="#migration-considerations" title="Permanent link">&para;</a></h2>
 <h3 id="from-redisson-to-redlock4j">From Redisson to redlock4j<a class="headerlink" href="#from-redisson-to-redlock4j" title="Permanent link">&para;</a></h3>
@@ -3185,17 +3245,15 @@
 <a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="p">}</span>
 <a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a>
 <a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="c1">// After (redlock4j)</span>
-<a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="n">MultiLock</span><span class="w"> </span><span class="n">multiLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MultiLock</span><span class="p">(</span>
-<a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a><span class="w">    </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;account:1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:3&quot;</span><span class="p">),</span>
-<a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="w">    </span><span class="n">redisDrivers</span><span class="p">,</span>
-<a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a><span class="w">    </span><span class="n">config</span>
-<a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a><span class="p">);</span>
-<a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a><span class="n">multiLock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span>
-<a id="__codelineno-25-20" name="__codelineno-25-20" href="#__codelineno-25-20"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a><span class="w">    </span><span class="c1">// work</span>
-<a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-25-23" name="__codelineno-25-23" href="#__codelineno-25-23"></a><span class="w">    </span><span class="n">multiLock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span>
-<a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a><span class="p">}</span>
+<a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="n">Lock</span><span class="w"> </span><span class="n">multiLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createMultiLock</span><span class="p">(</span>
+<a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a><span class="w">    </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;account:1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;account:3&quot;</span><span class="p">)</span>
+<a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="p">);</span>
+<a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a><span class="n">multiLock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span>
+<a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a><span class="w">    </span><span class="c1">// work</span>
+<a id="__codelineno-25-20" name="__codelineno-25-20" href="#__codelineno-25-20"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a><span class="w">    </span><span class="n">multiLock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span>
+<a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>Benefits</strong>:
 - Automatic deadlock prevention
@@ -3206,17 +3264,15 @@
 - Different performance characteristics</p>
 <h3 id="from-redlock4j-to-redisson">From redlock4j to Redisson<a class="headerlink" href="#from-redlock4j-to-redisson" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1">// Before (redlock4j)</span>
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">MultiLock</span><span class="w"> </span><span class="n">multiLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MultiLock</span><span class="p">(</span>
-<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">    </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;resource1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;resource2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;resource3&quot;</span><span class="p">),</span>
-<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">    </span><span class="n">redisDrivers</span><span class="p">,</span>
-<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">    </span><span class="n">config</span>
-<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="p">);</span>
-<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a>
-<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="c1">// After (Redisson) - if using multiple instances</span>
-<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="n">RLock</span><span class="w"> </span><span class="n">lock1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redisson1</span><span class="p">.</span><span class="na">getLock</span><span class="p">(</span><span class="s">&quot;resource1&quot;</span><span class="p">);</span>
-<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="n">RLock</span><span class="w"> </span><span class="n">lock2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redisson2</span><span class="p">.</span><span class="na">getLock</span><span class="p">(</span><span class="s">&quot;resource2&quot;</span><span class="p">);</span>
-<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="n">RLock</span><span class="w"> </span><span class="n">lock3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redisson3</span><span class="p">.</span><span class="na">getLock</span><span class="p">(</span><span class="s">&quot;resource3&quot;</span><span class="p">);</span>
-<a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="n">RedissonRedLock</span><span class="w"> </span><span class="n">multiLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RedissonRedLock</span><span class="p">(</span><span class="n">lock1</span><span class="p">,</span><span class="w"> </span><span class="n">lock2</span><span class="p">,</span><span class="w"> </span><span class="n">lock3</span><span class="p">);</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">Lock</span><span class="w"> </span><span class="n">multiLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createMultiLock</span><span class="p">(</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">    </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;resource1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;resource2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;resource3&quot;</span><span class="p">)</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="p">);</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="c1">// After (Redisson) - if using multiple instances</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="n">RLock</span><span class="w"> </span><span class="n">lock1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redisson1</span><span class="p">.</span><span class="na">getLock</span><span class="p">(</span><span class="s">&quot;resource1&quot;</span><span class="p">);</span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="n">RLock</span><span class="w"> </span><span class="n">lock2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redisson2</span><span class="p">.</span><span class="na">getLock</span><span class="p">(</span><span class="s">&quot;resource2&quot;</span><span class="p">);</span>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="n">RLock</span><span class="w"> </span><span class="n">lock3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redisson3</span><span class="p">.</span><span class="na">getLock</span><span class="p">(</span><span class="s">&quot;resource3&quot;</span><span class="p">);</span>
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="n">RedissonRedLock</span><span class="w"> </span><span class="n">multiLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RedissonRedLock</span><span class="p">(</span><span class="n">lock1</span><span class="p">,</span><span class="w"> </span><span class="n">lock2</span><span class="p">,</span><span class="w"> </span><span class="n">lock3</span><span class="p">);</span>
 </code></pre></div>
 <p><strong>Benefits</strong>:
 - Can use different Redis instances
@@ -3246,40 +3302,7 @@
 <p>Choose based on your specific requirements:
 - <strong>Same cluster, multiple resources</strong> → redlock4j MultiLock
 - <strong>Multiple instances, flexible composition</strong> → Redisson RedissonMultiLock
-- <strong>Multiple instances, Redlock algorithm</strong> → Redisson RedissonRedLock
-    boolean acquired = successfulNodes &gt;= config.getQuorum()
-                    &amp;&amp; validityTime &gt; 0;</p>
-<div class="highlight"><pre><span></span><code>// 4. Rollback if failed
-if (!acquired) {
-    releaseAllLocks(lockValues);
-}
-
-return new MultiLockResult(acquired, validityTime, lockValues, ...);
-</code></pre></div>
-<p>}
-<code>**Per-Node Acquisition**:</code>java
-private boolean acquireAllOnNode(RedisDriver driver, Map<String, String> lockValues) {
-    List<String> acquiredKeys = new ArrayList&lt;&gt;();
-
-    for (String key : lockKeys) {
-        if (driver.setIfNotExists(key, lockValue, timeout)) {
-            acquiredKeys.add(key);
-        } else {
-            // Failed - rollback this node
-            rollbackOnNode(driver, lockValues, acquiredKeys);
-            return false;
-        }
-    }
-    return true;
-}
-```</p>
-<p><strong>Flow</strong>:
-1. Generate unique lock values for all keys
-2. For each Redis node:
-   - Try to acquire ALL locks
-   - If any fails, rollback that node
-3. Check if quorum achieved
-4. If not, release all acquired locks</p>
+- <strong>Multiple instances, Redlock algorithm</strong> → Redisson RedissonRedLock</p>
 
 
 
@@ -3302,7 +3325,7 @@ private boolean acquireAllOnNode(RedisDriver driver, Map<String, String> lockVal
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="February 27, 2026 14:11:21 UTC">February 27, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 22, 2026 08:14:13 UTC">July 22, 2026</span>
   </span>
 
     
@@ -3386,7 +3409,7 @@ private boolean acquireAllOnNode(RedisDriver driver, Map<String, String> lockVal
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../logo-dark.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -33,7 +33,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -822,10 +822,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#distributed-lock-comparison-1-client-no-contention" class="md-nav__link">
+  <a href="#distributed-lock-comparison-5-clients-under-contention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Distributed Lock Comparison (1 client, no contention)
+        Distributed Lock Comparison (5 clients under contention)
       
     </span>
   </a>
@@ -944,10 +944,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#latency-avg-ms-lower-is-better" class="md-nav__link">
+  <a href="#p99-latency-ms-lower-is-better" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Latency (avg ms) - Lower is Better
+        p99 Latency (ms) - Lower is Better
       
     </span>
   </a>
@@ -1689,10 +1689,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#distributed-lock-comparison-1-client-no-contention" class="md-nav__link">
+  <a href="#distributed-lock-comparison-5-clients-under-contention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Distributed Lock Comparison (1 client, no contention)
+        Distributed Lock Comparison (5 clients under contention)
       
     </span>
   </a>
@@ -1811,10 +1811,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#latency-avg-ms-lower-is-better" class="md-nav__link">
+  <a href="#p99-latency-ms-lower-is-better" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Latency (avg ms) - Lower is Better
+        p99 Latency (ms) - Lower is Better
       
     </span>
   </a>
@@ -1908,7 +1908,11 @@
 
 
 <h1 id="performance-benchmarks">Performance Benchmarks<a class="headerlink" href="#performance-benchmarks" title="Permanent link">&para;</a></h1>
-<p>This guide provides comprehensive performance comparisons between <strong>redlock4j</strong> and other Redis-based locking libraries.</p>
+<p>This guide summarizes performance comparisons between <strong>redlock4j</strong> and other Redis-based locking libraries.</p>
+<div class="admonition note">
+<p class="admonition-title">Authoritative source</p>
+<p>The full, authoritative benchmark results live in the <a href="../architecture/#performance-analysis">Architecture guide's Performance Analysis section</a> and in <code>redlock4j-benchmark/benchmark-analysis.md</code> (§7). This page summarizes those results; if the numbers ever diverge, the Architecture guide and <code>benchmark-analysis.md</code> win.</p>
+</div>
 <h2 id="test-environment">Test Environment<a class="headerlink" href="#test-environment" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1935,8 +1939,16 @@
 <td>30s</td>
 </tr>
 <tr>
-<td>Benchmark Duration</td>
-<td>1 minute per implementation</td>
+<td>Clients</td>
+<td>5 (10 for ReadWriteLock: 5 readers + 5 writers)</td>
+</tr>
+<tr>
+<td>Warmup (discarded)</td>
+<td>30s</td>
+</tr>
+<tr>
+<td>Measurement</td>
+<td>60s (1 minute) per implementation</td>
 </tr>
 <tr>
 <td>JDK</td>
@@ -1952,7 +1964,7 @@
 <li>Clock drift compensation  </li>
 <li>Node iteration overhead</li>
 </ul>
-<h3 id="distributed-lock-comparison-1-client-no-contention">Distributed Lock Comparison (1 client, no contention)<a class="headerlink" href="#distributed-lock-comparison-1-client-no-contention" title="Permanent link">&para;</a></h3>
+<h3 id="distributed-lock-comparison-5-clients-under-contention">Distributed Lock Comparison (5 clients under contention)<a class="headerlink" href="#distributed-lock-comparison-5-clients-under-contention" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -1963,40 +1975,40 @@
 </thead>
 <tbody>
 <tr>
+<td>RedPulsar</td>
+<td>21.63</td>
+<td>3-node Redlock; throughput leader</td>
+</tr>
+<tr>
+<td>Spring Integration</td>
+<td>19.47</td>
+<td>Single node</td>
+</tr>
+<tr>
+<td>ShedLock</td>
+<td>18.86</td>
+<td>Single node</td>
+</tr>
+<tr>
 <td><strong>redlock4j-singlenode</strong></td>
 <td><strong>18.33</strong></td>
 <td>SingleNodeStrategy optimized</td>
 </tr>
 <tr>
-<td>ShedLock</td>
-<td>18.37</td>
-<td>Single node</td>
-</tr>
-<tr>
-<td>Spring Integration</td>
-<td>18.23</td>
-<td>Single node</td>
-</tr>
-<tr>
 <td>Redisson RLock</td>
-<td>18.32</td>
+<td>18.24</td>
 <td>Single node</td>
-</tr>
-<tr>
-<td>RedPulsar</td>
-<td>18.26</td>
-<td>3-node Redlock</td>
 </tr>
 <tr>
 <td>redlock4j-3node</td>
-<td>17.60</td>
-<td>Full 3-node Redlock</td>
+<td>0.81</td>
+<td>Full 3-node Redlock (best p99 in field: 858ms)</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Key Finding</strong>: Single-node mode is <strong>competitive with other single-node implementations</strong> while retaining the ability to scale to multi-node Redlock when needed.</p>
 <blockquote>
-<p><strong>Note</strong>: Multi-client contention scenarios with 3-node Redlock show degraded performance due to the inherent cost of distributed consensus. For high-contention workloads, consider single-node mode or tuning retry delays.</p>
+<p><strong>Note</strong>: 3-node Redlock shows low throughput on the basic <code>DistributedLock</code> primitive because of the <strong>polling wait strategy under contention</strong>, not the cost of consensus per se — waiters sleep on a fixed poll interval and race on release. Exponential backoff (already landed) doubled 3-node throughput; a pub/sub-on-release wait strategy (planned, benchmark-analysis §8 A3) targets the remainder. Despite the throughput gap, 3-node redlock4j has <strong>best-in-class p99</strong> on several primitives (DistributedLock, RWLock writer, MultiLock, Semaphore, CountDownLatch). For high-throughput contention workloads today, prefer single-node mode.</p>
 </blockquote>
 <hr />
 <h2 id="lock-type-benchmarks">Lock Type Benchmarks<a class="headerlink" href="#lock-type-benchmarks" title="Permanent link">&para;</a></h2>
@@ -2014,40 +2026,40 @@
 <tbody>
 <tr>
 <td><strong>Total Ops/s</strong></td>
-<td>18.21</td>
-<td><strong>18.56</strong></td>
-<td>17.49</td>
+<td>18.24</td>
+<td><strong>18.33</strong></td>
+<td>0.81</td>
 </tr>
 <tr>
-<td><strong>Avg Wait Time</strong></td>
+<td><strong>Mean Wait Time</strong></td>
 <td>229ms</td>
-<td><strong>218ms</strong></td>
-<td>265ms</td>
+<td>251ms</td>
+<td>259ms</td>
 </tr>
 <tr>
 <td><strong>p50 Latency</strong></td>
-<td>56.5ms</td>
-<td><strong>0.6ms</strong></td>
-<td>1.3ms</td>
+<td>122.9ms</td>
+<td><strong>67.1ms</strong></td>
+<td>191.3ms</td>
 </tr>
 <tr>
-<td><strong>p95 Latency</strong></td>
-<td>923ms</td>
-<td>110ms</td>
-<td>1,775ms</td>
+<td><strong>p99 Latency</strong></td>
+<td>1,286.7ms</td>
+<td>1,977.5ms</td>
+<td><strong>858.0ms</strong></td>
 </tr>
 <tr>
 <td><strong>Correctness</strong></td>
-<td>✅ PASS</td>
-<td>✅ PASS</td>
-<td>✅ PASS</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>PASS</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Analysis</strong>: redlock4j-singlenode outperforms Redisson by 2% with <strong>94x better p50 latency</strong>.</p>
+<p><strong>Analysis</strong>: redlock4j-singlenode is at parity with Redisson on throughput (within 1%) and has better p50 latency. redlock4j-3node trades throughput for the <strong>best p99 in the field</strong> (858ms vs Redisson 1,286.7ms); the 3-node throughput gap traces to the polling wait strategy under contention (see note above).</p>
 <hr />
 <h3 id="2-fairlock-fifo-ordering">2. FairLock (FIFO Ordering)<a class="headerlink" href="#2-fairlock-fifo-ordering" title="Permanent link">&para;</a></h3>
-<p>Guarantees lock acquisition in request order using Redis sorted sets.</p>
+<p>Guarantees lock acquisition in request order using Redis sorted sets. FairLock uses the polling wait strategy (keyspace notifications degrade FairLock, and exponential backoff also hurts the head-of-queue waiter).</p>
 <table>
 <thead>
 <tr>
@@ -2060,15 +2072,21 @@
 <tbody>
 <tr>
 <td><strong>Total Ops/s</strong></td>
-<td><strong>18.25</strong></td>
-<td>17.85</td>
-<td>16.52</td>
+<td><strong>16.95</strong></td>
+<td>11.92</td>
+<td>~2.95</td>
 </tr>
 <tr>
-<td><strong>Avg Wait Time</strong></td>
-<td><strong>115ms</strong></td>
-<td>116ms</td>
-<td>126ms</td>
+<td><strong>Mean Wait Time</strong></td>
+<td><strong>249ms</strong></td>
+<td>365ms</td>
+<td>1,685ms</td>
+</tr>
+<tr>
+<td><strong>p99 Latency</strong></td>
+<td><strong>229.5ms</strong></td>
+<td>471.1ms</td>
+<td>2,457.1ms</td>
 </tr>
 <tr>
 <td><strong>FIFO Violations</strong></td>
@@ -2078,7 +2096,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Analysis</strong>: Redisson slightly faster due to Lua script optimization. Both maintain strict FIFO ordering.</p>
+<p><strong>Analysis</strong>: Redisson leads FairLock (~1.4x faster than single-node redlock4j) thanks to its single-Lua-script head-of-queue path. Switching redlock4j FairLock to polling moved it from ~0 ops/s to ~70% of Redisson's throughput; the per-attempt quorum head-check round-trip on 3 nodes is the remaining bottleneck (planned fix: atomic head-check + acquire). All implementations maintain strict FIFO ordering.</p>
 <hr />
 <h3 id="3-multilock-atomic-multi-resource">3. MultiLock (Atomic Multi-Resource)<a class="headerlink" href="#3-multilock-atomic-multi-resource" title="Permanent link">&para;</a></h3>
 <p>Acquires multiple resources atomically with deadlock prevention.</p>
@@ -2094,28 +2112,34 @@
 <tbody>
 <tr>
 <td><strong>Total Ops/s</strong></td>
-<td>17.58</td>
-<td><strong>18.02</strong></td>
-<td>16.87</td>
+<td>17.05</td>
+<td>16.97</td>
+<td><strong>17.72</strong></td>
 </tr>
 <tr>
-<td><strong>Avg Wait Time</strong></td>
-<td><strong>114ms</strong></td>
-<td>117ms</td>
-<td>124ms</td>
+<td><strong>Mean Wait Time</strong></td>
+<td>273ms</td>
+<td>303ms</td>
+<td><strong>237ms</strong></td>
+</tr>
+<tr>
+<td><strong>p99 Latency</strong></td>
+<td>1,192ms</td>
+<td>1,709.5ms</td>
+<td><strong>1,057.6ms</strong></td>
 </tr>
 <tr>
 <td><strong>Correctness</strong></td>
-<td>✅ PASS</td>
-<td>✅ PASS</td>
-<td>✅ PASS</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>PASS</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Analysis</strong>: redlock4j-singlenode is <strong>2.5% faster</strong> than Redisson.</p>
+<p><strong>Analysis</strong>: redlock4j-3node (multilock) is the leader on <strong>every axis</strong> — throughput, mean wait, and p99 — after the parallel multi-node I/O change.</p>
 <hr />
 <h3 id="4-readwritelock">4. ReadWriteLock<a class="headerlink" href="#4-readwritelock" title="Permanent link">&para;</a></h3>
-<p>Allows concurrent readers with exclusive writers.</p>
+<p>Allows concurrent readers with exclusive writers (10 clients: 5 readers + 5 writers).</p>
 <table>
 <thead>
 <tr>
@@ -2128,25 +2152,37 @@
 <tbody>
 <tr>
 <td><strong>Reader Ops/s</strong></td>
-<td><strong>50.44</strong></td>
-<td>20.40</td>
-<td>9.24</td>
+<td><strong>151.65</strong></td>
+<td>74.66</td>
+<td>95.41</td>
+</tr>
+<tr>
+<td><strong>Reader p99</strong></td>
+<td><strong>5.82ms</strong></td>
+<td>340.6ms</td>
+<td>348.4ms</td>
 </tr>
 <tr>
 <td><strong>Writer Ops/s</strong></td>
-<td>6.09</td>
-<td><strong>17.81</strong></td>
-<td>16.65</td>
+<td>0.21</td>
+<td>15.63</td>
+<td><strong>16.42</strong></td>
+</tr>
+<tr>
+<td><strong>Writer p99</strong></td>
+<td>16,820.7ms</td>
+<td>755.6ms</td>
+<td><strong>104.2ms</strong></td>
 </tr>
 <tr>
 <td><strong>Correctness</strong></td>
-<td>✅ PASS</td>
-<td>✅ PASS</td>
-<td>✅ PASS</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>PASS</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Analysis</strong>: Redisson excels at concurrent reads; redlock4j has <strong>3x better writer throughput</strong>.</p>
+<p><strong>Analysis</strong>: Redisson leads reader throughput (~1.6x) because it decrements readers in-process via semaphore counting, while redlock4j hits Redis on every read acquire (an architectural choice, not a regression). On the writer side, <strong>Redisson is starved</strong> (0.21 ops/s, ~9.7s mean wait — only a handful of successful writes in 60s), while redlock4j-3node leads with 16.42 ops/s and a best-in-class 104.2ms writer p99.</p>
 <hr />
 <h3 id="5-semaphore">5. Semaphore<a class="headerlink" href="#5-semaphore" title="Permanent link">&para;</a></h3>
 <p>Limits concurrent access to a resource (configurable permits).</p>
@@ -2162,25 +2198,31 @@
 <tbody>
 <tr>
 <td><strong>Total Ops/s</strong></td>
-<td>54.69</td>
-<td><strong>108.49</strong></td>
-<td>103.32</td>
+<td>54.71</td>
+<td><strong>91.09</strong></td>
+<td>87.50</td>
 </tr>
 <tr>
-<td><strong>Avg Wait Time</strong></td>
-<td>56.94ms</td>
-<td><strong>0.85ms</strong></td>
-<td>2.09ms</td>
+<td><strong>Mean Wait Time</strong></td>
+<td>37.87ms</td>
+<td><strong>0.83ms</strong></td>
+<td>1.84ms</td>
+</tr>
+<tr>
+<td><strong>p99 Latency</strong></td>
+<td>386.5ms</td>
+<td><strong>2.21ms</strong></td>
+<td>4.20ms</td>
 </tr>
 <tr>
 <td><strong>Correctness</strong></td>
-<td>✅ PASS</td>
-<td>✅ PASS</td>
-<td>✅ PASS</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>PASS</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Analysis</strong>: redlock4j-singlenode is <strong>2x faster</strong> with <strong>67x lower latency</strong>.</p>
+<p><strong>Analysis</strong>: redlock4j-singlenode is <strong>~1.7x faster</strong> than Redisson with <strong>~100x lower p99 latency</strong>; the 3-node mode is nearly as fast.</p>
 <hr />
 <h3 id="6-countdownlatch">6. CountDownLatch<a class="headerlink" href="#6-countdownlatch" title="Permanent link">&para;</a></h3>
 <p>Distributed coordination - wait for N events to complete.</p>
@@ -2196,25 +2238,31 @@
 <tbody>
 <tr>
 <td><strong>Latches/s</strong></td>
-<td>59.66</td>
-<td>35.59</td>
-<td><strong>60.97</strong></td>
+<td>59.02</td>
+<td>58.19</td>
+<td><strong>59.91</strong></td>
 </tr>
 <tr>
-<td><strong>Avg Wait Time</strong></td>
-<td>16.74ms</td>
-<td><strong>16.32ms</strong></td>
-<td>16.34ms</td>
+<td><strong>Mean Wait Time</strong></td>
+<td>16.91ms</td>
+<td>15.67ms</td>
+<td><strong>15.18ms</strong></td>
+</tr>
+<tr>
+<td><strong>p99 Latency</strong></td>
+<td>22.6ms</td>
+<td>19.9ms</td>
+<td><strong>19.9ms</strong></td>
 </tr>
 <tr>
 <td><strong>Correctness</strong></td>
-<td>✅ PASS</td>
-<td>✅ PASS</td>
-<td>✅ PASS</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>PASS</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Analysis</strong>: redlock4j-3node slightly beats Redisson. Coordination primitives benefit from multi-node distribution.</p>
+<p><strong>Analysis</strong>: All three are within ~3% on throughput; redlock4j-3node has a slight edge on both throughput and p99 latency.</p>
 <hr />
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
 <h3 id="throughput-opss-higher-is-better">Throughput (ops/s) - Higher is Better<a class="headerlink" href="#throughput-opss-higher-is-better" title="Permanent link">&para;</a></h3>
@@ -2231,49 +2279,56 @@
 <tbody>
 <tr>
 <td>Distributed Lock</td>
-<td>18.21</td>
-<td><strong>18.56</strong></td>
-<td>17.49</td>
-<td>redlock4j</td>
+<td>18.24</td>
+<td><strong>18.33</strong></td>
+<td>0.81</td>
+<td>redlock4j (single-node)</td>
 </tr>
 <tr>
 <td>FairLock</td>
-<td><strong>18.25</strong></td>
-<td>17.85</td>
-<td>16.52</td>
+<td><strong>16.95</strong></td>
+<td>11.92</td>
+<td>~2.95</td>
 <td>Redisson</td>
 </tr>
 <tr>
 <td>MultiLock</td>
-<td>17.58</td>
-<td><strong>18.02</strong></td>
-<td>16.87</td>
-<td>redlock4j</td>
+<td>17.05</td>
+<td>16.97</td>
+<td><strong>17.72</strong></td>
+<td>redlock4j (3-node)</td>
 </tr>
 <tr>
-<td>ReadWriteLock</td>
-<td><strong>56.53</strong></td>
-<td>38.22</td>
-<td>25.89</td>
+<td>ReadWriteLock (reader)</td>
+<td><strong>151.65</strong></td>
+<td>74.66</td>
+<td>95.41</td>
 <td>Redisson</td>
 </tr>
 <tr>
+<td>ReadWriteLock (writer)</td>
+<td>0.21</td>
+<td>15.63</td>
+<td><strong>16.42</strong></td>
+<td>redlock4j (3-node)</td>
+</tr>
+<tr>
 <td><strong>Semaphore</strong></td>
-<td>54.69</td>
-<td><strong>108.49</strong></td>
-<td>103.32</td>
+<td>54.71</td>
+<td><strong>91.09</strong></td>
+<td>87.50</td>
 <td><strong>redlock4j</strong></td>
 </tr>
 <tr>
 <td>CountDownLatch</td>
-<td>59.66</td>
-<td>35.59</td>
-<td><strong>60.97</strong></td>
-<td>redlock4j</td>
+<td>59.02</td>
+<td>58.19</td>
+<td><strong>59.91</strong></td>
+<td>redlock4j (3-node)</td>
 </tr>
 </tbody>
 </table>
-<h3 id="latency-avg-ms-lower-is-better">Latency (avg ms) - Lower is Better<a class="headerlink" href="#latency-avg-ms-lower-is-better" title="Permanent link">&para;</a></h3>
+<h3 id="p99-latency-ms-lower-is-better">p99 Latency (ms) - Lower is Better<a class="headerlink" href="#p99-latency-ms-lower-is-better" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2287,58 +2342,66 @@
 <tbody>
 <tr>
 <td>Distributed Lock</td>
-<td>229</td>
-<td><strong>218</strong></td>
-<td>265</td>
-<td>redlock4j</td>
+<td>1,286.7</td>
+<td>1,977.5</td>
+<td><strong>858.0</strong></td>
+<td>redlock4j (3-node)</td>
 </tr>
 <tr>
 <td>FairLock</td>
-<td><strong>115</strong></td>
-<td>116</td>
-<td>126</td>
+<td><strong>229.8</strong></td>
+<td>434.8</td>
+<td>2,457.1</td>
 <td>Redisson</td>
 </tr>
 <tr>
 <td>MultiLock</td>
-<td><strong>114</strong></td>
-<td>117</td>
-<td>124</td>
+<td>1,192.2</td>
+<td>1,709.5</td>
+<td><strong>1,057.6</strong></td>
+<td>redlock4j (3-node)</td>
+</tr>
+<tr>
+<td>ReadWriteLock (reader)</td>
+<td><strong>5.82</strong></td>
+<td>340.6</td>
+<td>348.4</td>
 <td>Redisson</td>
 </tr>
 <tr>
-<td>ReadWriteLock</td>
-<td><strong>110</strong></td>
-<td>117</td>
-<td>275</td>
-<td>Redisson</td>
+<td>ReadWriteLock (writer)</td>
+<td>16,820.7</td>
+<td>755.6</td>
+<td><strong>104.2</strong></td>
+<td>redlock4j (3-node)</td>
 </tr>
 <tr>
 <td><strong>Semaphore</strong></td>
-<td>56.94</td>
-<td><strong>0.85</strong></td>
-<td>2.09</td>
+<td>386.5</td>
+<td><strong>2.21</strong></td>
+<td>4.20</td>
 <td><strong>redlock4j</strong></td>
 </tr>
 <tr>
 <td>CountDownLatch</td>
-<td>16.74</td>
-<td><strong>16.32</strong></td>
-<td>16.34</td>
-<td>redlock4j</td>
+<td>22.6</td>
+<td>19.9</td>
+<td><strong>19.9</strong></td>
+<td>redlock4j (3-node)</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="key-takeaways">Key Takeaways<a class="headerlink" href="#key-takeaways" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Basic Distributed Lock</strong>: redlock4j matches or beats Redisson</li>
-<li><strong>FairLock</strong>: Redisson has slight edge due to Lua optimization</li>
-<li><strong>MultiLock</strong>: redlock4j competitive, simpler implementation</li>
-<li><strong>ReadWriteLock</strong>: Redisson better for read-heavy, redlock4j better for write-heavy</li>
-<li><strong>Semaphore</strong>: redlock4j is <strong>2x faster</strong> with <strong>67x lower latency</strong></li>
-<li><strong>CountDownLatch</strong>: redlock4j-3node slightly faster</li>
-<li><strong>3-node overhead</strong>: ~5-10% performance cost for distributed consensus</li>
+<li><strong>Basic Distributed Lock</strong>: single-node redlock4j is at parity with Redisson on throughput; 3-node has the best p99 in the field but low throughput under contention (polling wait strategy, not consensus cost)</li>
+<li><strong>FairLock</strong>: Redisson has the edge due to its single-Lua-script head-of-queue path</li>
+<li><strong>MultiLock</strong>: redlock4j-3node leads on every axis (throughput and p99)</li>
+<li><strong>ReadWriteLock</strong>: Redisson better for read-heavy; redlock4j far better for write-heavy (Redisson starves writers) and best-in-class writer p99</li>
+<li><strong>Semaphore</strong>: redlock4j is <strong>~1.7x faster</strong> with <strong>~100x lower p99 latency</strong></li>
+<li><strong>CountDownLatch</strong>: redlock4j-3node slightly faster on throughput and p99</li>
+<li><strong>3-node throughput gap</strong>: on <code>DistributedLock</code> and <code>FairLock</code> the bottleneck is the polling wait strategy under contention (pub/sub-on-release is the planned fix); other primitives are at or above field-leader performance</li>
+<li><strong>redlock4j leads 4 of 7 categories on throughput and is best-in-class on p99 for 5 of 7</strong></li>
 <li><strong>Correctness</strong>: All implementations pass with zero violations</li>
 </ol>
 <hr />
@@ -2375,18 +2438,19 @@
 <a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">    </span>-Dexec.args<span class="o">=</span><span class="s2">&quot;--duration 5 --count 5&quot;</span>
 </code></pre></div>
 <h3 id="command-line-options">Command Line Options<a class="headerlink" href="#command-line-options" title="Permanent link">&para;</a></h3>
+<p>The table below lists the CLI <strong>tool defaults</strong>. Note these differ from the settings used to produce the results on this page: the published numbers were measured with <strong>30s warmup + 60s (1 min) measurement, 5 clients</strong> (10 for ReadWriteLock), matching the Architecture guide's Performance Analysis and <code>benchmark-analysis.md</code> §7.</p>
 <table>
 <thead>
 <tr>
 <th>Option</th>
 <th>Description</th>
-<th>Default</th>
+<th>Tool Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>--duration &lt;min&gt;</code></td>
-<td>Benchmark duration in minutes</td>
+<td>Measurement duration in minutes</td>
 <td>30</td>
 </tr>
 <tr>
@@ -2401,7 +2465,7 @@
 </tr>
 <tr>
 <td><code>--warmup &lt;sec&gt;</code></td>
-<td>Warmup duration in seconds</td>
+<td>Warmup duration in seconds (discarded)</td>
 <td>60</td>
 </tr>
 <tr>
@@ -2458,7 +2522,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="April 22, 2026 21:08:30 UTC">April 22, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 22, 2026 08:14:13 UTC">July 22, 2026</span>
   </span>
 
     
@@ -2542,7 +2606,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

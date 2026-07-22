@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../logo-dark.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -33,7 +33,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -922,10 +922,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#reuse-redlock-instances" class="md-nav__link">
+  <a href="#reuse-the-redlockmanager" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Reuse Redlock Instances
+        Reuse the RedlockManager
       
     </span>
   </a>
@@ -933,10 +933,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#configure-connection-pools" class="md-nav__link">
+  <a href="#tune-node-connections" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configure Connection Pools
+        Tune Node Connections
       
     </span>
   </a>
@@ -983,10 +983,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#use-consistent-naming-convention" class="md-nav__link">
+  <a href="#use-a-consistent-naming-convention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use Consistent Naming Convention
+        Use a Consistent Naming Convention
       
     </span>
   </a>
@@ -1092,7 +1092,7 @@
   <a href="#dont-forget-to-unlock" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ❌ Don't Forget to Unlock
+        Don't Forget to Unlock
       
     </span>
   </a>
@@ -1100,10 +1100,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dont-use-same-redis-instance-multiple-times" class="md-nav__link">
+  <a href="#dont-configure-exactly-2-nodes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ❌ Don't Use Same Redis Instance Multiple Times
+        Don't Configure Exactly 2 Nodes
       
     </span>
   </a>
@@ -1114,7 +1114,7 @@
   <a href="#dont-ignore-lock-acquisition-failures" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ❌ Don't Ignore Lock Acquisition Failures
+        Don't Ignore Lock Acquisition Failures
       
     </span>
   </a>
@@ -1962,10 +1962,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#reuse-redlock-instances" class="md-nav__link">
+  <a href="#reuse-the-redlockmanager" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Reuse Redlock Instances
+        Reuse the RedlockManager
       
     </span>
   </a>
@@ -1973,10 +1973,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#configure-connection-pools" class="md-nav__link">
+  <a href="#tune-node-connections" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configure Connection Pools
+        Tune Node Connections
       
     </span>
   </a>
@@ -2023,10 +2023,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#use-consistent-naming-convention" class="md-nav__link">
+  <a href="#use-a-consistent-naming-convention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use Consistent Naming Convention
+        Use a Consistent Naming Convention
       
     </span>
   </a>
@@ -2132,7 +2132,7 @@
   <a href="#dont-forget-to-unlock" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ❌ Don't Forget to Unlock
+        Don't Forget to Unlock
       
     </span>
   </a>
@@ -2140,10 +2140,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dont-use-same-redis-instance-multiple-times" class="md-nav__link">
+  <a href="#dont-configure-exactly-2-nodes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ❌ Don't Use Same Redis Instance Multiple Times
+        Don't Configure Exactly 2 Nodes
       
     </span>
   </a>
@@ -2154,7 +2154,7 @@
   <a href="#dont-ignore-lock-acquisition-failures" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ❌ Don't Ignore Lock Acquisition Failures
+        Don't Ignore Lock Acquisition Failures
       
     </span>
   </a>
@@ -2199,164 +2199,210 @@
 
 <h1 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h1>
 <p>Follow these best practices to use Redlock4j effectively and safely in production.</p>
+<p>All examples assume a <code>RedlockManager manager</code> created from a
+<code>RedlockConfiguration</code>, and locks obtained via <code>manager.createLock(...)</code>.</p>
 <h2 id="lock-management">Lock Management<a class="headerlink" href="#lock-management" title="Permanent link">&para;</a></h2>
 <h3 id="always-release-locks">Always Release Locks<a class="headerlink" href="#always-release-locks" title="Permanent link">&para;</a></h3>
 <p>Always release locks in a <code>finally</code> block:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">lock</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="c1">// Critical section</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">        </span><span class="n">redlock</span><span class="p">.</span><span class="na">unlock</span><span class="p">(</span><span class="n">lock</span><span class="p">);</span><span class="w">  </span><span class="c1">// Always execute</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">);</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">lock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="c1">// Critical section</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="n">lock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span><span class="w">  </span><span class="c1">// Always execute</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="check-lock-acquisition">Check Lock Acquisition<a class="headerlink" href="#check-lock-acquisition" title="Permanent link">&para;</a></h3>
-<p>Always check if lock acquisition succeeded:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">lock</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="c1">// Lock acquired successfully</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="c1">// Failed to acquire lock - handle appropriately</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="n">handleLockFailure</span><span class="p">();</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">}</span>
+<p>When you don't want to block indefinitely, use <code>tryLock()</code> and check the result:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">);</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">lock</span><span class="p">.</span><span class="na">tryLock</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">        </span><span class="c1">// Lock acquired successfully</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="n">lock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="c1">// Failed to acquire lock - handle appropriately</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="n">handleLockFailure</span><span class="p">();</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="use-appropriate-ttl">Use Appropriate TTL<a class="headerlink" href="#use-appropriate-ttl" title="Permanent link">&para;</a></h3>
-<p>Set TTL longer than your operation:</p>
+<p>Set the lock timeout longer than your operation. The lock's time-to-live is the
+<code>defaultLockTimeout</code> configured on the manager:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// Bad: TTL too short</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">);</span><span class="w">  </span><span class="c1">// 1 second</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">performLongOperation</span><span class="p">();</span><span class="w">  </span><span class="c1">// Takes 5 seconds - lock will expire!</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1">// Good: TTL with safety margin</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span><span class="w">  </span><span class="c1">// 10 seconds</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">performLongOperation</span><span class="p">();</span><span class="w">  </span><span class="c1">// Takes 5 seconds - safe</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">bad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultLockTimeout</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofSeconds</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="w">  </span><span class="c1">// 1 second</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1">// performLongOperation() takes 5 seconds - lock will expire!</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1">// Good: TTL with safety margin</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">good</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultLockTimeout</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofSeconds</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span><span class="w">  </span><span class="c1">// 10 seconds</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="c1">// performLongOperation() takes 5 seconds - safe</span>
 </code></pre></div>
+<p>If an operation occasionally runs long, extend the lock instead of setting an
+excessively large TTL: <code>((Redlock) lock).extend(10000)</code>.</p>
 <h2 id="redis-configuration">Redis Configuration<a class="headerlink" href="#redis-configuration" title="Permanent link">&para;</a></h2>
 <h3 id="use-independent-redis-instances">Use Independent Redis Instances<a class="headerlink" href="#use-independent-redis-instances" title="Permanent link">&para;</a></h3>
 <p>For production, use truly independent Redis instances:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// Good: Independent instances on different servers</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">Redlock</span><span class="w"> </span><span class="n">redlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Redlock</span><span class="p">(</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">JedisPool</span><span class="p">(</span><span class="s">&quot;redis1.example.com&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">),</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">JedisPool</span><span class="p">(</span><span class="s">&quot;redis2.example.com&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">),</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="k">new</span><span class="w"> </span><span class="n">JedisPool</span><span class="p">(</span><span class="s">&quot;redis3.example.com&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">);</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis1.example.com&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis2.example.com&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis3.example.com&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1">// Bad: Master-slave replication (not independent)</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1">// Don&#39;t use master and its slaves as separate instances</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1">// Don&#39;t use a master and its slaves as separate nodes</span>
 </code></pre></div>
 <h3 id="minimum-3-instances">Minimum 3 Instances<a class="headerlink" href="#minimum-3-instances" title="Permanent link">&para;</a></h3>
-<p>Always use at least 3 Redis instances:</p>
+<p>Use at least 3 Redis instances for fault tolerance:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// Minimum for fault tolerance</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">Redlock</span><span class="w"> </span><span class="n">redlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Redlock</span><span class="p">(</span><span class="n">pool1</span><span class="p">,</span><span class="w"> </span><span class="n">pool2</span><span class="p">,</span><span class="w"> </span><span class="n">pool3</span><span class="p">);</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1">// Better: 5 instances for higher availability</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">Redlock</span><span class="w"> </span><span class="n">redlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Redlock</span><span class="p">(</span><span class="n">pool1</span><span class="p">,</span><span class="w"> </span><span class="n">pool2</span><span class="p">,</span><span class="w"> </span><span class="n">pool3</span><span class="p">,</span><span class="w"> </span><span class="n">pool4</span><span class="p">,</span><span class="w"> </span><span class="n">pool5</span><span class="p">);</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis2&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis3&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="c1">// Better: 5 instances for higher availability</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis2&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis3&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis4&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis5&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </code></pre></div>
+<p>A single node is also valid for local development or non-critical use: with one
+node Redlock4j runs in single-node mode. With three or more nodes it requires a
+quorum.</p>
 <h3 id="use-odd-numbers">Use Odd Numbers<a class="headerlink" href="#use-odd-numbers" title="Permanent link">&para;</a></h3>
 <p>Always use an odd number of instances:</p>
 <ul>
-<li>✅ 3, 5, 7 instances</li>
-<li>❌ 2, 4, 6 instances</li>
+<li>3, 5, 7 instances</li>
+<li>2, 4, 6 instances</li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">Exactly 2 nodes is not supported</p>
+<p>A configuration with <strong>exactly 2 nodes</strong> throws <code>IllegalArgumentException</code>
+at <code>build()</code>. Use <strong>1 node</strong> (single-node mode) or <strong>3 or more</strong> nodes
+(quorum mode). Two nodes cannot form a meaningful quorum, so it is rejected
+outright.</p>
+</div>
 <h2 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
 <h3 id="handle-lock-failures">Handle Lock Failures<a class="headerlink" href="#handle-lock-failures" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">lock</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">);</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">lock</span><span class="p">.</span><span class="na">tryLock</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="c1">// Log the failure</span>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="n">logger</span><span class="p">.</span><span class="na">warn</span><span class="p">(</span><span class="s">&quot;Failed to acquire lock for resource&quot;</span><span class="p">);</span>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="c1">// Implement fallback strategy</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="c1">// Implement a fallback strategy</span>
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="c1">// Option 1: Retry later</span>
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="n">scheduleRetry</span><span class="p">();</span>
 <a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="c1">// Option 2: Return error to caller</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="c1">// Option 2: Return an error to the caller</span>
 <a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LockAcquisitionException</span><span class="p">(</span><span class="s">&quot;Could not acquire lock&quot;</span><span class="p">);</span>
 <a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="c1">// Option 3: Use alternative approach</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="c1">// Option 3: Use an alternative approach</span>
 <a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">    </span><span class="n">performAlternativeOperation</span><span class="p">();</span>
 <a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="handle-exceptions">Handle Exceptions<a class="headerlink" href="#handle-exceptions" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">lock</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">        </span><span class="n">performCriticalOperation</span><span class="p">();</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="n">logger</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">&quot;Error in critical section&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="n">handleError</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">lock</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">            </span><span class="n">redlock</span><span class="p">.</span><span class="na">unlock</span><span class="p">(</span><span class="n">lock</span><span class="p">);</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">&quot;Error releasing lock&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">            </span><span class="c1">// Don&#39;t throw - we&#39;re in finally block</span>
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">        </span><span class="p">}</span>
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">);</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kt">boolean</span><span class="w"> </span><span class="n">acquired</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="n">acquired</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lock</span><span class="p">.</span><span class="na">tryLock</span><span class="p">();</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">acquired</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">        </span><span class="n">performCriticalOperation</span><span class="p">();</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="n">logger</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">&quot;Error in critical section&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="n">handleError</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">acquired</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">            </span><span class="n">lock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">            </span><span class="n">logger</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">&quot;Error releasing lock&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">            </span><span class="c1">// Don&#39;t throw - we&#39;re in a finally block</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="p">}</span>
 </code></pre></div>
 <h2 id="performance">Performance<a class="headerlink" href="#performance" title="Permanent link">&para;</a></h2>
-<h3 id="reuse-redlock-instances">Reuse Redlock Instances<a class="headerlink" href="#reuse-redlock-instances" title="Permanent link">&para;</a></h3>
-<p>Create Redlock instances once and reuse:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// Good: Singleton pattern</span>
+<h3 id="reuse-the-redlockmanager">Reuse the RedlockManager<a class="headerlink" href="#reuse-the-redlockmanager" title="Permanent link">&para;</a></h3>
+<p>Create the <code>RedlockManager</code> once and reuse it. It owns the Redis connections, so
+creating one per operation is wasteful. Creating individual locks from a shared
+manager is cheap:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// Good: single shared manager</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">LockService</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Redlock</span><span class="w"> </span><span class="n">REDLOCK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createRedlock</span><span class="p">();</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">RedlockManager</span><span class="w"> </span><span class="n">MANAGER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockManager</span><span class="p">.</span><span class="na">withJedis</span><span class="p">(</span><span class="n">createConfig</span><span class="p">());</span>
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
 <a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Lock</span><span class="w"> </span><span class="nf">acquireLock</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">resource</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">REDLOCK</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">}</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="c1">// Bad: Creating new instance each time</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="kd">public</span><span class="w"> </span><span class="n">Lock</span><span class="w"> </span><span class="nf">acquireLock</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">resource</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="n">Redlock</span><span class="w"> </span><span class="n">redlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Redlock</span><span class="p">(</span><span class="n">pool1</span><span class="p">,</span><span class="w"> </span><span class="n">pool2</span><span class="p">,</span><span class="w"> </span><span class="n">pool3</span><span class="p">);</span><span class="w">  </span><span class="c1">// Wasteful!</span>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="p">}</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">        </span><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MANAGER</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="n">resource</span><span class="p">);</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">        </span><span class="n">lock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">lock</span><span class="p">;</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">}</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="c1">// Bad: creating a new manager each time</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="kd">public</span><span class="w"> </span><span class="n">Lock</span><span class="w"> </span><span class="nf">acquireLock</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">resource</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">    </span><span class="n">RedlockManager</span><span class="w"> </span><span class="n">manager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockManager</span><span class="p">.</span><span class="na">withJedis</span><span class="p">(</span><span class="n">createConfig</span><span class="p">());</span><span class="w">  </span><span class="c1">// Wasteful!</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">    </span><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="n">resource</span><span class="p">);</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">    </span><span class="n">lock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">lock</span><span class="p">;</span>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="configure-connection-pools">Configure Connection Pools<a class="headerlink" href="#configure-connection-pools" title="Permanent link">&para;</a></h3>
-<p>Properly configure connection pools:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">JedisPoolConfig</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JedisPoolConfig</span><span class="p">();</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">config</span><span class="p">.</span><span class="na">setMaxTotal</span><span class="p">(</span><span class="mi">128</span><span class="p">);</span><span class="w">        </span><span class="c1">// Enough for your load</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">config</span><span class="p">.</span><span class="na">setMaxIdle</span><span class="p">(</span><span class="mi">64</span><span class="p">);</span><span class="w">          </span><span class="c1">// Keep some idle connections</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">config</span><span class="p">.</span><span class="na">setMinIdle</span><span class="p">(</span><span class="mi">16</span><span class="p">);</span><span class="w">          </span><span class="c1">// Minimum ready connections</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">config</span><span class="p">.</span><span class="na">setTestOnBorrow</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span><span class="w">   </span><span class="c1">// Validate connections</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="n">config</span><span class="p">.</span><span class="na">setTestWhileIdle</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span><span class="w">  </span><span class="c1">// Clean up stale connections</span>
+<h3 id="tune-node-connections">Tune Node Connections<a class="headerlink" href="#tune-node-connections" title="Permanent link">&para;</a></h3>
+<p>Connection tuning happens per node via <code>RedisNodeConfiguration</code>, not via a pool
+config object:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">RedisNodeConfiguration</span><span class="w"> </span><span class="n">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedisNodeConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="p">.</span><span class="na">host</span><span class="p">(</span><span class="s">&quot;redis1&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="p">.</span><span class="na">port</span><span class="p">(</span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="p">.</span><span class="na">connectionTimeoutMs</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span><span class="w">  </span><span class="c1">// time to establish a connection</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="p">.</span><span class="na">socketTimeoutMs</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span><span class="w">      </span><span class="c1">// time to wait on a command</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </code></pre></div>
 <h3 id="use-appropriate-retry-settings">Use Appropriate Retry Settings<a class="headerlink" href="#use-appropriate-retry-settings" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="p">.</span><span class="na">retryCount</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w">      </span><span class="c1">// Don&#39;t retry too many times</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="p">.</span><span class="na">retryDelay</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="w">    </span><span class="c1">// Reasonable delay between retries</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis2&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis3&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="p">.</span><span class="na">maxRetryAttempts</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w">                  </span><span class="c1">// Don&#39;t retry too many times</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="p">.</span><span class="na">retryDelay</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofMillis</span><span class="p">(</span><span class="mi">200</span><span class="p">))</span><span class="w">   </span><span class="c1">// Reasonable delay between retries</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </code></pre></div>
 <h2 id="resource-naming">Resource Naming<a class="headerlink" href="#resource-naming" title="Permanent link">&para;</a></h2>
 <h3 id="use-descriptive-names">Use Descriptive Names<a class="headerlink" href="#use-descriptive-names" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// Good: Clear and descriptive</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;user:123:profile:update&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;order:456:payment:process&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// Good: clear and descriptive</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="s">&quot;user:123:profile:update&quot;</span><span class="p">);</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="s">&quot;order:456:payment:process&quot;</span><span class="p">);</span>
 <a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="c1">// Bad: Unclear names</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;lock1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;temp&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="c1">// Bad: unclear names</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="s">&quot;lock1&quot;</span><span class="p">);</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="s">&quot;temp&quot;</span><span class="p">);</span>
 </code></pre></div>
-<h3 id="use-consistent-naming-convention">Use Consistent Naming Convention<a class="headerlink" href="#use-consistent-naming-convention" title="Permanent link">&para;</a></h3>
+<h3 id="use-a-consistent-naming-convention">Use a Consistent Naming Convention<a class="headerlink" href="#use-a-consistent-naming-convention" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// Establish a pattern</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">String</span><span class="w"> </span><span class="n">lockKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s:%s:%s&quot;</span><span class="p">,</span><span class="w"> </span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">String</span><span class="w"> </span><span class="n">lockKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%s:%s:%s&quot;</span><span class="p">,</span>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="n">entityType</span><span class="p">,</span><span class="w">    </span><span class="c1">// &quot;user&quot;, &quot;order&quot;, &quot;product&quot;</span>
 <a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="n">entityId</span><span class="p">,</span><span class="w">      </span><span class="c1">// &quot;123&quot;, &quot;456&quot;</span>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="n">operation</span><span class="w">      </span><span class="c1">// &quot;update&quot;, &quot;delete&quot;, &quot;process&quot;</span>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="p">);</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="n">operation</span><span class="p">);</span><span class="w">    </span><span class="c1">// &quot;update&quot;, &quot;delete&quot;, &quot;process&quot;</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="n">lockKey</span><span class="p">);</span>
 </code></pre></div>
 <h2 id="monitoring-and-logging">Monitoring and Logging<a class="headerlink" href="#monitoring-and-logging" title="Permanent link">&para;</a></h2>
 <h3 id="log-lock-operations">Log Lock Operations<a class="headerlink" href="#log-lock-operations" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="n">resourceId</span><span class="p">,</span><span class="w"> </span><span class="n">ttl</span><span class="p">);</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">lock</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="n">resourceId</span><span class="p">);</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">lock</span><span class="p">.</span><span class="na">tryLock</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="n">logger</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">&quot;Acquired lock for resource: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">resourceId</span><span class="p">);</span>
 <a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">        </span><span class="n">performOperation</span><span class="p">();</span>
 <a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">        </span><span class="n">redlock</span><span class="p">.</span><span class="na">unlock</span><span class="p">(</span><span class="n">lock</span><span class="p">);</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">        </span><span class="n">lock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span>
 <a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">        </span><span class="n">logger</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="s">&quot;Released lock for resource: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">resourceId</span><span class="p">);</span>
 <a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
@@ -2375,50 +2421,59 @@
 <h3 id="test-lock-behavior">Test Lock Behavior<a class="headerlink" href="#test-lock-behavior" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nd">@Test</span>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">testLockAcquisition</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;test-resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="n">assertNotNull</span><span class="p">(</span><span class="n">lock</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Should acquire lock&quot;</span><span class="p">);</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="s">&quot;test-resource&quot;</span><span class="p">);</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="n">assertTrue</span><span class="p">(</span><span class="n">lock</span><span class="p">.</span><span class="na">tryLock</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Should acquire lock&quot;</span><span class="p">);</span>
 <a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="c1">// Try to acquire same lock - should fail</span>
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="n">Lock</span><span class="w"> </span><span class="n">lock2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">tryLock</span><span class="p">(</span><span class="s">&quot;test-resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">    </span><span class="n">assertNull</span><span class="p">(</span><span class="n">lock2</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Should not acquire already locked resource&quot;</span><span class="p">);</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="c1">// Try to acquire the same lock from another thread - should fail</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="n">Lock</span><span class="w"> </span><span class="n">lock2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="s">&quot;test-resource&quot;</span><span class="p">);</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">    </span><span class="n">assertFalse</span><span class="p">(</span><span class="n">lockFromOtherThread</span><span class="p">(</span><span class="n">lock2</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Should not acquire an already locked resource&quot;</span><span class="p">);</span>
 <a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">    </span><span class="n">redlock</span><span class="p">.</span><span class="na">unlock</span><span class="p">(</span><span class="n">lock</span><span class="p">);</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">    </span><span class="n">lock</span><span class="p">.</span><span class="na">unlock</span><span class="p">();</span>
 <a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="use-testcontainers">Use Testcontainers<a class="headerlink" href="#use-testcontainers" title="Permanent link">&para;</a></h3>
-<p>For integration tests:</p>
+<p>For integration tests, point node configuration at the container's mapped port:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nd">@Testcontainers</span>
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">RedlockIntegrationTest</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nd">@Container</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">GenericContainer</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">GenericContainer</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span>
 <a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">GenericContainer</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="s">&quot;redis:7-alpine&quot;</span><span class="p">)</span>
 <a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">            </span><span class="p">.</span><span class="na">withExposedPorts</span><span class="p">(</span><span class="mi">6379</span><span class="p">);</span>
 <a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>
 <a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">    </span><span class="nd">@Test</span>
 <a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">testWithRealRedis</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">        </span><span class="n">JedisPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JedisPool</span><span class="p">(</span>
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">            </span><span class="n">redis</span><span class="p">.</span><span class="na">getHost</span><span class="p">(),</span><span class="w"> </span>
-<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">            </span><span class="n">redis</span><span class="p">.</span><span class="na">getFirstMappedPort</span><span class="p">()</span>
-<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">        </span><span class="p">);</span>
-<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="w">        </span><span class="n">Redlock</span><span class="w"> </span><span class="n">redlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Redlock</span><span class="p">(</span><span class="n">pool</span><span class="p">);</span>
-<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="w">        </span><span class="c1">// Test with real Redis</span>
-<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="p">}</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">        </span><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">            </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="n">redis</span><span class="p">.</span><span class="na">getHost</span><span class="p">(),</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="na">getFirstMappedPort</span><span class="p">())</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">            </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">RedlockManager</span><span class="w"> </span><span class="n">manager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockManager</span><span class="p">.</span><span class="na">withJedis</span><span class="p">(</span><span class="n">config</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="w">            </span><span class="c1">// Test with real Redis</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="p">}</span>
 </code></pre></div>
 <h2 id="common-pitfalls">Common Pitfalls<a class="headerlink" href="#common-pitfalls" title="Permanent link">&para;</a></h2>
-<h3 id="dont-forget-to-unlock">❌ Don't Forget to Unlock<a class="headerlink" href="#dont-forget-to-unlock" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1">// Bad: No unlock</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">performOperation</span><span class="p">();</span><span class="w">  </span><span class="c1">// If this throws, lock is never released!</span>
+<h3 id="dont-forget-to-unlock">Don't Forget to Unlock<a class="headerlink" href="#dont-forget-to-unlock" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1">// Bad: no unlock</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">);</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">lock</span><span class="p">.</span><span class="na">lock</span><span class="p">();</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="n">performOperation</span><span class="p">();</span><span class="w">  </span><span class="c1">// If this throws, the lock is never released!</span>
 </code></pre></div>
-<h3 id="dont-use-same-redis-instance-multiple-times">❌ Don't Use Same Redis Instance Multiple Times<a class="headerlink" href="#dont-use-same-redis-instance-multiple-times" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">// Bad: Same instance counted 3 times</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">Redlock</span><span class="w"> </span><span class="n">redlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Redlock</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span><span class="w"> </span><span class="n">pool</span><span class="p">,</span><span class="w"> </span><span class="n">pool</span><span class="p">);</span><span class="w">  </span><span class="c1">// Wrong!</span>
+<p>Always pair <code>lock()</code> / successful <code>tryLock()</code> with <code>unlock()</code> in a <code>finally</code>
+block.</p>
+<h3 id="dont-configure-exactly-2-nodes">Don't Configure Exactly 2 Nodes<a class="headerlink" href="#dont-configure-exactly-2-nodes" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">// Bad: exactly 2 nodes throws IllegalArgumentException at build()</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;redis2&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span><span class="w">  </span><span class="c1">// throws!</span>
 </code></pre></div>
-<h3 id="dont-ignore-lock-acquisition-failures">❌ Don't Ignore Lock Acquisition Failures<a class="headerlink" href="#dont-ignore-lock-acquisition-failures" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1">// Bad: Assuming lock is always acquired</span>
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">redlock</span><span class="p">.</span><span class="na">lock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">);</span>
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">performOperation</span><span class="p">();</span><span class="w">  </span><span class="c1">// What if lock is null?</span>
+<p>Use 1 node (single-node mode) or 3+ nodes (quorum mode).</p>
+<h3 id="dont-ignore-lock-acquisition-failures">Don't Ignore Lock Acquisition Failures<a class="headerlink" href="#dont-ignore-lock-acquisition-failures" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1">// Bad: assuming the lock is always acquired</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">Lock</span><span class="w"> </span><span class="n">lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">manager</span><span class="p">.</span><span class="na">createLock</span><span class="p">(</span><span class="s">&quot;resource&quot;</span><span class="p">);</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">lock</span><span class="p">.</span><span class="na">tryLock</span><span class="p">();</span><span class="w">          </span><span class="c1">// return value ignored</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">performOperation</span><span class="p">();</span><span class="w">      </span><span class="c1">// What if the lock wasn&#39;t acquired?</span>
 </code></pre></div>
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ul>
@@ -2447,7 +2502,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="April 22, 2026 21:03:58 UTC">April 22, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 22, 2026 08:14:13 UTC">July 22, 2026</span>
   </span>
 
     
@@ -2531,7 +2586,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

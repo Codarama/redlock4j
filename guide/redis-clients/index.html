@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../logo-dark.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -33,7 +33,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -749,10 +749,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#connection-pool-configuration" class="md-nav__link">
+  <a href="#node-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Connection Pool Configuration
+        Node Configuration
       
     </span>
   </a>
@@ -821,10 +821,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#advanced-configuration" class="md-nav__link">
+  <a href="#node-configuration_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Advanced Configuration
+        Node Configuration
       
     </span>
   </a>
@@ -898,17 +898,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mixed-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mixed Usage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#connection-management" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -916,34 +905,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Connection Management">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jedis_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Jedis
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#lettuce_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Lettuce
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1722,10 +1683,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#connection-pool-configuration" class="md-nav__link">
+  <a href="#node-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Connection Pool Configuration
+        Node Configuration
       
     </span>
   </a>
@@ -1794,10 +1755,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#advanced-configuration" class="md-nav__link">
+  <a href="#node-configuration_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Advanced Configuration
+        Node Configuration
       
     </span>
   </a>
@@ -1871,17 +1832,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mixed-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mixed Usage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#connection-management" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1889,34 +1839,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Connection Management">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jedis_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Jedis
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#lettuce_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Lettuce
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1952,7 +1874,12 @@
 
 
 <h1 id="redis-clients">Redis Clients<a class="headerlink" href="#redis-clients" title="Permanent link">&para;</a></h1>
-<p>Redlock4j supports both Jedis and Lettuce Redis clients through a clean driver abstraction.</p>
+<p>Redlock4j supports both Jedis and Lettuce Redis clients through a clean driver
+abstraction. You never construct pools or clients yourself: you describe your
+Redis nodes with <code>RedisNodeConfiguration</code> / <code>RedlockConfiguration</code>, and pick the
+driver once when you create the manager via <code>RedlockManager.withJedis(config)</code>
+or <code>RedlockManager.withLettuce(config)</code>. The chosen driver is used for every
+node, and the manager owns the underlying connections.</p>
 <h2 id="jedis">Jedis<a class="headerlink" href="#jedis" title="Permanent link">&para;</a></h2>
 <p>Jedis is a synchronous Redis client that's simple and straightforward.</p>
 <h3 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h3>
@@ -1963,31 +1890,39 @@
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nt">&lt;/dependency&gt;</span>
 </code></pre></div>
 <h3 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">redis.clients.jedis.JedisPool</span><span class="p">;</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.codarama.redlock4j.Redlock</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.codarama.redlock4j.RedlockManager</span><span class="p">;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.codarama.redlock4j.configuration.RedlockConfiguration</span><span class="p">;</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">JedisPool</span><span class="w"> </span><span class="n">pool1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JedisPool</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">);</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">JedisPool</span><span class="w"> </span><span class="n">pool2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JedisPool</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6380</span><span class="p">);</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">JedisPool</span><span class="w"> </span><span class="n">pool3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JedisPool</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6381</span><span class="p">);</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">Redlock</span><span class="w"> </span><span class="n">redlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Redlock</span><span class="p">(</span><span class="n">pool1</span><span class="p">,</span><span class="w"> </span><span class="n">pool2</span><span class="p">,</span><span class="w"> </span><span class="n">pool3</span><span class="p">);</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6380</span><span class="p">)</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6381</span><span class="p">)</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">RedlockManager</span><span class="w"> </span><span class="n">manager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockManager</span><span class="p">.</span><span class="na">withJedis</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>
 </code></pre></div>
-<h3 id="connection-pool-configuration">Connection Pool Configuration<a class="headerlink" href="#connection-pool-configuration" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">redis.clients.jedis.JedisPoolConfig</span><span class="p">;</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">JedisPoolConfig</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JedisPoolConfig</span><span class="p">();</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">config</span><span class="p">.</span><span class="na">setMaxTotal</span><span class="p">(</span><span class="mi">128</span><span class="p">);</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">config</span><span class="p">.</span><span class="na">setMaxIdle</span><span class="p">(</span><span class="mi">128</span><span class="p">);</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">config</span><span class="p">.</span><span class="na">setMinIdle</span><span class="p">(</span><span class="mi">16</span><span class="p">);</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">config</span><span class="p">.</span><span class="na">setTestOnBorrow</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">config</span><span class="p">.</span><span class="na">setTestOnReturn</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="n">config</span><span class="p">.</span><span class="na">setTestWhileIdle</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">config</span><span class="p">.</span><span class="na">setMinEvictableIdleTimeMillis</span><span class="p">(</span><span class="mi">60000</span><span class="p">);</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="n">config</span><span class="p">.</span><span class="na">setTimeBetweenEvictionRunsMillis</span><span class="p">(</span><span class="mi">30000</span><span class="p">);</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="n">config</span><span class="p">.</span><span class="na">setNumTestsPerEvictionRun</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">config</span><span class="p">.</span><span class="na">setBlockWhenExhausted</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="n">JedisPool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JedisPool</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">,</span><span class="w"> </span><span class="mi">2000</span><span class="p">);</span>
+<h3 id="node-configuration">Node Configuration<a class="headerlink" href="#node-configuration" title="Permanent link">&para;</a></h3>
+<p>You don't pass a <code>JedisPool</code> or pool config object. Instead, tune each node with
+<code>RedisNodeConfiguration</code>, which exposes the connection settings Redlock4j needs
+(host, port, optional password and database, and connection/socket timeouts):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.codarama.redlock4j.configuration.RedisNodeConfiguration</span><span class="p">;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.codarama.redlock4j.configuration.RedlockConfiguration</span><span class="p">;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">RedisNodeConfiguration</span><span class="w"> </span><span class="n">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedisNodeConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="p">.</span><span class="na">host</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="p">.</span><span class="na">port</span><span class="p">(</span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="p">.</span><span class="na">password</span><span class="p">(</span><span class="s">&quot;secret&quot;</span><span class="p">)</span><span class="w">        </span><span class="c1">// optional, default null</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="p">.</span><span class="na">database</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">               </span><span class="c1">// optional, default 0</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="p">.</span><span class="na">connectionTimeoutMs</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span><span class="w"> </span><span class="c1">// default 2000</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="p">.</span><span class="na">socketTimeoutMs</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span><span class="w">     </span><span class="c1">// default 2000</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">    </span><span class="c1">// ... add the other nodes ...</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="n">RedlockManager</span><span class="w"> </span><span class="n">manager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockManager</span><span class="p">.</span><span class="na">withJedis</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>
 </code></pre></div>
 <h3 id="advantages">Advantages<a class="headerlink" href="#advantages" title="Permanent link">&para;</a></h3>
 <ul>
@@ -2012,45 +1947,40 @@
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nt">&lt;/dependency&gt;</span>
 </code></pre></div>
 <h3 id="basic-usage_1">Basic Usage<a class="headerlink" href="#basic-usage_1" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.lettuce.core.RedisClient</span><span class="p">;</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.codarama.redlock4j.Redlock</span><span class="p">;</span>
+<p>Selecting Lettuce is a one-line change: the node configuration is identical, you
+just create the manager with <code>withLettuce</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.codarama.redlock4j.RedlockManager</span><span class="p">;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.codarama.redlock4j.configuration.RedlockConfiguration</span><span class="p">;</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">RedisClient</span><span class="w"> </span><span class="n">client1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedisClient</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;redis://localhost:6379&quot;</span><span class="p">);</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">RedisClient</span><span class="w"> </span><span class="n">client2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedisClient</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;redis://localhost:6380&quot;</span><span class="p">);</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">RedisClient</span><span class="w"> </span><span class="n">client3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedisClient</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;redis://localhost:6381&quot;</span><span class="p">);</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">Redlock</span><span class="w"> </span><span class="n">redlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Redlock</span><span class="p">(</span><span class="n">client1</span><span class="p">,</span><span class="w"> </span><span class="n">client2</span><span class="p">,</span><span class="w"> </span><span class="n">client3</span><span class="p">);</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6380</span><span class="p">)</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6381</span><span class="p">)</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="n">RedlockManager</span><span class="w"> </span><span class="n">manager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockManager</span><span class="p">.</span><span class="na">withLettuce</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>
 </code></pre></div>
-<h3 id="advanced-configuration">Advanced Configuration<a class="headerlink" href="#advanced-configuration" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.lettuce.core.RedisURI</span><span class="p">;</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.lettuce.core.ClientOptions</span><span class="p">;</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.lettuce.core.TimeoutOptions</span><span class="p">;</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.lettuce.core.resource.ClientResources</span><span class="p">;</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.lettuce.core.resource.DefaultClientResources</span><span class="p">;</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.time.Duration</span><span class="p">;</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="c1">// Configure client resources</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">ClientResources</span><span class="w"> </span><span class="n">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DefaultClientResources</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="p">.</span><span class="na">ioThreadPoolSize</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="p">.</span><span class="na">computationThreadPoolSize</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="c1">// Configure Redis URI</span>
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="n">RedisURI</span><span class="w"> </span><span class="n">redisUri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedisURI</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">    </span><span class="p">.</span><span class="na">withHost</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">    </span><span class="p">.</span><span class="na">withPort</span><span class="p">(</span><span class="mi">6379</span><span class="p">)</span>
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">    </span><span class="p">.</span><span class="na">withTimeout</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofSeconds</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">    </span><span class="p">.</span><span class="na">withDatabase</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>
-<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="c1">// Configure client options</span>
-<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="n">ClientOptions</span><span class="w"> </span><span class="n">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClientOptions</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="w">    </span><span class="p">.</span><span class="na">autoReconnect</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
-<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="w">    </span><span class="p">.</span><span class="na">timeoutOptions</span><span class="p">(</span><span class="n">TimeoutOptions</span><span class="p">.</span><span class="na">enabled</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofSeconds</span><span class="p">(</span><span class="mi">5</span><span class="p">)))</span>
-<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>
-<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a><span class="n">RedisClient</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedisClient</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span><span class="w"> </span><span class="n">redisUri</span><span class="p">);</span>
-<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="n">client</span><span class="p">.</span><span class="na">setOptions</span><span class="p">(</span><span class="n">options</span><span class="p">);</span>
+<h3 id="node-configuration_1">Node Configuration<a class="headerlink" href="#node-configuration_1" title="Permanent link">&para;</a></h3>
+<p>As with Jedis, you don't build <code>RedisURI</code>, <code>ClientOptions</code>, or
+<code>ClientResources</code> yourself. The same <code>RedisNodeConfiguration</code> fields drive the
+Lettuce driver, including per-node timeouts, password, and database selection:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.codarama.redlock4j.configuration.RedisNodeConfiguration</span><span class="p">;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.codarama.redlock4j.configuration.RedlockConfiguration</span><span class="p">;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">RedisNodeConfiguration</span><span class="w"> </span><span class="n">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedisNodeConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="p">.</span><span class="na">host</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="p">.</span><span class="na">port</span><span class="p">(</span><span class="mi">6379</span><span class="p">)</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="p">.</span><span class="na">database</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="p">.</span><span class="na">connectionTimeoutMs</span><span class="p">(</span><span class="mi">5000</span><span class="p">)</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="p">.</span><span class="na">socketTimeoutMs</span><span class="p">(</span><span class="mi">5000</span><span class="p">)</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="n">RedlockConfiguration</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockConfiguration</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="p">.</span><span class="na">addRedisNode</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">    </span><span class="c1">// ... add the other nodes ...</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="n">RedlockManager</span><span class="w"> </span><span class="n">manager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockManager</span><span class="p">.</span><span class="na">withLettuce</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>
 </code></pre></div>
 <h3 id="advantages_1">Advantages<a class="headerlink" href="#advantages_1" title="Permanent link">&para;</a></h3>
 <ul>
@@ -2080,42 +2010,17 @@
 <li>You're using Redis Cluster or Sentinel</li>
 <li>You need advanced features</li>
 </ul>
-<h2 id="mixed-usage">Mixed Usage<a class="headerlink" href="#mixed-usage" title="Permanent link">&para;</a></h2>
-<p>You can use different clients for different Redis instances:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// Mix Jedis and Lettuce (not recommended, but possible)</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">JedisPool</span><span class="w"> </span><span class="n">jedisPool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JedisPool</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6379</span><span class="p">);</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">RedisClient</span><span class="w"> </span><span class="n">lettuceClient1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedisClient</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;redis://localhost:6380&quot;</span><span class="p">);</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">RedisClient</span><span class="w"> </span><span class="n">lettuceClient2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedisClient</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;redis://localhost:6381&quot;</span><span class="p">);</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="c1">// This works, but stick to one client type for consistency</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="n">Redlock</span><span class="w"> </span><span class="n">redlock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Redlock</span><span class="p">(</span><span class="n">jedisPool</span><span class="p">,</span><span class="w"> </span><span class="n">lettuceClient1</span><span class="p">,</span><span class="w"> </span><span class="n">lettuceClient2</span><span class="p">);</span>
-</code></pre></div>
-<div class="admonition warning">
-<p class="admonition-title">Consistency Recommendation</p>
-<p>While mixing clients is technically possible, it's recommended to use the same client type for all Redis instances for consistency and easier maintenance.</p>
-</div>
 <h2 id="connection-management">Connection Management<a class="headerlink" href="#connection-management" title="Permanent link">&para;</a></h2>
-<h3 id="jedis_1">Jedis<a class="headerlink" href="#jedis_1" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// Always close pools when done</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="c1">// Use redlock</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="n">pool1</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="n">pool2</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="n">pool3</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">}</span>
+<p>The <code>RedlockManager</code> owns the connections to every configured node, regardless
+of which driver you selected. You do not open or close pools or clients
+yourself. Because <code>RedlockManager</code> implements <code>AutoCloseable</code>, closing the
+manager releases all underlying connections:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">RedlockManager</span><span class="w"> </span><span class="n">manager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RedlockManager</span><span class="p">.</span><span class="na">withJedis</span><span class="p">(</span><span class="n">config</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="c1">// Use the manager and the locks it creates</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="p">}</span><span class="w"> </span><span class="c1">// all connections closed automatically</span>
 </code></pre></div>
-<h3 id="lettuce_1">Lettuce<a class="headerlink" href="#lettuce_1" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">// Shutdown clients and resources</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="c1">// Use redlock</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="n">client1</span><span class="p">.</span><span class="na">shutdown</span><span class="p">();</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="n">client2</span><span class="p">.</span><span class="na">shutdown</span><span class="p">();</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="n">client3</span><span class="p">.</span><span class="na">shutdown</span><span class="p">();</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="n">resources</span><span class="p">.</span><span class="na">shutdown</span><span class="p">();</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="p">}</span>
-</code></pre></div>
+<p>If you manage the manager's lifecycle manually, call <code>manager.close()</code> when your
+application shuts down.</p>
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../best-practices/">Best Practices</a> - Follow recommended practices</li>
@@ -2143,7 +2048,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="February 9, 2026 16:44:59 UTC">February 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 22, 2026 08:14:13 UTC">July 22, 2026</span>
   </span>
 
     
@@ -2227,7 +2132,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       

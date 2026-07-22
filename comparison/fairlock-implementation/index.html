@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../logo-dark.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -33,7 +33,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1473,6 +1473,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#measured-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measured Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2290,6 +2301,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#measured-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measured Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2510,14 +2532,14 @@
 <li><strong>Verification</strong>: <code>isAtFrontOfQueue()</code> checks across multiple nodes</li>
 <li><strong>Clock Dependency</strong>: Relies on reasonably synchronized clocks</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">votesForFront</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">RedisDriver</span><span class="w"> </span><span class="n">driver</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">redisDrivers</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">firstElements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">driver</span><span class="p">.</span><span class="na">zRange</span><span class="p">(</span><span class="n">queueKey</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">firstElements</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">token</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">firstElements</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">        </span><span class="n">votesForFront</span><span class="o">++</span><span class="p">;</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">}</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="k">return</span><span class="w"> </span><span class="n">votesForFront</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="na">getQuorum</span><span class="p">();</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// The execution strategy fans out to the appropriate nodes and applies the</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1">// quorum rule; a node &quot;votes&quot; for the token if it is at the front of that</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1">// node&#39;s queue.</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="kt">int</span><span class="w"> </span><span class="n">votesForFront</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">executionStrategy</span><span class="p">.</span><span class="na">executeOnNodes</span><span class="p">(</span><span class="n">driver</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">firstElements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">driver</span><span class="p">.</span><span class="na">zRange</span><span class="p">(</span><span class="n">queueKey</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">!</span><span class="n">firstElements</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">token</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">firstElements</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">});</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="k">return</span><span class="w"> </span><span class="n">executionStrategy</span><span class="p">.</span><span class="na">isSuccessful</span><span class="p">(</span><span class="n">votesForFront</span><span class="p">);</span>
 </code></pre></div>
 <h3 id="redisson_2">Redisson<a class="headerlink" href="#redisson_2" title="Permanent link">&para;</a></h3>
 <ul>
@@ -2541,16 +2563,17 @@
 <h3 id="redlock4j_3">redlock4j<a class="headerlink" href="#redlock4j_3" title="Permanent link">&para;</a></h3>
 <p><strong>Strategy</strong>: Periodic cleanup during queue operations</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">private</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">addToQueue</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">token</span><span class="p">,</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">timestamp</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="c1">// Add to queue</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">RedisDriver</span><span class="w"> </span><span class="n">driver</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">redisDrivers</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="c1">// Add to queue on the appropriate nodes via the execution strategy</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="n">executionStrategy</span><span class="p">.</span><span class="na">executeOnNodes</span><span class="p">(</span><span class="n">driver</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">        </span><span class="n">driver</span><span class="p">.</span><span class="na">zAdd</span><span class="p">(</span><span class="n">queueKey</span><span class="p">,</span><span class="w"> </span><span class="n">timestamp</span><span class="p">,</span><span class="w"> </span><span class="n">token</span><span class="p">);</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="c1">// Cleanup expired entries</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">expirationThreshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">()</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">        </span><span class="o">-</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="na">getDefaultLockTimeoutMs</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="n">cleanupExpiredQueueEntries</span><span class="p">(</span><span class="n">expirationThreshold</span><span class="p">);</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">}</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="p">});</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="c1">// Cleanup expired entries (older than 2x the lock timeout)</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="n">Duration</span><span class="w"> </span><span class="n">expirationAge</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config</span><span class="p">.</span><span class="na">getDefaultLockTimeout</span><span class="p">().</span><span class="na">multipliedBy</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">expirationThreshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">expirationAge</span><span class="p">.</span><span class="na">toMillis</span><span class="p">();</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="n">cleanupExpiredQueueEntries</span><span class="p">(</span><span class="n">expirationThreshold</span><span class="p">);</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>Characteristics</strong>:
 - Cleanup triggered on <code>addToQueue()</code>
@@ -2754,30 +2777,30 @@
 <h3 id="redlock4j_7">redlock4j<a class="headerlink" href="#redlock4j_7" title="Permanent link">&para;</a></h3>
 <p><strong>Lines of Code</strong>: ~390 lines</p>
 <p><strong>Pros</strong>:
-- ✅ Simpler to understand
-- ✅ Single data structure (sorted set)
-- ✅ Fewer Redis operations
-- ✅ Less state to manage
-- ✅ Timestamp-based ordering is intuitive</p>
+- Simpler to understand
+- Single data structure (sorted set)
+- Fewer Redis operations
+- Less state to manage
+- Timestamp-based ordering is intuitive</p>
 <p><strong>Cons</strong>:
-- ❌ Clock skew sensitivity
-- ❌ Polling-based (no notifications)
-- ❌ Cleanup only on addToQueue
-- ❌ Less sophisticated timeout handling</p>
+- Clock skew sensitivity
+- Polling-based (no notifications)
+- Cleanup only on addToQueue
+- Less sophisticated timeout handling</p>
 <h3 id="redisson_7">Redisson<a class="headerlink" href="#redisson_7" title="Permanent link">&para;</a></h3>
 <p><strong>Lines of Code</strong>: ~350 lines (but denser Lua scripts)</p>
 <p><strong>Pros</strong>:
-- ✅ Robust stale thread handling
-- ✅ Better timeout estimation
-- ✅ Explicit thread notification (pub/sub)
-- ✅ Less clock-dependent (list ordering)
-- ✅ Production-hardened</p>
+- Robust stale thread handling
+- Better timeout estimation
+- Explicit thread notification (pub/sub)
+- Less clock-dependent (list ordering)
+- Production-hardened</p>
 <p><strong>Cons</strong>:
-- ❌ More complex implementation
-- ❌ Two data structures to maintain
-- ❌ More Redis operations per attempt
-- ❌ Cleanup overhead on every operation
-- ❌ Requires pub/sub infrastructure</p>
+- More complex implementation
+- Two data structures to maintain
+- More Redis operations per attempt
+- Cleanup overhead on every operation
+- Requires pub/sub infrastructure</p>
 <h2 id="performance-comparison">Performance Comparison<a class="headerlink" href="#performance-comparison" title="Permanent link">&para;</a></h2>
 <h3 id="redlock4j_8">redlock4j<a class="headerlink" href="#redlock4j_8" title="Permanent link">&para;</a></h3>
 <p><strong>Lock Acquisition</strong>:
@@ -2802,6 +2825,55 @@
   - Lock release
   - Pub/sub notification</p>
 <p><strong>Total</strong>: Fewer round trips, but heavier Lua scripts</p>
+<h3 id="measured-performance">Measured Performance<a class="headerlink" href="#measured-performance" title="Permanent link">&para;</a></h3>
+<p>Benchmark: 5 clients, 50 ms work per cycle, 3-node Redis 7 cluster, 60 s measurement (full methodology in <a href="../../guide/architecture/#performance-analysis">Architecture › Performance Analysis</a>).</p>
+<table>
+<thead>
+<tr>
+<th>Implementation</th>
+<th style="text-align: right;">Ops/s</th>
+<th style="text-align: right;">p50 (ms)</th>
+<th style="text-align: right;">p99 (ms)</th>
+<th style="text-align: right;">mean (ms)</th>
+<th style="text-align: right;">success</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Redisson</strong></td>
+<td style="text-align: right;"><strong>16.99</strong></td>
+<td style="text-align: right;"><strong>221</strong></td>
+<td style="text-align: right;"><strong>230</strong></td>
+<td style="text-align: right;">248</td>
+<td style="text-align: right;">100 %</td>
+</tr>
+<tr>
+<td>redlock4j-singlenode</td>
+<td style="text-align: right;">12.42</td>
+<td style="text-align: right;">332</td>
+<td style="text-align: right;">435</td>
+<td style="text-align: right;">349</td>
+<td style="text-align: right;">100 %</td>
+</tr>
+<tr>
+<td>redlock4j-3node (Jedis)</td>
+<td style="text-align: right;">2.95</td>
+<td style="text-align: right;">1,666</td>
+<td style="text-align: right;">2,457</td>
+<td style="text-align: right;">1,642</td>
+<td style="text-align: right;">100 %</td>
+</tr>
+<tr>
+<td>redlock4j-3node (Lettuce)</td>
+<td style="text-align: right;">2.87</td>
+<td style="text-align: right;">1,667</td>
+<td style="text-align: right;">2,549</td>
+<td style="text-align: right;">1,685</td>
+<td style="text-align: right;">100 %</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reading the numbers</strong>: Redisson leads on both throughput and p99 in single-node mode because its atomic Lua scripts collapse the queue-check + acquire into one round trip. redlock4j's 3-node mode is throughput-limited by the per-attempt quorum head-check (<code>ZRANGE</code> on every node). The structural fix is tracked as P2-8 (single-shot atomic head-check + acquire) in <code>redlock4j-benchmark/benchmark-analysis.md</code> §8. Note: FairLock deliberately uses fixed-interval polling — exponential backoff hurts FairLock because head-of-queue waiters must claim the lock the instant the holder releases.</p>
 <h2 id="edge-cases-robustness">Edge Cases &amp; Robustness<a class="headerlink" href="#edge-cases-robustness" title="Permanent link">&para;</a></h2>
 <h3 id="redlock4j_9">redlock4j<a class="headerlink" href="#redlock4j_9" title="Permanent link">&para;</a></h3>
 <p><strong>Clock Skew</strong>:
@@ -2872,8 +2944,8 @@
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">LockState</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">lockValue</span><span class="p">;</span>
 <a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">queueToken</span><span class="p">;</span>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">acquisitionTime</span><span class="p">;</span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">validityTime</span><span class="p">;</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">Instant</span><span class="w"> </span><span class="n">acquisitionTime</span><span class="p">;</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">Duration</span><span class="w"> </span><span class="n">validityDuration</span><span class="p">;</span>
 <a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">holdCount</span><span class="p">;</span>
 <a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="p">}</span>
 <a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>
@@ -2920,7 +2992,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="February 27, 2026 14:11:21 UTC">February 27, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 22, 2026 08:14:13 UTC">July 22, 2026</span>
   </span>
 
     
@@ -3004,7 +3076,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       
