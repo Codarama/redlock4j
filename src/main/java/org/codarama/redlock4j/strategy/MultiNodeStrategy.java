@@ -15,13 +15,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
@@ -166,13 +160,10 @@ public class MultiNodeStrategy implements LockExecutionStrategy {
         int successCount = 0;
         for (CompletableFuture<Boolean> future : futures) {
             try {
-                if (Boolean.TRUE.equals(future.get())) {
+                if (Boolean.TRUE.equals(future.join())) {
                     successCount++;
                 }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            } catch (ExecutionException e) {
+            } catch (CompletionException e) {
                 logger.warn("Unexpected error during {}: {}", description, e.getMessage());
             }
         }
