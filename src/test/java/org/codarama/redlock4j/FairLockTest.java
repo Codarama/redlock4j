@@ -13,12 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -85,7 +87,10 @@ public class FairLockTest {
 
         FairLock lock = new FairLock("test-fair", drivers, testConfig, null);
 
-        boolean acquired = lock.tryLock(Duration.ofMillis(100));
+        // A zero timeout skips the deadline check, so the queue is always consulted exactly once. Under a wall-clock
+        // budget a slow fan-out can expire the deadline before the first zRange, leaving those stubs unused and
+        // failing the test under strict stubbing.
+        boolean acquired = lock.tryLock(Duration.ZERO);
 
         assertFalse(acquired);
         assertFalse(lock.isHeldByCurrentThread());
@@ -141,7 +146,8 @@ public class FairLockTest {
         lenient().when(mockDriver3.zAdd(anyString(), anyDouble(), anyString())).thenReturn(true);
 
         // Someone else is always at the front of the queue
-        when(mockDriver1.zRange(anyString(), eq(0L), eq(0L))).thenReturn(Collections.singletonList("other-token"));
+        lenient().when(mockDriver1.zRange(anyString(), eq(0L), eq(0L)))
+                .thenReturn(Collections.singletonList("other-token"));
         lenient().when(mockDriver2.zRange(anyString(), eq(0L), eq(0L)))
                 .thenReturn(Collections.singletonList("other-token"));
         lenient().when(mockDriver3.zRange(anyString(), eq(0L), eq(0L)))
@@ -162,18 +168,22 @@ public class FairLockTest {
         RedlockConfiguration shortConfig = shortRetryConfig();
 
         // Add to queue and become the front-most waiter
+        // FairLock generates the queue token internally, so capture what the drivers actually receive. Every stubbing
+        // call stays on this thread: the zAdd answers run on parallel fan-out threads, and Mockito cannot safely stub
+        // a mock while another thread is invoking it.
+        AtomicReference<String> queueToken = new AtomicReference<>();
+
         when(mockDriver1.zAdd(anyString(), anyDouble(), anyString())).thenAnswer(inv -> {
-            String token = inv.getArgument(2);
-            lenient().when(mockDriver1.zRange(anyString(), eq(0L), eq(0L)))
-                    .thenReturn(Collections.singletonList(token));
-            lenient().when(mockDriver2.zRange(anyString(), eq(0L), eq(0L)))
-                    .thenReturn(Collections.singletonList(token));
-            lenient().when(mockDriver3.zRange(anyString(), eq(0L), eq(0L)))
-                    .thenReturn(Collections.singletonList(token));
+            queueToken.set(inv.getArgument(2));
             return true;
         });
         lenient().when(mockDriver2.zAdd(anyString(), anyDouble(), anyString())).thenReturn(true);
         lenient().when(mockDriver3.zAdd(anyString(), anyDouble(), anyString())).thenReturn(true);
+        // The head of the queue is our own token, so this thread is the front-most waiter.
+        Answer<List<String>> queueHeadIsOurToken = inv -> Collections.singletonList(queueToken.get());
+        lenient().when(mockDriver1.zRange(anyString(), eq(0L), eq(0L))).thenAnswer(queueHeadIsOurToken);
+        lenient().when(mockDriver2.zRange(anyString(), eq(0L), eq(0L))).thenAnswer(queueHeadIsOurToken);
+        lenient().when(mockDriver3.zRange(anyString(), eq(0L), eq(0L))).thenAnswer(queueHeadIsOurToken);
 
         // We are at the front, but the underlying lock cannot be acquired (quorum not met)
         lenient().when(mockDriver1.setIfNotExists(anyString(), anyString(), anyLong())).thenReturn(false);
@@ -222,7 +232,8 @@ public class FairLockTest {
         lenient().when(mockDriver2.zAdd(anyString(), anyDouble(), anyString())).thenReturn(true);
         lenient().when(mockDriver3.zAdd(anyString(), anyDouble(), anyString())).thenReturn(true);
 
-        when(mockDriver1.zRange(anyString(), eq(0L), eq(0L))).thenReturn(Collections.singletonList("other-token"));
+        lenient().when(mockDriver1.zRange(anyString(), eq(0L), eq(0L)))
+                .thenReturn(Collections.singletonList("other-token"));
         lenient().when(mockDriver2.zRange(anyString(), eq(0L), eq(0L)))
                 .thenReturn(Collections.singletonList("other-token"));
         lenient().when(mockDriver3.zRange(anyString(), eq(0L), eq(0L)))
@@ -242,7 +253,8 @@ public class FairLockTest {
         lenient().when(mockDriver2.zAdd(anyString(), anyDouble(), anyString())).thenReturn(true);
         lenient().when(mockDriver3.zAdd(anyString(), anyDouble(), anyString())).thenReturn(true);
 
-        when(mockDriver1.zRange(anyString(), eq(0L), eq(0L))).thenReturn(Collections.singletonList("other-token"));
+        lenient().when(mockDriver1.zRange(anyString(), eq(0L), eq(0L)))
+                .thenReturn(Collections.singletonList("other-token"));
         lenient().when(mockDriver2.zRange(anyString(), eq(0L), eq(0L)))
                 .thenReturn(Collections.singletonList("other-token"));
         lenient().when(mockDriver3.zRange(anyString(), eq(0L), eq(0L)))
@@ -311,18 +323,24 @@ public class FairLockTest {
     }
 
     private void setupSuccessfulAcquisition() throws RedisDriverException {
+        // FairLock generates the queue token internally, so capture what the drivers actually receive. Every stubbing
+        // call stays on this thread: the zAdd answers run on parallel fan-out threads, and Mockito cannot safely stub
+        // a mock while another thread is invoking it.
+        AtomicReference<String> queueToken = new AtomicReference<>();
+
         when(mockDriver1.zAdd(anyString(), anyDouble(), anyString())).thenAnswer(inv -> {
-            String token = inv.getArgument(2);
-            lenient().when(mockDriver1.zRange(anyString(), eq(0L), eq(0L)))
-                    .thenReturn(Collections.singletonList(token));
-            lenient().when(mockDriver2.zRange(anyString(), eq(0L), eq(0L)))
-                    .thenReturn(Collections.singletonList(token));
-            lenient().when(mockDriver3.zRange(anyString(), eq(0L), eq(0L)))
-                    .thenReturn(Collections.singletonList(token));
+            queueToken.set(inv.getArgument(2));
             return true;
         });
         when(mockDriver2.zAdd(anyString(), anyDouble(), anyString())).thenReturn(true);
         when(mockDriver3.zAdd(anyString(), anyDouble(), anyString())).thenReturn(true);
+
+        // The head of the queue is our own token, so this thread is the front-most waiter.
+        Answer<List<String>> queueHeadIsOurToken = inv -> Collections.singletonList(queueToken.get());
+        lenient().when(mockDriver1.zRange(anyString(), eq(0L), eq(0L))).thenAnswer(queueHeadIsOurToken);
+        lenient().when(mockDriver2.zRange(anyString(), eq(0L), eq(0L))).thenAnswer(queueHeadIsOurToken);
+        lenient().when(mockDriver3.zRange(anyString(), eq(0L), eq(0L))).thenAnswer(queueHeadIsOurToken);
+
         when(mockDriver1.setIfNotExists(anyString(), anyString(), anyLong())).thenReturn(true);
         when(mockDriver2.setIfNotExists(anyString(), anyString(), anyLong())).thenReturn(true);
         when(mockDriver3.setIfNotExists(anyString(), anyString(), anyLong())).thenReturn(true);
